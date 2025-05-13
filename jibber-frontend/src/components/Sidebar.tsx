@@ -4,14 +4,14 @@ import ChatPreview from "./ChatPreview"
 const Sidebar = () => {
   return (
     <div className="h-screen w-[500px] p-2 bg-neutral-50 outline-1 outline-neutral-200 poppins-regular">
-        <div className="flex gap-4 items-center border-b-2 border-neutral-200 p-1.5">
-            <span className="w-12 h-12 flex justify-center items-center rounded-full hover:bg-neutral-200 cursor-pointer duration-300"><MenuIcon/></span>
-            <span className="text-2xl text-neutral-800">Messages</span>
+        <div className="flex gap-4 items-center border-b-2 border-neutral-200">
+            <span className="w-11 h-11 flex justify-center items-center rounded-full hover:bg-neutral-200 cursor-pointer duration-300"><MenuIcon size={20}/></span>
+            <span className="text-xl text-neutral-800">Messages</span>
             <span className="px-2 h-fit text-xs py-0.5 bg-red-400 rounded-full text-white">13</span>
         </div>
         
         <div >
-            <input type="text" placeholder="Search" className="bg-neutral-100 outline-1 outline-neutral-300 text-lg text-neutral-800 px-4 h-11 mt-4 w-full rounded-xl"/>
+            <input type="text" placeholder="Search" className="bg-neutral-100 outline-1 outline-neutral-300 text-neutral-800 px-4 h-10 text-sm mt-4 w-full rounded-xl"/>
         </div>
         <div className="pt-5">
             <ChatPreview name="Siddhant Chaturvedi" lastChatText="Hello" icon="https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D" />

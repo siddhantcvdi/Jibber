@@ -50,15 +50,15 @@ const ChatArea = () => {
   return (
     <div className="h-screen w-full bg-neutral-50 outline-1 outline-neutral-200 poppins-regular">
       <div className="w-full h-18 bg-neutral-50">
-        <div className="flex gap-4 items-center p-3.5 border-b-2 cursor-pointer border-neutral-200 mx-2">
-          <span className="w-10 overflow-hidden h-10 bg-neutral-800 text-white flex justify-center items-center rounded-full">
+        <div className="flex gap-4 items-center p-2.5 border-b-2 cursor-pointer border-neutral-200 mx-2">
+          <span className="w-8 overflow-hidden h-8 bg-neutral-800 text-white flex justify-center items-center rounded-full">
             <img
               src="https://images.moneycontrol.com/static-mcnews/2024/12/20241211112438_BeFunky-collage-2024-12-11T165424.810.jpg?impolicy=website&width=770&height=431"
               className="object-cover h-full w-full"
               alt=""
             />
           </span>
-          <span className="text-xl text-neutral-800">Donald Duck</span>
+          <span className="text-lg text-neutral-800">Donald Duck</span>
         </div>
       </div>
       <div className="flex flex-col gap-2 p-4 h-[calc(100vh-140px)] overflow-y-auto">

@@ -13,7 +13,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({ name, lastChatText, icon }) =
                 <img src={icon} alt="" className="h-full w-full object-cover" />
             </div>
             <div className="flex-1 overflow-hidden">
-                <div className="text-xl">{name}</div>
+                <div className="text-lg">{name}</div>
                 <div className="text-neutral-700 text-[14px] text-nowrap truncate">{lastChatText}</div>
             </div>
         </div>

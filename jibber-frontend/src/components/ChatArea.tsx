@@ -12,7 +12,7 @@ const ChatArea = () => {
   const [messages, setMessages] = useState<Message[]>([
     { text: "Hello, how are you?", isSentByMe: false, timestamp: "10:30 AM" },
     { text: "I'm good, thanks! How about you?", isSentByMe: true, timestamp: "10:31 AM" },
-    { text: "I'm doing well too!", isSentByMe: true, timestamp: "10:31 AM" },
+    { text: "I'm doing well too!", isSentByMe: false, timestamp: "10:31 AM" },
   ]);
 
   const [newMessage, setNewMessage] = useState("");
@@ -61,7 +61,7 @@ const ChatArea = () => {
           <span className="text-lg text-neutral-800">Donald Duck</span>
         </div>
       </div>
-      <div className="flex flex-col gap-2 p-4 h-[calc(100vh-140px)] overflow-y-auto">
+      <div className="flex flex-col gap-0.5 p-4 h-[calc(100vh-140px)] overflow-y-auto">
         {messages.map((message, index) => {
           const isLastInGroup =
             index === messages.length - 1 ||

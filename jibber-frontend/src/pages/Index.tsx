@@ -2,7 +2,7 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { CTA } from "@/components/CTA";
 import { Button } from "@/components/ui/button";
-import { Lock, MessageCircle } from "lucide-react";
+import { Lock} from "lucide-react";
 
 const Index = () => {
   const handleContinue = () => {

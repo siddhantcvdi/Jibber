@@ -15,7 +15,7 @@ export function Hero() {
         Send messages with confidence. Your conversations are protected with military-grade encryption
         that keeps your data private and secure.
       </p>
-      <Button size="lg" className="bg-[#5e63f9] hover:bg-[#5355ab] text-white font-medium px-8 py-6 text-lg rounded-full">
+      <Button size="lg" className="bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white font-medium px-8 py-6 text-lg rounded-full">
         Continue
       </Button>
     </div>

@@ -13,7 +13,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col poppins-regular">
       {/* Header */}
       <header className="py-4 px-6 flex items-center justify-between border-b">
         <div className="flex items-center">
@@ -21,8 +21,8 @@ const Index = () => {
           <span className="font-bold text-xl ml-2">Jibber</span>
         </div>
         <div>
-          <Button variant="ghost" className="mr-2">Sign In</Button>
-          <Button className="bg-[#5e63f9] hover:bg-[#5355ab] text-white">Sign Up</Button>
+          <Button variant="ghost" className="mr-2 cursor-pointer">Sign In</Button>
+          <Button className="bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white">Sign Up</Button>
         </div>
       </header>
 
@@ -65,54 +65,55 @@ const Index = () => {
                 <span>No data mining or advertising based on your messages</span>
               </div>
               <Button 
-                className="mt-4 bg-[#5e63f9] hover:bg-[#5355ab] text-white rounded-full px-8"
+                className="mt-4 bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white rounded-full px-8"
                 onClick={handleContinue}
               >
                 Continue
               </Button>
             </div>
+
             <div className="md:w-1/2 flex justify-center mt-8 md:mt-0">
-              <div className="relative w-[280px] h-[560px] bg-gray-900 rounded-[36px] p-3 shadow-xl border-4 border-gray-800">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1/3 h-6 bg-gray-800 rounded-b-xl"></div>
-                <div className="w-full h-full bg-white rounded-[28px] overflow-hidden">
+              <div className="relative w-[280px] h-[560px] bg-gray-900 rounded-[48px] p-1 shadow-xl border-4 border-gray-800">
+                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-1/3 h-5 bg-gray-900 rounded-xl"></div>
+                <div className="w-full h-full bg-white rounded-[42px] overflow-hidden">
                   {/* Header */}
-                  <div className="bg-gray-100 p-4 flex items-center">
+                  <div className="bg-gray-100 p-4 pb-2 flex items-center">
                     <div className="w-8 h-8 rounded-full bg-[#eef0ff] flex items-center justify-center">
-                      <span className="text-[#5e63f9] font-bold">DD</span>
+                      <span className="text-[#5e63f9] mt-3 font-bold">DD</span>
                     </div>
-                    <div className="ml-3">
+                    <div className="ml-3 mt-4">
                       <p className="font-medium">Donald Duck</p>
                     </div>
                   </div>
                   
                   {/* Messages */}
-                  <div className="p-4 h-[460px] overflow-y-auto flex flex-col space-y-4">
+                  <div className="p-4 h-[425px] overflow-y-auto flex flex-col space-y-4 text-sm">
                     <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none max-w-[80%] self-start">
                       <p>Hello, how are you?</p>
-                      <p className="text-xs text-gray-400 mt-1">10:30 AM</p>
+                      <p className="text-[10px] text-gray-400 mt-1">10:30 AM</p>
                     </div>
                     
                     <div className="bg-[#5e63f9] p-3 rounded-2xl rounded-tr-none max-w-[80%] self-end text-white">
                       <p>I'm good, thanks! How about you?</p>
-                      <p className="text-xs text-[#e0e1ff] mt-1">10:32 AM</p>
+                      <p className="text-[10px] text-[#e0e1ff] mt-1">10:32 AM</p>
                     </div>
                     
                     <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none max-w-[80%] self-start">
                       <p>I'm doing well too!</p>
-                      <p className="text-xs text-gray-400 mt-1">10:33 AM</p>
+                      <p className="text-[10px] text-gray-400 mt-1">10:33 AM</p>
                     </div>
                   </div>
                   
                   {/* Input field */}
-                  <div className="p-4 border-t">
-                    <div className="bg-gray-100 rounded-full flex items-center p-1 pl-4">
+                  <div className="p-2 pt-1 border-t px-4">
+                    <div className="bg-gray-100 rounded-xl flex items-center p-1 pl-4">
                       <input 
                         type="text" 
                         placeholder="Type a message..." 
-                        className="bg-transparent outline-none flex-1 text-sm"
+                        className="bg-transparent outline-none w-full flex-1 text-sm"
                         readOnly
                       />
-                      <button className="bg-[#5e63f9] h-8 w-8 rounded-full flex items-center justify-center">
+                      <button className="bg-[#5e63f9] h-8 w-8 rounded-lg flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                           <path d="M22 2L11 13"></path>
                           <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>

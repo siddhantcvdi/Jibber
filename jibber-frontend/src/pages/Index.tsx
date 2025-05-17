@@ -3,6 +3,8 @@ import { Features } from "@/components/Features";
 import { CTA } from "@/components/CTA";
 import { Button } from "@/components/ui/button";
 import { Lock} from "lucide-react";
+import jibber from "../assets/jibber.png"
+
 
 const Index = () => {
   const handleContinue = () => {
@@ -15,12 +17,12 @@ const Index = () => {
       {/* Header */}
       <header className="py-4 px-6 flex items-center justify-between border-b">
         <div className="flex items-center">
-          <img src="/lovable-uploads/4f87853d-f43a-489f-8e35-c44bdba29e44.png" alt="Jibber Logo" className="h-8 w-8" />
+          <img src={jibber} alt="Jibber Logo" className="h-8 w-8" />
           <span className="font-bold text-xl ml-2">Jibber</span>
         </div>
         <div>
           <Button variant="ghost" className="mr-2">Sign In</Button>
-          <Button className="bg-[#6366c7] hover:bg-[#5355ab] text-white">Sign Up</Button>
+          <Button className="bg-[#5e63f9] hover:bg-[#5355ab] text-white">Sign Up</Button>
         </div>
       </header>
 
@@ -51,19 +53,19 @@ const Index = () => {
                 stay between you and your recipients.
               </p>
               <div className="flex items-center mb-4">
-                <Lock className="h-5 w-5 text-[#6366c7] mr-2" />
+                <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>Messages cannot be intercepted or read by third parties</span>
               </div>
               <div className="flex items-center mb-4">
-                <Lock className="h-5 w-5 text-[#6366c7] mr-2" />
+                <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>Automated deletion options for sensitive conversations</span>
               </div>
               <div className="flex items-center mb-4">
-                <Lock className="h-5 w-5 text-[#6366c7] mr-2" />
+                <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>No data mining or advertising based on your messages</span>
               </div>
               <Button 
-                className="mt-4 bg-[#6366c7] hover:bg-[#5355ab] text-white rounded-full px-8"
+                className="mt-4 bg-[#5e63f9] hover:bg-[#5355ab] text-white rounded-full px-8"
                 onClick={handleContinue}
               >
                 Continue
@@ -76,7 +78,7 @@ const Index = () => {
                   {/* Header */}
                   <div className="bg-gray-100 p-4 flex items-center">
                     <div className="w-8 h-8 rounded-full bg-[#eef0ff] flex items-center justify-center">
-                      <span className="text-[#6366c7] font-bold">DD</span>
+                      <span className="text-[#5e63f9] font-bold">DD</span>
                     </div>
                     <div className="ml-3">
                       <p className="font-medium">Donald Duck</p>
@@ -90,7 +92,7 @@ const Index = () => {
                       <p className="text-xs text-gray-400 mt-1">10:30 AM</p>
                     </div>
                     
-                    <div className="bg-[#6366c7] p-3 rounded-2xl rounded-tr-none max-w-[80%] self-end text-white">
+                    <div className="bg-[#5e63f9] p-3 rounded-2xl rounded-tr-none max-w-[80%] self-end text-white">
                       <p>I'm good, thanks! How about you?</p>
                       <p className="text-xs text-[#e0e1ff] mt-1">10:32 AM</p>
                     </div>
@@ -110,7 +112,7 @@ const Index = () => {
                         className="bg-transparent outline-none flex-1 text-sm"
                         readOnly
                       />
-                      <button className="bg-[#6366c7] h-8 w-8 rounded-full flex items-center justify-center">
+                      <button className="bg-[#5e63f9] h-8 w-8 rounded-full flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                           <path d="M22 2L11 13"></path>
                           <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
@@ -134,7 +136,7 @@ const Index = () => {
       <footer className="bg-gray-800 text-white py-6 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center mb-4 md:mb-0">
-            <img src="/lovable-uploads/4f87853d-f43a-489f-8e35-c44bdba29e44.png" alt="Jibber Logo" className="h-6 w-6 invert" />
+            <img src={jibber} alt="Jibber Logo" className="h-6 w-6" />
             <span className="font-bold text-xl ml-2">Jibber</span>
           </div>
           <div className="text-sm text-gray-400">

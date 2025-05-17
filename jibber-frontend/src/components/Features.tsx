@@ -1,4 +1,4 @@
-
+import jibber from "../assets/jibber.png"
 import { MessageCircle, Lock } from "lucide-react";
 
 interface FeatureProps {
@@ -30,7 +30,7 @@ export function Features() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <Feature
-          icon={<img src="/lovable-uploads/4f87853d-f43a-489f-8e35-c44bdba29e44.png" alt="Jibber Icon" className="h-6 w-6 text-[#6366c7]" />}
+          icon={<img src={jibber} alt="Jibber Icon" className="h-6 w-6 text-[#6366c7]" />}
           title="End-to-End Encryption"
           description="Your messages are encrypted on your device and can only be decrypted by the recipient."
         />

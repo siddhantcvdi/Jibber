@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
-
 export function CTA() {
   return (
-    <div className="bg-[#6366c7] py-16 px-4">
+    <div className="bg-[#5e63f9] py-16 px-4">
       <div className="max-w-4xl mx-auto text-center">
         <div className="flex items-center justify-center mb-6">
-          <img src="/lovable-uploads/4f87853d-f43a-489f-8e35-c44bdba29e44.png" alt="Jibber Logo" className="h-10 w-10 invert" />
+          <h1 className="text-3xl font-bold text-white">Jibber</h1>
         </div>
         <h2 className="text-3xl font-bold text-white mb-4">
           Ready to chat securely?

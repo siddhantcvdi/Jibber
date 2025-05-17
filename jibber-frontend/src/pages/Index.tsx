@@ -45,22 +45,22 @@ const Index = () => {
         {/* Mobile Preview Section */}
         <section className="py-16 px-4 md:px-6">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold mb-4">Privacy at your fingertips</h2>
-              <p className="text-lg text-muted-foreground mb-6">
+            <div className="md:w-1/2 max-md:text-center">
+              <h2 className="text-2xl md:text-3xl font-bold mb-4">Privacy at your fingertips</h2>
+              <p className="text-muted-foreground mb-6">
                 Jibber puts you in control of your digital conversations. 
                 With our intuitive interface and powerful encryption, your messages 
                 stay between you and your recipients.
               </p>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center mb-4 text-left text-sm">
                 <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>Messages cannot be intercepted or read by third parties</span>
               </div>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center mb-4 text-left text-sm">
                 <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>Automated deletion options for sensitive conversations</span>
               </div>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center mb-4 text-left text-sm">
                 <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>No data mining or advertising based on your messages</span>
               </div>

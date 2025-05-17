@@ -3,10 +3,7 @@ export function CTA() {
   return (
     <div className="bg-[#5e63f9] py-16 px-4">
       <div className="max-w-4xl mx-auto text-center">
-        <div className="flex items-center justify-center mb-6">
-          <h1 className="text-3xl font-bold text-white">Jibber</h1>
-        </div>
-        <h2 className="text-3xl font-bold text-white mb-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
           Ready to chat securely?
         </h2>
         <p className="text-[#e0e1ff] text-lg mb-8 max-w-2xl mx-auto">

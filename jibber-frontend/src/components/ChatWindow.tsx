@@ -7,8 +7,7 @@ interface Message {
   isSentByMe: boolean;
   timestamp: string;
 }
-
-const ChatArea = () => {
+const ChatWindow = () => {
   const [messages, setMessages] = useState<Message[]>([
     { text: "Hello, how are you?", isSentByMe: false, timestamp: "10:30 AM" },
     { text: "I'm good, thanks! How about you?", isSentByMe: true, timestamp: "10:31 AM" },
@@ -48,7 +47,7 @@ const ChatArea = () => {
   }, [messages]);
 
   return (
-    <div className="h-screen w-full bg-neutral-50 outline-1 outline-neutral-200 poppins-regular">
+    <div className="h-screen flex-1 bg-neutral-50 outline-1 outline-neutral-200 poppins-regular">
       <div className="w-full h-18 bg-neutral-50">
         <div className="flex gap-4 items-center p-2.5 border-b-2 cursor-pointer border-neutral-200 mx-2">
           <span className="w-8 overflow-hidden h-8 bg-neutral-800 text-white flex justify-center items-center rounded-full">
@@ -65,7 +64,8 @@ const ChatArea = () => {
         {messages.map((message, index) => {
           const isLastInGroup =
             index === messages.length - 1 ||
-            messages[index + 1].timestamp !== message.timestamp;
+            messages[index + 1].timestamp !== message.timestamp ||
+            messages[index + 1].isSentByMe !== message.isSentByMe;
 
           return (
             <ChatBubble
@@ -73,7 +73,7 @@ const ChatArea = () => {
               text={message.text}
               isSentByMe={message.isSentByMe}
               timestamp={isLastInGroup ? message.timestamp : ""}
-              isGrouped={!isLastInGroup}
+              isGrouped={!isLastInGroup && message.isSentByMe}
             />
           );
         })}
@@ -90,7 +90,7 @@ const ChatArea = () => {
           rows={1}
         />
         <button
-          className="px-3.5 py-3.5 cursor-pointer bg-blue-500 text-white rounded-full hover:bg-blue-600"
+          className="px-3.5 py-3.5 cursor-pointer bg-[#5e63f9] text-white rounded-full hover:bg-[rgb(83,88,247)]"
           onClick={handleSendMessage}
         >
           <SendHorizonal size={20} />
@@ -100,4 +100,4 @@ const ChatArea = () => {
   );
 };
 
-export default ChatArea;
+export default ChatWindow;

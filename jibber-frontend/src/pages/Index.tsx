@@ -2,8 +2,10 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { CTA } from "@/components/CTA";
 import { Button } from "@/components/ui/button";
-import { Lock} from "lucide-react";
+import { Lock, MessageSquareDot } from "lucide-react";
 import jibber from "../assets/jibber.png"
+import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 
 
 const Index = () => {
@@ -11,6 +13,7 @@ const Index = () => {
     // Handle navigation or sign-up here
     console.log("Continue button clicked");
   };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col poppins-regular">
@@ -21,8 +24,20 @@ const Index = () => {
           <span className="font-bold text-xl ml-2">Jibber</span>
         </div>
         <div>
-          <Button variant="ghost" className="mr-2 cursor-pointer">Sign In</Button>
-          <Button className="bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white">Sign Up</Button>
+          <SignedIn>
+            <SignOutButton>
+              <Button variant="ghost" className="mr-2 cursor-pointer">Sign Out</Button>
+            </SignOutButton>
+            <Button className="bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white" onClick={()=>navigate('/app')}><MessageSquareDot/>Chats</Button>
+          </SignedIn>
+          <SignedOut>
+            <SignInButton>
+              <Button variant="ghost" className="mr-2 cursor-pointer">Sign In</Button>
+            </SignInButton>
+            <SignUpButton>
+              <Button className="bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white">Sign Up</Button>
+            </SignUpButton>
+          </SignedOut>
         </div>
       </header>
 
@@ -48,8 +63,8 @@ const Index = () => {
             <div className="md:w-1/2 max-md:text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">Privacy at your fingertips</h2>
               <p className="text-muted-foreground mb-6">
-                Jibber puts you in control of your digital conversations. 
-                With our intuitive interface and powerful encryption, your messages 
+                Jibber puts you in control of your digital conversations.
+                With our intuitive interface and powerful encryption, your messages
                 stay between you and your recipients.
               </p>
               <div className="flex items-center mb-4 text-left text-sm">
@@ -64,7 +79,7 @@ const Index = () => {
                 <Lock className="h-5 w-5 text-[#5e63f9] mr-2" />
                 <span>No data mining or advertising based on your messages</span>
               </div>
-              <Button 
+              <Button
                 className="mt-4 bg-[#5e63f9] cursor-pointer hover:bg-[rgb(83,88,247)] text-white rounded-full px-8"
                 onClick={handleContinue}
               >
@@ -85,31 +100,31 @@ const Index = () => {
                       <p className="font-medium">Donald Duck</p>
                     </div>
                   </div>
-                  
+
                   {/* Messages */}
                   <div className="p-4 h-[425px] overflow-y-auto flex flex-col space-y-4 text-sm">
                     <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none max-w-[80%] self-start">
                       <p>Hello, how are you?</p>
                       <p className="text-[10px] text-gray-400 mt-1">10:30 AM</p>
                     </div>
-                    
+
                     <div className="bg-[#5e63f9] p-3 rounded-2xl rounded-tr-none max-w-[80%] self-end text-white">
                       <p>I'm good, thanks! How about you?</p>
                       <p className="text-[10px] text-[#e0e1ff] mt-1">10:32 AM</p>
                     </div>
-                    
+
                     <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none max-w-[80%] self-start">
                       <p>I'm doing well too!</p>
                       <p className="text-[10px] text-gray-400 mt-1">10:33 AM</p>
                     </div>
                   </div>
-                  
+
                   {/* Input field */}
                   <div className="p-2 pt-1 border-t px-4">
                     <div className="bg-gray-100 rounded-xl flex items-center p-1 pl-4">
-                      <input 
-                        type="text" 
-                        placeholder="Type a message..." 
+                      <input
+                        type="text"
+                        placeholder="Type a message..."
                         className="bg-transparent outline-none w-full flex-1 text-sm"
                         readOnly
                       />

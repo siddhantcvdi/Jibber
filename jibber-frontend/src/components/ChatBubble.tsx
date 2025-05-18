@@ -21,7 +21,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, isSentByMe, timestamp, is
         transition={{ duration: 0.3 }}
         className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
           isSentByMe
-            ? 'bg-blue-500 text-white rounded-tr-none'
+            ? 'bg-[#5e63f9] text-white rounded-tr-none'
             : 'bg-gray-200 text-black rounded-tl-none'
         }`}
         style={{ whiteSpace: 'pre-wrap' }} // Preserve line breaks and whitespace

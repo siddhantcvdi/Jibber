@@ -1,14 +1,20 @@
 import { Route, Routes } from "react-router-dom"
-import UserChats from "./pages/UserChats"
 import Landing from "./pages/Index"
+import MainLayout from "./Layouts/MainLayout"
+import ContactList from "./components/ContactList"
+import ChatWindow from "./components/ChatWindow"
+
 
 function App() {
-
+  
   return (
     <>
     <Routes>
-      <Route element={<Landing/>} path="/"/>
-      <Route element={<UserChats/>} path="/chats"/>
+      <Route path="/" element={<Landing />} />
+      <Route path="/app/*" element={<MainLayout/>}>
+        <Route index element={<ContactList/>}/>
+        <Route path="chat/:id" element={<ChatWindow/>}/>
+      </Route>
     </Routes>
     </>
   )

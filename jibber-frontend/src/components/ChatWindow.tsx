@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import ChatBubble from "./ChatBubble";
 import { SendHorizonal, MoreVertical } from "lucide-react";
 import { ThemeToggle } from "./ui/theme-toggle";
-import { useMediaQuery } from "react-responsive";
 
 interface Message {
   text: string;
@@ -23,39 +22,22 @@ const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isMobile = useMediaQuery({ maxWidth: 768 });
-  // Track if the textarea is focused
-  const [isInputFocused, setIsInputFocused] = useState(false);
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
 
     const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const messageToSend = newMessage;
 
-    // Save the current focus state
-    const wasFocused = isInputFocused;
-    
-    // Clear input first without losing focus
-    setNewMessage("");
-    
-    // Then update the messages
-    setMessages(prev => [
-      ...prev,
-      { text: messageToSend, isSentByMe: true, timestamp: currentTime },
+    setMessages([
+      ...messages,
+      { text: newMessage, isSentByMe: true, timestamp: currentTime },
     ]);
-    
-    // On mobile, make sure we maintain focus without a delay
-    if (isMobile && textareaRef.current && wasFocused) {
-      textareaRef.current.focus();
-    }
+    setNewMessage("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // On desktop: Enter sends, Shift+Enter adds new line
-    // On mobile: Enter always adds new line, never sends
-    if (e.key === "Enter" && !e.shiftKey && !isMobile) {
-      e.preventDefault(); // Prevent default Enter behavior on desktop only
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent default Enter behavior
       handleSendMessage();
     }
   };
@@ -64,7 +46,7 @@ const ChatWindow = () => {
   const autoResizeTextarea = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
     }
   };
 
@@ -155,18 +137,15 @@ const ChatWindow = () => {
           <textarea
             ref={textareaRef}
             className="flex-1 resize-none outline-none max-h-32 text-foreground py-0 leading-normal placeholder:text-muted-foreground my-auto bg-transparent"
-            placeholder={isMobile ? "Type a message... (Enter for new line)" : "Type a message... (Enter to send)"}
+            placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={1}
-            onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
           />
           <button
             className="p-2 sm:p-3 rounded-lg bg-[#5e63f9] text-white hover:shadow-md transition-all"
             onClick={handleSendMessage}
-            type="button" // Explicitly set type to prevent form submission behavior
           >
             <SendHorizonal size={18} />
           </button>

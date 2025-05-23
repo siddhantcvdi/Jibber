@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from "framer-motion";
 import { FiMoon, FiSun } from "react-icons/fi";
 import useThemeStore from '@/store/themeStore';

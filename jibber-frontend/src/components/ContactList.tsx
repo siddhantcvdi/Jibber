@@ -3,7 +3,7 @@ import ChatPreview from "./ContactPreview"
 
 const ContactList = () => {
   return (
-    <div className="h-screen max-md:w-full p-2 bg-neutral-50 outline-1 outline-neutral-200 poppins-regular">
+    <div className="h-screen w-1/4 min-w-[400px] max-md:w-full p-2 bg-neutral-50 outline-1 outline-neutral-200 poppins-regular">
         <div className="flex gap-4 items-center border-b-2 border-neutral-200">
             <span className="w-11 h-11 flex justify-center items-center rounded-full hover:bg-neutral-200 cursor-pointer duration-300"><MenuIcon size={20}/></span>
             <span className="text-xl text-neutral-800">Messages</span>

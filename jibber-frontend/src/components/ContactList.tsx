@@ -6,7 +6,7 @@ import { ThemeToggle } from "./ui/theme-toggle"
 const ContactList = () => {
   const [activeTab, setActiveTab] = useState("all");  
   return (
-    <div className="h-screen w-1/4 min-w-[320px] max-md:w-full flex flex-col bg-background border-r border-border poppins-regular">
+    <div className="h-[100dvh] w-full md:w-1/4 md:min-w-[320px] flex flex-col bg-background border-r border-border poppins-regular">
       <div className="p-4 border-border">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">

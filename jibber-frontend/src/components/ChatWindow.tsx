@@ -78,7 +78,7 @@ const ChatWindow = () => {
   }, {} as Record<string, (Message & { isLastInGroup: boolean })[]>);
 
   return (
-    <div className="flex flex-col h-screen flex-1 bg-muted/50 shadow-lg rounded-lg overflow-hidden">
+    <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-lg overflow-hidden">
       {/* Chat header */}
       <div className="bg-background border-b border-border shadow-sm">
         <div className="flex justify-between items-center p-3 px-4">
@@ -109,7 +109,7 @@ const ChatWindow = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-6 bg-background/75">
+      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 bg-background/75">
         {Object.entries(groupedMessages).map(([date, dateMessages]) => (
           <div key={date}>
             <div className="flex justify-center my-4 ">
@@ -132,7 +132,7 @@ const ChatWindow = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="bg-background border-border p-3">
+      <div className="bg-background border-border p-2 sm:p-3">
         <div className="flex items-center gap-2 bg-background rounded-2xl border border-border pl-3 px-1.5 py-1.5">
           <textarea
             ref={textareaRef}
@@ -144,10 +144,10 @@ const ChatWindow = () => {
             rows={1}
           />
           <button
-            className="p-3 rounded-lg bg-[#5e63f9] text-white hover:shadow-md transition-all"
+            className="p-2 sm:p-3 rounded-lg bg-[#5e63f9] text-white hover:shadow-md transition-all"
             onClick={handleSendMessage}
           >
-            <SendHorizonal size={20} />
+            <SendHorizonal size={18} />
           </button>
         </div>
       </div>

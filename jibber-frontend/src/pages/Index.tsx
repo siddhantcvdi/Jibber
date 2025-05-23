@@ -7,6 +7,7 @@ import jibber from "../assets/jibber.png"
 import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 
 const Index = () => {
@@ -40,14 +41,14 @@ const Index = () => {
   }, []);
   
   return (
-    <div className="min-h-screen flex flex-col poppins-regular bg-white">
+    <div className="min-h-screen flex flex-col poppins-regular bg-background">
       {/* Header */}
-      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
+      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b sticky top-0 z-50 bg-background/90 backdrop-blur-sm">
         <div className="flex items-center">
           <div className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] p-2 rounded-lg">
             <img src={jibber} alt="Jibber Logo" className="h-6 w-6" />
           </div>
-          <span className="font-bold text-xl ml-2">Jibber</span>
+          <span className="font-bold text-xl ml-2 text-foreground">Jibber</span>
         </div>
         
         {/* Desktop navigation */}
@@ -55,27 +56,29 @@ const Index = () => {
           <nav className="flex items-center mr-6">
             <a 
               href="#features" 
-              className="text-gray-600 hover:text-[#5e63f9] mx-3 text-sm font-medium"
+              className="text-muted-foreground hover:text-[#5e63f9] mx-3 text-sm font-medium"
               onClick={(e) => smoothScroll(e, 'features')}
             >
               Features
             </a>
             <a 
               href="#security" 
-              className="text-gray-600 hover:text-[#5e63f9] mx-3 text-sm font-medium"
+              className="text-muted-foreground hover:text-[#5e63f9] mx-3 text-sm font-medium"
               onClick={(e) => smoothScroll(e, 'security')}
             >
               Security
             </a>
             <a 
               href="#about" 
-              className="text-gray-600 hover:text-[#5e63f9] mx-3 text-sm font-medium"
+              className="text-muted-foreground hover:text-[#5e63f9] mx-3 text-sm font-medium"
               onClick={(e) => smoothScroll(e, 'about')}
             >
               About
             </a>
           </nav>
           
+          <ThemeToggle />
+
           <SignedIn>
             <SignOutButton>
               <Button variant="ghost" className="mr-2 cursor-pointer">Sign Out</Button>
@@ -96,37 +99,38 @@ const Index = () => {
         </div>
 
         {/* Mobile menu button */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-2">
+          <ThemeToggle />
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-md hover:bg-gray-100"
+            className="p-2 rounded-md hover:bg-accent"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? <X className="h-6 w-6 text-foreground" /> : <Menu className="h-6 w-6 text-foreground" />}
           </button>
         </div>
       </header>
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-white pt-16 px-6 flex flex-col md:hidden">
+        <div className="fixed inset-0 z-40 bg-background pt-16 px-6 flex flex-col md:hidden">
           <nav className="flex flex-col space-y-6 py-8">
             <a 
               href="#features" 
-              className="text-gray-900 hover:text-[#5e63f9] text-lg font-medium" 
+              className="text-foreground hover:text-[#5e63f9] text-lg font-medium" 
               onClick={(e) => smoothScroll(e, 'features')}
             >
               Features
             </a>
             <a 
               href="#security" 
-              className="text-gray-900 hover:text-[#5e63f9] text-lg font-medium" 
+              className="text-foreground hover:text-[#5e63f9] text-lg font-medium" 
               onClick={(e) => smoothScroll(e, 'security')}
             >
               Security
             </a>
             <a 
               href="#about" 
-              className="text-gray-900 hover:text-[#5e63f9] text-lg font-medium" 
+              className="text-foreground hover:text-[#5e63f9] text-lg font-medium" 
               onClick={(e) => smoothScroll(e, 'about')}
             >
               About
@@ -157,7 +161,7 @@ const Index = () => {
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-white">
+        <section className="bg-background">
           <div className="max-w-7xl mx-auto">
             <Hero />
           </div>
@@ -171,14 +175,14 @@ const Index = () => {
         </section>
 
         {/* Mobile Preview Section */}
-        <section id="security" className="py-20 px-4 md:px-6 bg-gray-50 overflow-hidden">
+        <section id="security" className="py-20 px-4 md:px-6 bg-muted/30 overflow-hidden">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 relative">
             {/* Decorative elements */}
-            <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-100 rounded-full opacity-20 blur-3xl"></div>
+            <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-100 dark:bg-blue-900/20 rounded-full opacity-20 blur-3xl"></div>
             
             <div className="md:w-1/2 max-md:text-center relative z-10">
-              <span className="inline-block px-4 py-2 rounded-full bg-[#eef0ff] text-[#5e63f9] font-medium text-sm mb-4">Advanced Security</span>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Privacy at your fingertips</h2>
+              <span className="inline-block px-4 py-2 rounded-full bg-[#eef0ff] dark:bg-[#2d2f6b] text-[#5e63f9] font-medium text-sm mb-4">Advanced Security</span>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">Privacy at your fingertips</h2>
               <p className="text-muted-foreground mb-8 text-lg">
                 Jibber puts you in control of your digital conversations.
                 With our intuitive interface and powerful encryption, your messages
@@ -188,36 +192,36 @@ const Index = () => {
               <div className="space-y-6 mb-8">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mt-1">
-                    <div className="rounded-full p-2 bg-[#eef0ff]">
+                    <div className="rounded-full p-2 bg-[#eef0ff] dark:bg-[#2d2f6b]">
                       <Shield className="h-5 w-5 text-[#5e63f9]" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <h3 className="font-medium">End-to-end encryption</h3>
+                    <h3 className="font-medium text-foreground">End-to-end encryption</h3>
                     <p className="text-sm text-muted-foreground">Messages cannot be intercepted or read by third parties</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mt-1">
-                    <div className="rounded-full p-2 bg-[#eef0ff]">
+                    <div className="rounded-full p-2 bg-[#eef0ff] dark:bg-[#2d2f6b]">
                       <Lock className="h-5 w-5 text-[#5e63f9]" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <h3 className="font-medium">Enhanced Privacy Controls</h3>
+                    <h3 className="font-medium text-foreground">Enhanced Privacy Controls</h3>
                     <p className="text-sm text-muted-foreground">Customizable privacy settings to protect your conversations</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mt-1">
-                    <div className="rounded-full p-2 bg-[#eef0ff]">
+                    <div className="rounded-full p-2 bg-[#eef0ff] dark:bg-[#2d2f6b]">
                       <Shield className="h-5 w-5 text-[#5e63f9]" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <h3 className="font-medium">No data mining</h3>
+                    <h3 className="font-medium text-foreground">No data mining</h3>
                     <p className="text-sm text-muted-foreground">No data mining or advertising based on your messages</p>
                   </div>
                 </div>
@@ -236,53 +240,53 @@ const Index = () => {
               {/* Phone frame with shadow and highlights */}
               <div className="relative">
                 {/* Floating decorative elements */}
-                <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-[#eef0ff] rounded-full blur-2xl opacity-80 z-0"></div>
-                <div className="absolute -top-6 -left-6 w-16 h-16 bg-[#eef0ff] rounded-full blur-2xl opacity-80 z-0"></div>
+                <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-[#eef0ff] dark:bg-[#2d2f6b] rounded-full blur-2xl opacity-80 z-0"></div>
+                <div className="absolute -top-6 -left-6 w-16 h-16 bg-[#eef0ff] dark:bg-[#2d2f6b] rounded-full blur-2xl opacity-80 z-0"></div>
                 
-                <div className="relative w-[280px] h-[560px] bg-gradient-to-br from-gray-800 to-gray-900 rounded-[48px] p-1 shadow-2xl border-[4px] border-gray-800 z-10">
+                <div className="relative w-[280px] h-[560px] bg-gradient-to-br from-gray-800 to-gray-900 rounded-[54px] p-1.5 shadow-2xl border-[3.5px] border-gray-800 z-10">
                   {/* Notch */}
-                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-1/3 h-5 bg-gray-900 rounded-xl z-20"></div>
+                  <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-1/3 h-6 bg-gray-900 rounded-xl z-20"></div>
                   
                   {/* Screen content */}
-                  <div className="w-full h-full bg-white rounded-[42px] overflow-hidden relative z-10">
+                  <div className="w-full h-full bg-white dark:bg-gray-900 rounded-[48px] overflow-hidden relative z-10">
                     {/* Header */}
-                    <div className="bg-gray-100 p-4 pb-2 flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-[#eef0ff] flex items-center justify-center">
-                        <span className="text-[#5e63f9] mt-3 font-bold">DD</span>
+                    <div className="bg-gray-100 dark:bg-gray-800 p-4 pt-8 pb-2 flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-[#eef0ff] dark:bg-[#2d2f6b] flex items-center justify-center">
+                        <span className="text-[#5e63f9] font-bold text-xs">JA</span>
                       </div>
-                      <div className="ml-3 mt-4">
-                        <p className="font-medium">Donald Duck</p>
+                      <div className="ml-8">
+                        <p className="font-medium dark:text-gray-100 text-sm">Jibber Admin</p>
                       </div>
                     </div>
 
                     {/* Messages */}
-                    <div className="p-4 h-[425px] overflow-y-auto flex flex-col space-y-4 text-sm">
-                      <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none max-w-[80%] self-start">
+                    <div className="p-5 h-[395px] overflow-y-auto flex flex-col space-y-5 text-sm">
+                      <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-2xl rounded-tl-sm max-w-[80%] self-start dark:text-gray-200 shadow-sm">
                         <p>Hello, how are you?</p>
-                        <p className="text-[10px] text-gray-400 mt-1">10:30 AM</p>
+                        <p className="text-[10px] text-gray-400 mt-1.5">10:30 AM</p>
                       </div>
 
-                      <div className="bg-[#5e63f9] p-3 rounded-2xl rounded-tr-none max-w-[80%] self-end text-white">
+                      <div className="bg-[#5e63f9] p-3 rounded-2xl rounded-tr-sm max-w-[80%] self-end text-white shadow-sm">
                         <p>I'm good, thanks! How about you?</p>
-                        <p className="text-[10px] text-[#e0e1ff] mt-1">10:32 AM</p>
+                        <p className="text-[10px] text-[#e0e1ff] mt-1.5">10:32 AM</p>
                       </div>
 
-                      <div className="bg-gray-100 p-3 rounded-2xl rounded-tl-none max-w-[80%] self-start">
+                      <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-2xl rounded-tl-sm max-w-[80%] self-start dark:text-gray-200 shadow-sm">
                         <p>I'm doing well too!</p>
-                        <p className="text-[10px] text-gray-400 mt-1">10:33 AM</p>
+                        <p className="text-[10px] text-gray-400 mt-1.5">10:33 AM</p>
                       </div>
                     </div>
 
                     {/* Input field */}
-                    <div className="p-2 pt-1 border-t px-4">
-                      <div className="bg-gray-100 rounded-xl flex items-center p-1 pl-4">
+                    <div className="p-3 dark:border-gray-700 px-4">
+                      <div className="bg-gray-100 dark:bg-gray-800 rounded-full flex items-center p-1.5 pl-5 pr-2">
                         <input
                           type="text"
                           placeholder="Type a message..."
-                          className="bg-transparent outline-none w-full flex-1 text-sm"
+                          className="bg-transparent outline-none w-full flex-1 text-sm dark:text-gray-300"
                           readOnly
                         />
-                        <button className="bg-[#5e63f9] h-8 w-8 rounded-lg flex items-center justify-center">
+                        <button className="bg-[#5e63f9] h-9 w-9 rounded-full flex items-center justify-center ml-1.5 shadow-sm">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                             <path d="M22 2L11 13"></path>
                             <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
@@ -294,7 +298,7 @@ const Index = () => {
                 </div>
                 
                 {/* Reflection effect */}
-                <div className="absolute inset-0 rounded-[48px] bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-20 pointer-events-none"></div>
+                <div className="absolute inset-0 rounded-[54px] bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-20 pointer-events-none"></div>
               </div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ChatBubble from "./ChatBubble";
 import { SendHorizonal, MoreVertical } from "lucide-react";
 import { ThemeToggle } from "./ui/theme-toggle";
+import { useMediaQuery } from "react-responsive";
 
 interface Message {
   text: string;
@@ -22,6 +23,7 @@ const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useMediaQuery({ maxWidth: 768 });
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
@@ -33,11 +35,20 @@ const ChatWindow = () => {
       { text: newMessage, isSentByMe: true, timestamp: currentTime },
     ]);
     setNewMessage("");
+    
+    // Refocus the textarea and keep keyboard open on mobile
+    if (isMobile && textareaRef.current) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 10);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevent default Enter behavior
+    // On desktop: Enter sends, Shift+Enter adds new line
+    // On mobile: Enter always adds new line, never sends
+    if (e.key === "Enter" && !e.shiftKey && !isMobile) {
+      e.preventDefault(); // Prevent default Enter behavior on desktop only
       handleSendMessage();
     }
   };
@@ -137,7 +148,7 @@ const ChatWindow = () => {
           <textarea
             ref={textareaRef}
             className="flex-1 resize-none outline-none max-h-32 text-foreground py-0 leading-normal placeholder:text-muted-foreground my-auto bg-transparent"
-            placeholder="Type a message..."
+            placeholder={isMobile ? "Type a message... (Enter for new line)" : "Type a message... (Enter to send)"}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}

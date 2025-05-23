@@ -4,19 +4,17 @@ import { CTA } from "@/components/CTA";
 import { Button } from "@/components/ui/button";
 import { Lock, MessageSquareDot, Shield, Menu, X } from "lucide-react";
 import jibber from "../assets/jibber.png"
-import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton, useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 
 const Index = () => {
-  const handleContinue = () => {
-    // Handle navigation or sign-up here
-    console.log("Continue button clicked");
-  };
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isSignedIn } = useAuth();
+
 
   // Smooth scroll function
   const smoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
@@ -227,12 +225,22 @@ const Index = () => {
                 </div>
               </div>
               
-              <Button
-                className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all"
-                onClick={handleContinue}
-              >
-                Get Started
-              </Button>
+              {isSignedIn ? (
+                <Button
+                  className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all"
+                  onClick={() => navigate('/app')}
+                >
+                  Go to Chats
+                </Button>
+              ) : (
+                <SignUpButton>
+                  <Button
+                    className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all cursor-pointer"
+                  >
+                    Get Started
+                  </Button>
+                </SignUpButton>
+              )}
             </div>
 
             {/* Phone preview - keeping the UI intact */}

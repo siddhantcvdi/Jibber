@@ -1,6 +1,18 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useAuth, SignUpButton } from "@clerk/clerk-react";
 
 export function CTA() {
+  const navigate = useNavigate();
+  const { isSignedIn } = useAuth();
+
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative overflow-hidden">
       {/* Background with gradient */}
@@ -28,10 +40,30 @@ export function CTA() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-white text-[#5e63f9] hover:bg-gray-100 font-medium px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
-              Get Started Now
-            </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium px-8 py-6 text-lg rounded-full">
+            {isSignedIn ? (
+              <Button 
+                size="lg" 
+                className="bg-white text-[#5e63f9] hover:bg-gray-100 font-medium px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                onClick={() => navigate('/app')}
+              >
+                Go to Chats
+              </Button>
+            ) : (
+              <SignUpButton>
+                <Button 
+                  size="lg" 
+                  className="bg-white text-[#5e63f9] hover:bg-gray-100 font-medium px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                >
+                  Get Started Now
+                </Button>
+              </SignUpButton>
+            )}
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium px-8 py-6 text-lg rounded-full"
+              onClick={scrollToFeatures}
+            >
               Learn More
             </Button>
           </div>

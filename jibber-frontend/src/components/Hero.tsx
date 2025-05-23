@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import jibber from '../assets/jibber.png'
+import { useNavigate } from "react-router-dom";
+import { useAuth, SignUpButton } from "@clerk/clerk-react";
 
 export function Hero() {
+  const navigate = useNavigate();
+  const { isSignedIn } = useAuth();
+
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
@@ -11,7 +16,6 @@ export function Hero() {
 
   return (
     <div className="relative overflow-hidden flex flex-col items-center justify-center py-20 px-4 md:px-6 lg:py-32 text-center">
-      {/* Background gradient blobs */}
       <div className="absolute -top-40 -left-40 w-80 h-80 bg-blue-100 dark:bg-blue-900/20 rounded-full opacity-30 blur-3xl"></div>
       <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-purple-100 dark:bg-purple-900/20 rounded-full opacity-30 blur-3xl"></div>
       
@@ -35,9 +39,24 @@ export function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button size="lg" className="bg-gradient-to-r from-[#5e63f9] to-[#7c80fa] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all duration-300 hover:shadow-xl">
-              Get Started
-            </Button>
+            {isSignedIn ? (
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-[#5e63f9] to-[#7c80fa] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all duration-300 hover:shadow-xl"
+                onClick={() => navigate('/app')}
+              >
+                Go to Chats
+              </Button>
+            ) : (
+              <SignUpButton>
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-[#5e63f9] to-[#7c80fa] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer"
+                >
+                  Get Started
+                </Button>
+              </SignUpButton>
+            )}
             <Button 
               size="lg" 
               variant="outline" 

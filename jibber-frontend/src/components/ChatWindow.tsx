@@ -37,12 +37,11 @@ const ChatWindow = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevent default Enter behavior
+      e.preventDefault();
       handleSendMessage();
     }
   };
 
-  // Auto-resize textarea based on content
   const autoResizeTextarea = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -50,7 +49,6 @@ const ChatWindow = () => {
     }
   };
 
-  // Scroll to the latest message when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -61,7 +59,6 @@ const ChatWindow = () => {
     autoResizeTextarea();
   }, [newMessage]);
 
-  // Group messages by date
   const groupedMessages = messages.reduce((groups, message, index) => {
     const date = new Date().toLocaleDateString();
     if (!groups[date]) {
@@ -79,7 +76,6 @@ const ChatWindow = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-lg overflow-hidden">
-      {/* Chat header */}
       <div className="bg-background border-b border-border shadow-sm">
         <div className="flex justify-between items-center p-3 px-4">
           <div className="flex items-center gap-3">

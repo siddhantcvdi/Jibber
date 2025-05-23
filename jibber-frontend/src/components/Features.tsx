@@ -1,4 +1,3 @@
-// import jibber from "../assets/jibber.png"
 import { MessageCircle, Lock, Shield, Check } from "lucide-react";
 import { useState } from "react";
 
@@ -19,10 +18,8 @@ function Feature({ icon, title, description, color, highlightPoints = [] }: Feat
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background gradient that appears on hover */}
       <div className={`absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-3 transition-opacity duration-400 ${color}`}></div>
       
-      {/* Top border highlight */}
       <div className={`absolute top-0 left-0 right-0 h-1 ${color} transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-400 ease-in-out`}></div>
       
       <div className="flex items-start">
@@ -53,7 +50,6 @@ function Feature({ icon, title, description, color, highlightPoints = [] }: Feat
 export function Features() {
   return (
     <div className="py-16 px-4 md:px-6 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
-      {/* Enhanced decorative elements */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#5e63f9] to-transparent opacity-20"></div>
       <div className="absolute -top-40 right-20 w-64 h-64 bg-purple-50 dark:bg-purple-900/10 rounded-full blur-3xl opacity-30"></div>
       
@@ -102,7 +98,6 @@ export function Features() {
           />
         </div>
         
-        {/* Stats section */}
         <div className="mt-14 bg-background dark:bg-card rounded-2xl shadow-md border border-border p-6 max-w-6xl mx-auto relative cursor-pointer hover:shadow-lg transition-all duration-300">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] opacity-5 rounded-2xl"></div>
           

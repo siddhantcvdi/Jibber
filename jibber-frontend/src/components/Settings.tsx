@@ -149,7 +149,7 @@ const Settings = () => {
                 <Button 
                   onClick={() => handleSaveChanges('profile')}
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8]"
+                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white"
                 >
                   {isLoading ? 'Saving...' : 'Save Profile Changes'}
                 </Button>
@@ -187,7 +187,7 @@ const Settings = () => {
                 <Button 
                   onClick={() => handleSaveChanges('account')}
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8]"
+                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white"
                 >
                   {isLoading ? 'Saving...' : 'Save Account Changes'}
                 </Button>
@@ -295,7 +295,7 @@ const Settings = () => {
                 <Button 
                   onClick={() => handleSaveChanges('security')}
                   disabled={isLoading || !isPasswordValid()}
-                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8]"
+                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white"
                 >
                   {isLoading ? 'Updating...' : 'Update Password'}
                 </Button>

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Check, AtSign } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, Check, AtSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import jibber from "../assets/jibber-new.png";
 
@@ -15,7 +15,6 @@ interface PasswordRequirement {
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
     username: "",
     email: "",
     password: "",
@@ -62,7 +61,6 @@ const Signup = () => {
 
   const isFormValid = () => {
     return (
-      formData.fullName.trim() &&
       formData.username.trim() &&
       formData.email.trim() &&
       passwordRequirements.every(req => req.met) &&
@@ -105,32 +103,13 @@ const Signup = () => {
             <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
               Create your account
             </CardTitle>
-            <CardDescription className="text-sm sm:text-base text-muted-foreground">
+            <CardDescription className="text-xs sm:text-sm -mt-4 text-muted-foreground">
               Join thousands of users for secure, private messaging
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Full Name Field */}
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm font-medium">
-                  Full name
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={formData.fullName}
-                    onChange={(e) => handleInputChange('fullName', e.target.value)}
-                    className="pl-10 h-11"
-                    required
-                  />
-                </div>
-              </div>
-
               {/* Username Field */}
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm font-medium">

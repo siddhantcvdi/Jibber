@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import jibber from '../assets/jibber-new.png'
+import jibberold from '../assets/jibber.png'
+
 import { useNavigate } from "react-router-dom";
 
 export function Hero() {
@@ -20,7 +21,7 @@ export function Hero() {
       <div className="relative z-10">
         <div className="flex items-center justify-center mb-6 animate-fade-in">
           <div className="bg-white dark:bg-gray-800 p-3 rounded-2xl shadow-lg flex items-center">
-            <img src={jibber} alt="" className="h-10 w-10"/>
+            <img src={jibberold} alt="" className="h-10 w-10"/>
             <h1 className="text-3xl md:text-4xl font-bold ml-2 text-foreground">Jibber</h1>
           </div>
         </div>

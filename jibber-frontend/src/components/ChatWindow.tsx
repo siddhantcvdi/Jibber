@@ -2,23 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import ChatBubble from "./ChatBubble";
 import { SendHorizonal, MoreVertical } from "lucide-react";
 import { ThemeToggle } from "./ui/theme-toggle";
-
-interface Message {
-  text: string;
-  isSentByMe: boolean;
-  timestamp: string;
-}
+import { useParams } from "react-router-dom";
+import { findContactById, type Message } from "../data/contactsData";
 
 const ChatWindow = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "Hello, how are you?", isSentByMe: false, timestamp: "10:30 AM" },
-    { text: "I'm good, thanks! How about you?", isSentByMe: true, timestamp: "10:31 AM" },
-    { text: "I'm doing well too!", isSentByMe: false, timestamp: "10:31 AM" },
-    { text: "What have you been up to lately?", isSentByMe: false, timestamp: "10:32 AM" },
-    { text: "Just working on a new project. It's a messaging app with end-to-end encryption.", isSentByMe: true, timestamp: "10:34 AM" },
-    { text: "That sounds really interesting! Can you tell me more about it?", isSentByMe: false, timestamp: "10:35 AM" },
-  ]);
-
+  const { id } = useParams<{ id: string }>();
+  const contact = findContactById(id || "");
+  
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -49,6 +40,13 @@ const ChatWindow = () => {
     }
   };
 
+  // Initialize messages when contact changes
+  useEffect(() => {
+    if (contact) {
+      setMessages(contact.messages);
+    }
+  }, [contact]);
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -59,20 +57,19 @@ const ChatWindow = () => {
     autoResizeTextarea();
   }, [newMessage]);
 
-  const groupedMessages = messages.reduce((groups, message, index) => {
-    const date = new Date().toLocaleDateString();
-    if (!groups[date]) {
-      groups[date] = [];
-    }
-    groups[date].push({
-      ...message,
-      isLastInGroup:
-        index === messages.length - 1 ||
-        messages[index + 1].timestamp !== message.timestamp ||
-        messages[index + 1].isSentByMe !== message.isSentByMe
-    });
-    return groups;
-  }, {} as Record<string, (Message & { isLastInGroup: boolean })[]>);
+  // If no contact found, show error or redirect
+  if (!contact) {
+    return (
+      <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-lg overflow-hidden">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h3 className="text-lg font-medium text-foreground mb-2">Contact not found</h3>
+            <p className="text-muted-foreground">The chat you're looking for doesn't exist.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-lg overflow-hidden">
@@ -82,16 +79,18 @@ const ChatWindow = () => {
             <div className="relative">
               <div className="w-10 h-10 overflow-hidden rounded-full bg-blue-100 dark:bg-blue-900/30 flex justify-center items-center">
                 <img
-                  src="https://images.moneycontrol.com/static-mcnews/2024/12/20241211112438_BeFunky-collage-2024-12-11T165424.810.jpg?impolicy=website&width=770&height=431"
+                  src={contact.icon}
                   className="object-cover h-full w-full"
-                  alt="Donald Duck"
+                  alt={contact.name}
                 />
               </div>
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+              {contact.isOnline && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+              )}
             </div>
             <div>
-              <h3 className="font-medium text-foreground">Donald Duck</h3>
-              <p className="text-xs text-muted-foreground">Online</p>
+              <h3 className="font-medium text-foreground">{contact.name}</h3>
+              <p className="text-xs text-muted-foreground">{contact.isOnline ? 'Online' : 'Offline'}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -106,23 +105,13 @@ const ChatWindow = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 bg-background/75">
-        {Object.entries(groupedMessages).map(([date, dateMessages]) => (
-          <div key={date}>
-            <div className="flex justify-center my-4 ">
-              <div className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">
-                {date === new Date().toLocaleDateString() ? "Today" : date}
-              </div>
-            </div>
-            {dateMessages.map((message, index) => (
-              <ChatBubble
-                key={index}
-                text={message.text}
-                isSentByMe={message.isSentByMe}
-                timestamp={message.isLastInGroup ? message.timestamp : ""}
-                isGrouped={!message.isLastInGroup}
-              />
-            ))}
-          </div>
+        {messages.map((message, index) => (
+          <ChatBubble
+            key={index}
+            text={message.text}
+            isSentByMe={message.isSentByMe}
+            timestamp={message.timestamp}
+          />
         ))}
 
         <div ref={messagesEndRef} />

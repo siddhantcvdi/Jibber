@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/ForgotPassword"
 import MainLayout from "./Layouts/MainLayout"
 import ContactList from "./components/ContactList"
 import ChatWindow from "./components/ChatWindow"
+import Settings from "./components/Settings"
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Route path="/app/*" element={<MainLayout/>}>
         <Route index element={<ContactList/>}/>
         <Route path="chat/:id" element={<ChatWindow/>}/>
+        <Route path="settings" element={<Settings/>}/>
       </Route>
     </Routes>
     </>

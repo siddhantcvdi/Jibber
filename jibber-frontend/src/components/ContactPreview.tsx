@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Check, Shield } from 'lucide-react';
 
 interface ChatPreviewProps {
@@ -24,9 +24,12 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
     isOnline = true
 }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     
     const handleNavigate = () => {
-        navigate(`/app/chat/${id}`);
+        // If we're already in a chat route, replace the current entry instead of pushing
+        const isCurrentlyInChat = location.pathname.startsWith('/app/chat/');
+        navigate(`/app/chat/${id}`, { replace: isCurrentlyInChat });
     };
     
     return (

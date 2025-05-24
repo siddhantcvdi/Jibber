@@ -2,9 +2,17 @@ import { Search, Settings } from "lucide-react"
 import ChatPreview from "./ContactPreview"
 import { useState } from "react"
 import { ThemeToggle } from "./ui/theme-toggle"
+import { contactsData } from "../data/contactsData"
+import { useLocation } from "react-router-dom"
 
 const ContactList = () => {
-  const [activeTab, setActiveTab] = useState("all");  
+  const [activeTab, setActiveTab] = useState("all");
+  const location = useLocation();
+  
+  // Get current chat ID from URL to determine which chat is active
+  const currentChatId = location.pathname.includes('/app/chat/') 
+    ? location.pathname.split('/app/chat/')[1] 
+    : null;  
   return (
     <div className="h-[100dvh] w-full md:w-1/4 md:min-w-[320px] flex flex-col bg-background border-r border-border poppins-regular">
       <div className="p-4 border-border">
@@ -34,19 +42,6 @@ const ContactList = () => {
         >
           All
           {activeTab === "all" && (
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#5e63f9]"></div>
-          )}
-        </button>
-        <button 
-          onClick={() => setActiveTab("unread")}
-          className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
-            activeTab === "unread" 
-              ? "text-[#5e63f9]" 
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Unread
-          {activeTab === "unread" && (
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#5e63f9]"></div>
           )}
         </button>
@@ -82,39 +77,19 @@ const ContactList = () => {
         ) : (
           <div>
             <div>
-              <ChatPreview 
-                name="Siddhant Chaturvedi" 
-                lastChatText="Yes, I'll be there in 5 minutes" 
-                icon="https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D" 
-                id="1234" 
-                time="11:45 AM"
-                isActive={true}
-              />
-              <ChatPreview 
-                name="Donald Duck" 
-                lastChatText="That sounds really interesting! Can you tell me more about it?" 
-                icon="https://images.moneycontrol.com/static-mcnews/2024/12/20241211112438_BeFunky-collage-2024-12-11T165424.810.jpg?impolicy=website&width=770&height=431" 
-                id="4567"
-                time="10:35 AM"
-                unread={2}
-              />
-              <ChatPreview 
-                name="Joe Who" 
-                lastChatText="Where am I? I don't remember..." 
-                icon="https://www.thoughtco.com/thmb/naT2Yc0Z1u0kz37osn29jkOSm-g=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-1055820900-ed9e56a18e5e464e8b00620f1174dbfa.jpg" 
-                id="8901"
-                time="Yesterday"
-                unread={1}
-                isOnline={false}
-              />
-              <ChatPreview 
-                name="Alice Thompson" 
-                lastChatText="Thanks for the information!" 
-                icon="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D" 
-                id="5678"
-                time="Tuesday"
-                isOnline={false}
-              />
+              {contactsData.map((contact) => (
+                <ChatPreview 
+                  key={contact.id}
+                  name={contact.name} 
+                  lastChatText={contact.lastChatText} 
+                  icon={contact.icon} 
+                  id={contact.id} 
+                  time={contact.time}
+                  unread={contact.unread}
+                  isActive={currentChatId === contact.id}
+                  isOnline={contact.isOnline}
+                />
+              ))}
             </div>
           </div>
         )}

@@ -5,15 +5,14 @@ interface ChatBubbleProps {
   text: string;
   isSentByMe: boolean;
   timestamp: string;
-  isGrouped: boolean;
 }
 
-const ChatBubble: React.FC<ChatBubbleProps> = ({ text, isSentByMe, timestamp, isGrouped }) => {
+const ChatBubble: React.FC<ChatBubbleProps> = ({ text, isSentByMe, timestamp }) => {
   return (
     <div
       className={`flex flex-col ${
         isSentByMe ? "items-end" : "items-start"
-      } ${isGrouped ? "mb-1" : "mb-4"}`}
+      } mb-2`}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -31,9 +30,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, isSentByMe, timestamp, is
       >
         <p className="text-[14px] font-normal leading-[1.5] tracking-[0.2px]">{text}</p>
       </motion.div>
-      {timestamp && (
-        <span className="text-[9px] font-medium text-muted-foreground mt-1.5 mx-1.5 opacity-75">{timestamp}</span>
-      )}
+      <span className="text-[9px] font-medium text-muted-foreground mt-1.5 mx-1.5 opacity-75">{timestamp}</span>
     </div>
   );
 };

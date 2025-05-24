@@ -62,7 +62,7 @@ const Login = () => {
             <CardTitle className="text-2xl sm:text-3xl font-bold text-foreground">
               Welcome back
             </CardTitle>
-            <CardDescription className="text-muted-foreground text-sm sm:text-base">
+            <CardDescription className="text-xs sm:text-sm -mt-4 text-muted-foreground">
               Sign in to your account to continue chatting securely
             </CardDescription>
           </CardHeader>

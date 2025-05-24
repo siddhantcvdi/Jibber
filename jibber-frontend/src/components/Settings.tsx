@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Lock, Upload, Eye, EyeOff, Camera, AtSign } from "lucide-react";
+import { User, Mail, Lock, Upload, Eye, EyeOff, Camera, AtSign, AlertTriangle } from "lucide-react";
 
 const Settings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -205,6 +205,21 @@ const Settings = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Warning about data loss */}
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                        Important: Data Loss Warning
+                      </h4>
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        Changing your password will permanently delete all your chat history and messages. Make sure you remember your new password to avoid losing access to your account.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Current Password */}
                 <div className="space-y-2">
                   <Label htmlFor="current-password">Current Password</Label>

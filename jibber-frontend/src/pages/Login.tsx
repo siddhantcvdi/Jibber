@@ -128,6 +128,7 @@ const Login = () => {
                 </div>
                 <Link 
                   to="/forgot-password" 
+                  replace={true}
                   className="text-sm text-[#5e63f9] hover:text-[#4f53e6] transition-colors text-left sm:text-right"
                 >
                   Forgot password?
@@ -157,6 +158,7 @@ const Login = () => {
                 Don't have an account?{" "}
                 <Link 
                   to="/signup" 
+                  replace={true}
                   className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors"
                 >
                   Sign up for free

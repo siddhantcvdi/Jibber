@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Eye, EyeOff, Mail, Lock, ArrowLeft, Check, AtSign } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowLeft, Check, AtSign, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import jibber from "../assets/jibber-new.png";
 
@@ -223,7 +223,17 @@ const Signup = () => {
                 )}
               </div>
 
-              {/* Terms and Conditions - REMOVED */}
+              {/* Password Security Warning */}
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                      <strong>Important:</strong> Please remember your password. If you forget it, all your chat history will be permanently deleted and cannot be recovered.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* Signup Button */}
               <Button
@@ -248,6 +258,7 @@ const Signup = () => {
                 Already have an account?{" "}
                 <Link 
                   to="/login" 
+                  replace={true}
                   className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors"
                 >
                   Sign in here

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import jibber from "../assets/jibber-new.png";
 import { motion } from "framer-motion";
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
         
         {/* Back to login button */}
         <div className="absolute top-4 left-4 z-10">
-          <Link to="/login">
+          <Link to="/login" replace={true}>
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Login
@@ -86,7 +86,7 @@ const ForgotPassword = () => {
                   Try another email
                 </Button>
                 
-                <Link to="/login">
+                <Link to="/login" replace={true}>
                   <Button className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white">
                     Back to Login
                   </Button>
@@ -144,6 +144,21 @@ const ForgotPassword = () => {
           </CardHeader>
 
           <CardContent>
+            {/* Warning about data loss */}
+            <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                    Important: Data Loss Warning
+                  </h4>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    Resetting your password will permanently delete all your previous chat history and messages. This action cannot be undone.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div className="space-y-2">

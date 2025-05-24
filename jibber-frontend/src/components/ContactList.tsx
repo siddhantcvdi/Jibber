@@ -3,11 +3,12 @@ import ChatPreview from "./ContactPreview"
 import { useState } from "react"
 import { ThemeToggle } from "./ui/theme-toggle"
 import { contactsData } from "../data/contactsData"
-import { useLocation } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 const ContactList = () => {
   const [activeTab, setActiveTab] = useState("all");
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Get current chat ID from URL to determine which chat is active
   const currentChatId = location.pathname.includes('/app/chat/') 
@@ -23,7 +24,10 @@ const ContactList = () => {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <button className="p-2 rounded-full hover:bg-accent text-muted-foreground transition-colors">
+            <button 
+              onClick={() => navigate('/app/settings')}
+              className="p-2 rounded-full hover:bg-accent text-muted-foreground transition-colors"
+            >
               <Settings size={18} />
             </button>
           </div>
@@ -40,7 +44,7 @@ const ContactList = () => {
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          All
+          All Chats
           {activeTab === "all" && (
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#5e63f9]"></div>
           )}

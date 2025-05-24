@@ -69,7 +69,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col font-[Poppins] bg-background">
       {/* Header */}
-      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b border-white/10 sticky top-0 z-50 glassmorphism-header">
+      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur-sm">
         <div className="flex items-center">
           <div className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] p-2 rounded-lg">
             <img src={jibber} alt="Jibber Logo" className="h-6 w-6" />
@@ -134,26 +134,26 @@ const Index = () => {
                 <Menu className="h-6 w-6 text-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 glassmorphism-dropdown">
-              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'features')}>
+            <DropdownMenuContent align="end" className="w-40 p-2">
+              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'features')} className="p-2">
                 Features
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'security')}>
+              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'security')} className="p-2">
                 Security
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'about')}>
+              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'about')} className="p-2">
                 About
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => navigate('/login')}
-                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium"
+                className="text-muted-foreground p-2 hover:text-foreground hover:bg-muted/50 font-medium"
               >
                 Sign In
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => navigate('/signup')}
-                className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] text-white hover:from-[#4f53e6] hover:to-[#6c70e8] font-semibold border-0 focus:bg-gradient-to-r focus:from-[#4f53e6] focus:to-[#6c70e8] focus:text-white"
+                className="bg-gradient-to-r from-[#5e63f9] p-2 to-[#7c7fff] text-white hover:from-[#4f53e6] hover:to-[#6c70e8] font-semibold border-0 focus:bg-gradient-to-r focus:from-[#4f53e6] focus:to-[#6c70e8] focus:text-white"
               >
                 Sign Up
               </DropdownMenuItem>

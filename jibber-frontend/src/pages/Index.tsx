@@ -2,26 +2,31 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { CTA } from "@/components/CTA";
 import { Button } from "@/components/ui/button";
-import { Lock, Shield, Menu, X } from "lucide-react";
+import { Lock, Shield, Menu } from "lucide-react";
 import jibber from "../assets/jibber-new.png"
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 const Index = () => {
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('hero');
 
 
   // Smooth scroll function
-  const smoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+  const smoothScroll = (e: React.MouseEvent<HTMLAnchorElement> | React.MouseEvent<HTMLDivElement>, targetId: string) => {
     e.preventDefault();
     const targetElement = document.getElementById(targetId);
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth' });
-      // Close mobile menu if open
-      setMobileMenuOpen(false);
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center'});
     }
   };
 
@@ -30,9 +35,34 @@ const Index = () => {
     // This adds smooth scrolling globally to the document
     document.documentElement.style.scrollBehavior = 'smooth';
     
+    // Intersection Observer to track active section
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { 
+        rootMargin: '-20% 0px -80% 0px',
+        threshold: 0.1
+      }
+    );
+
+    // Observe sections
+    const sections = ['hero', 'features', 'security', 'about'];
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+    
     return () => {
       // Clean up when component unmounts
       document.documentElement.style.scrollBehavior = '';
+      observer.disconnect();
     };
   }, []);
   
@@ -49,25 +79,37 @@ const Index = () => {
         
         {/* Desktop navigation */}
         <div className="hidden md:flex items-center space-x-6">
-          <nav className="flex items-center mr-6">
+          <nav className="flex items-center space-x-6 mr-6">
             <a 
               href="#features" 
-              className="text-muted-foreground hover:text-[#5e63f9] mx-3 text-sm font-medium"
               onClick={(e) => smoothScroll(e, 'features')}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                activeSection === 'features' 
+                  ? 'text-[#5e63f9] font-semibold' 
+                  : 'text-muted-foreground hover:text-[#5e63f9]'
+              }`}
             >
               Features
             </a>
             <a 
               href="#security" 
-              className="text-muted-foreground hover:text-[#5e63f9] mx-3 text-sm font-medium"
               onClick={(e) => smoothScroll(e, 'security')}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                activeSection === 'security' 
+                  ? 'text-[#5e63f9] font-semibold' 
+                  : 'text-muted-foreground hover:text-[#5e63f9]'
+              }`}
             >
               Security
             </a>
             <a 
               href="#about" 
-              className="text-muted-foreground hover:text-[#5e63f9] mx-3 text-sm font-medium"
               onClick={(e) => smoothScroll(e, 'about')}
+              className={`text-sm font-medium transition-colors duration-200 ${
+                activeSection === 'about' 
+                  ? 'text-[#5e63f9] font-semibold' 
+                  : 'text-muted-foreground hover:text-[#5e63f9]'
+              }`}
             >
               About
             </a>
@@ -86,56 +128,44 @@ const Index = () => {
         {/* Mobile menu button */}
         <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-md hover:bg-accent"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6 text-foreground" /> : <Menu className="h-6 w-6 text-foreground" />}
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="p-2">
+                <Menu className="h-6 w-6 text-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'features')}>
+                Features
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'security')}>
+                Security
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => smoothScroll(e, 'about')}>
+                About
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={() => navigate('/login')}
+                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium"
+              >
+                Sign In
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => navigate('/signup')}
+                className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] text-white hover:from-[#4f53e6] hover:to-[#6c70e8] font-semibold border-0 focus:bg-gradient-to-r focus:from-[#4f53e6] focus:to-[#6c70e8] focus:text-white"
+              >
+                Sign Up
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-background pt-16 px-6 flex flex-col md:hidden">
-          <nav className="flex flex-col space-y-6 py-8">
-            <a 
-              href="#features" 
-              className="text-foreground hover:text-[#5e63f9] text-lg font-medium" 
-              onClick={(e) => smoothScroll(e, 'features')}
-            >
-              Features
-            </a>
-            <a 
-              href="#security" 
-              className="text-foreground hover:text-[#5e63f9] text-lg font-medium" 
-              onClick={(e) => smoothScroll(e, 'security')}
-            >
-              Security
-            </a>
-            <a 
-              href="#about" 
-              className="text-foreground hover:text-[#5e63f9] text-lg font-medium" 
-              onClick={(e) => smoothScroll(e, 'about')}
-            >
-              About
-            </a>
-          </nav>
-          <div className="flex flex-col space-y-4 mt-4">
-            <Button variant="outline" className="w-full" onClick={() => navigate('/login')}>
-              Sign In
-            </Button>
-            <Button className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] w-full" onClick={() => navigate('/signup')}>
-              Sign Up
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* Main Content */}
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-background">
+        <section id="hero" className="bg-background">
           <div className="max-w-7xl mx-auto">
             <Hero />
           </div>

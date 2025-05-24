@@ -2,9 +2,8 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { CTA } from "@/components/CTA";
 import { Button } from "@/components/ui/button";
-import { Lock, MessageSquareDot, Shield, Menu, X } from "lucide-react";
-import jibber from "../assets/jibber.png"
-import { SignedIn, SignedOut, SignInButton, SignOutButton, SignUpButton, useAuth } from "@clerk/clerk-react";
+import { Lock, Shield, Menu, X } from "lucide-react";
+import jibber from "../assets/jibber-new.png"
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -13,7 +12,6 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 const Index = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isSignedIn } = useAuth();
 
 
   // Smooth scroll function
@@ -39,7 +37,7 @@ const Index = () => {
   }, []);
   
   return (
-    <div className="min-h-screen flex flex-col poppins-regular bg-background">
+    <div className="min-h-screen flex flex-col font-[Poppins] bg-background">
       {/* Header */}
       <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b sticky top-0 z-50 bg-background/90 backdrop-blur-sm">
         <div className="flex items-center">
@@ -77,23 +75,12 @@ const Index = () => {
           
           <ThemeToggle />
 
-          <SignedIn>
-            <SignOutButton>
-              <Button variant="ghost" className="mr-2 cursor-pointer">Sign Out</Button>
-            </SignOutButton>
-            <Button className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] cursor-pointer hover:from-[#4f53e6] hover:to-[#6c70e8] text-white" onClick={()=>navigate('/app')}>
-              <MessageSquareDot className="mr-2 h-4 w-4" />
-              Chats
-            </Button>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton>
-              <Button variant="ghost" className="mr-2 cursor-pointer">Sign In</Button>
-            </SignInButton>
-            <SignUpButton>
-              <Button className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] cursor-pointer hover:from-[#4f53e6] hover:to-[#6c70e8] text-white">Sign Up</Button>
-            </SignUpButton>
-          </SignedOut>
+          <Button variant="ghost" className="mr-2 cursor-pointer" onClick={() => navigate('/login')}>
+            Sign In
+          </Button>
+          <Button className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] cursor-pointer hover:from-[#4f53e6] hover:to-[#6c70e8] text-white" onClick={() => navigate('/signup')}>
+            Sign Up
+          </Button>
         </div>
 
         {/* Mobile menu button */}
@@ -135,23 +122,12 @@ const Index = () => {
             </a>
           </nav>
           <div className="flex flex-col space-y-4 mt-4">
-            <SignedIn>
-              <Button onClick={()=>navigate('/app')} className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] w-full">
-                <MessageSquareDot className="mr-2 h-4 w-4" />
-                Go to Chats
-              </Button>
-              <SignOutButton>
-                <Button variant="outline" className="w-full">Sign Out</Button>
-              </SignOutButton>
-            </SignedIn>
-            <SignedOut>
-              <SignInButton>
-                <Button variant="outline" className="w-full">Sign In</Button>
-              </SignInButton>
-              <SignUpButton>
-                <Button className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] w-full">Sign Up</Button>
-              </SignUpButton>
-            </SignedOut>
+            <Button variant="outline" className="w-full" onClick={() => navigate('/login')}>
+              Sign In
+            </Button>
+            <Button className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] w-full" onClick={() => navigate('/signup')}>
+              Sign Up
+            </Button>
           </div>
         </div>
       )}
@@ -225,22 +201,12 @@ const Index = () => {
                 </div>
               </div>
               
-              {isSignedIn ? (
-                <Button
-                  className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all"
-                  onClick={() => navigate('/app')}
-                >
-                  Go to Chats
-                </Button>
-              ) : (
-                <SignUpButton>
-                  <Button
-                    className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all cursor-pointer"
-                  >
-                    Get Started
-                  </Button>
-                </SignUpButton>
-              )}
+              <Button
+                className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all cursor-pointer"
+                onClick={() => navigate('/signup')}
+              >
+                Get Started
+              </Button>
             </div>
 
             {/* Phone preview - keeping the UI intact */}

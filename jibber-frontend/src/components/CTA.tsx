@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useAuth, SignUpButton } from "@clerk/clerk-react";
 
 export function CTA() {
   const navigate = useNavigate();
-  const { isSignedIn } = useAuth();
 
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
@@ -40,24 +38,13 @@ export function CTA() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {isSignedIn ? (
-              <Button 
-                size="lg" 
-                className="bg-white text-[#5e63f9] hover:bg-gray-100 font-medium px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                onClick={() => navigate('/app')}
-              >
-                Go to Chats
-              </Button>
-            ) : (
-              <SignUpButton>
-                <Button 
-                  size="lg" 
-                  className="bg-white text-[#5e63f9] hover:bg-gray-100 font-medium px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                >
-                  Get Started Now
-                </Button>
-              </SignUpButton>
-            )}
+            <Button 
+              size="lg" 
+              className="bg-white text-[#5e63f9] hover:bg-gray-100 font-medium px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+              onClick={() => navigate('/signup')}
+            >
+              Get Started Now
+            </Button>
             <Button 
               size="lg" 
               variant="outline" 

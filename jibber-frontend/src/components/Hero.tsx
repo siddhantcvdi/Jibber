@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button";
-import jibber from '../assets/jibber.png'
+import jibber from '../assets/jibber-new.png'
 import { useNavigate } from "react-router-dom";
-import { useAuth, SignUpButton } from "@clerk/clerk-react";
 
 export function Hero() {
   const navigate = useNavigate();
-  const { isSignedIn } = useAuth();
 
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
@@ -39,24 +37,13 @@ export function Hero() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {isSignedIn ? (
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-[#5e63f9] to-[#7c80fa] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all duration-300 hover:shadow-xl"
-                onClick={() => navigate('/app')}
-              >
-                Go to Chats
-              </Button>
-            ) : (
-              <SignUpButton>
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-[#5e63f9] to-[#7c80fa] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer"
-                >
-                  Get Started
-                </Button>
-              </SignUpButton>
-            )}
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-[#5e63f9] to-[#7c80fa] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium px-8 py-6 text-lg rounded-full shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer"
+              onClick={() => navigate('/signup')}
+            >
+              Get Started
+            </Button>
             <Button 
               size="lg" 
               variant="outline" 

@@ -40,7 +40,7 @@ const ForgotPassword = () => {
         
         {/* Back to login button */}
         <div className="absolute top-4 left-4 z-10">
-          <Link to="/login" replace={true}>
+          <Link to="/login">
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Login
@@ -86,7 +86,7 @@ const ForgotPassword = () => {
                   Try another email
                 </Button>
                 
-                <Link to="/login" replace={true}>
+                <Link to="/login">
                   <Button className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white">
                     Back to Login
                   </Button>

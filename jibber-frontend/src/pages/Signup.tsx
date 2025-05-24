@@ -258,7 +258,6 @@ const Signup = () => {
                 Already have an account?{" "}
                 <Link 
                   to="/login" 
-                  replace={true}
                   className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors"
                 >
                   Sign in here

@@ -28,7 +28,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden font-[Poppins]">
+    <div className="min-h-screen flex items-center justify-center p-4 pt-16 sm:pt-4 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden font-[Poppins]">
       {/* Background decorative elements */}
       <div className="absolute -top-40 -left-40 w-80 h-80 bg-[#5e63f9]/10 rounded-full blur-3xl opacity-60"></div>
       <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-[#7c7fff]/10 rounded-full blur-3xl opacity-60"></div>

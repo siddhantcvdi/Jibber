@@ -69,7 +69,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col font-[Poppins] bg-background">
       {/* Header */}
-      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b sticky top-0 z-50 bg-background/90 backdrop-blur-sm">
+      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b border-white/10 sticky top-0 z-50 glassmorphism-header">
         <div className="flex items-center">
           <div className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] p-2 rounded-lg">
             <img src={jibber} alt="Jibber Logo" className="h-6 w-6" />
@@ -134,7 +134,7 @@ const Index = () => {
                 <Menu className="h-6 w-6 text-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 glassmorphism-dropdown">
               <DropdownMenuItem onClick={(e) => smoothScroll(e, 'features')}>
                 Features
               </DropdownMenuItem>

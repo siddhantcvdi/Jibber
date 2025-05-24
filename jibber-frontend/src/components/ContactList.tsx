@@ -26,7 +26,7 @@ const ContactList = () => {
             <ThemeToggle />
             <button 
               onClick={() => navigate('/app/settings')}
-              className="p-2 rounded-full hover:bg-accent text-muted-foreground transition-colors"
+              className="p-2 rounded-2xl hover:bg-accent text-muted-foreground transition-colors"
             >
               <Settings size={18} />
             </button>

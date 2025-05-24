@@ -34,7 +34,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
     
     return (
         <div 
-            className={`flex gap-2 sm:gap-3 items-center cursor-pointer hover:bg-accent p-2 sm:p-3 rounded-xl transition-all duration-200 mb-1
+            className={`flex gap-2 sm:gap-3 items-center cursor-pointer hover:bg-accent p-2 sm:p-3 rounded-2xl transition-all duration-200 mb-1
                 ${isActive ? 'bg-accent/50 dark:bg-accent/30 border-l-4 border-[#5e63f9]' : ''}`}
             onClick={()=>handleNavigate()}
         >

@@ -18,10 +18,10 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, isSentByMe, timestamp }) 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className={`max-w-xs px-5 py-3 rounded-[18px] ${
+        className={`max-w-xs px-5 py-3 rounded-[24px] ${
           isSentByMe
-            ? 'bg-[#5e63f9]/90 backdrop-blur-sm text-white rounded-tr-[6px] shadow-lg shadow-[#5e63f9]/20 dark:shadow-[#5e63f9]/10'
-            : 'bg-gray-200 dark:bg-accent/70 text-foreground rounded-tl-[6px]'
+            ? 'bg-[#5e63f9]/90 backdrop-blur-sm text-white rounded-tr-[8px] shadow-lg shadow-[#5e63f9]/20 dark:shadow-[#5e63f9]/10'
+            : 'bg-gray-200 dark:bg-accent/70 text-foreground rounded-tl-[8px]'
         }`}
         style={{ 
           whiteSpace: 'pre-wrap',

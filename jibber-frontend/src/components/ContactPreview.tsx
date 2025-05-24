@@ -1,6 +1,4 @@
-import useChatWindowStore from '@/store/chatWindowStore';
 import React from 'react';
-import { useMediaQuery } from 'react-responsive';
 import { useNavigate } from 'react-router-dom';
 import { Check, Shield } from 'lucide-react';
 
@@ -26,19 +24,9 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
     isOnline = true
 }) => {
     const navigate = useNavigate();
-    const isMobile = useMediaQuery({ maxWidth: 768 });
-    const { setChatWindow } = useChatWindowStore();
     
     const handleNavigate = () => {
-        if(isMobile) 
-            navigate(`/app/chat/${id}`);
-        else {
-            setChatWindow({
-                id: id, 
-                name: name,
-                icon: icon,
-            });
-        }
+        navigate(`/app/chat/${id}`);
     };
     
     return (

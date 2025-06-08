@@ -26,7 +26,7 @@ function App() {
     };
     
     initializeAuth();
-  }, []);
+  }, [silentRefresh]);
 
   useEffect(() => {
     // Apply dark mode class to document element

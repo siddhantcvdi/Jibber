@@ -174,7 +174,7 @@ export const authStore = create<AuthState>((set, get) => ({
 
             try {
                 const userResponse = await api.get('/auth/me');
-                const user = userResponse.data.user;
+                const user = userResponse.data.data.user;
                 setAuth(accessToken, user);
             } catch {
                 setAuth(accessToken, null);

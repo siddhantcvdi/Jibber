@@ -8,23 +8,33 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import jibber from "../assets/jibber-new.png";
+import authStore from '@/store/auth.store';
+import { toast } from 'sonner';
 
 const Login = () => {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const {isAuthLoading, loginUser} = authStore()
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call - replace with actual login logic
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try{
+      loginUser({
+        usernameOrEmail: emailOrUsername,
+        password
+      });
+      toast.success("Logged In Successfully");
+    }catch(err: any){
+      const message = err.response.data.message || err.message || "An error occured";
+      console.log(err);
+      toast.error(message)
+      
+    }
     
     console.log("Login attempt:", { emailOrUsername, password, rememberMe });
-    setIsLoading(false);
   };
 
   return (
@@ -138,9 +148,9 @@ const Login = () => {
               <Button
                 type="submit"
                 className="w-full h-11 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium text-sm sm:text-base transition-all duration-300 disabled:opacity-50"
-                disabled={isLoading}
+                disabled={isAuthLoading}
               >
-                {isLoading ? (
+                {isAuthLoading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     <span>Signing in...</span>

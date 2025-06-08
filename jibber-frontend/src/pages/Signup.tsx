@@ -5,8 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Check, AtSign, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import jibber from "../assets/jibber-new.png";
+import authStore from "@/store/auth.store.ts";
+import { toast } from "sonner"
 
 interface PasswordRequirement {
   text: string;
@@ -22,7 +24,6 @@ const Signup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Password requirements validation
   const passwordRequirements: PasswordRequirement[] = [
@@ -48,15 +49,27 @@ const Signup = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const {registerUser, isAuthLoading} = authStore()
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call - replace with actual signup logic
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    try{
+      await registerUser({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
+      toast.success("User registered successfully.", {
+        position: "top-right",
+      });
+      navigate("/login");
+    }catch (err: any){
+      console.log(err)
+      toast.error(err?.response?.data?.message || err?.message || "Something went wrong.", {
+        position: "top-right",
+      });
+    }
     console.log("Signup attempt:", formData);
-    setIsLoading(false);
   };
 
   const isFormValid = () => {
@@ -239,9 +252,9 @@ const Signup = () => {
               <Button
                 type="submit"
                 className="w-full h-11 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium text-sm sm:text-base transition-all duration-300 disabled:opacity-50"
-                disabled={isLoading || !isFormValid()}
+                disabled={isAuthLoading || !isFormValid()}
               >
-                {isLoading ? (
+                {isAuthLoading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     <span>Creating account...</span>

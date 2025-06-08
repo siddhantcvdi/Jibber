@@ -72,7 +72,7 @@ const ChatWindow = () => {
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-3xl overflow-hidden">
+    <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg overflow-hidden">
       <div className="bg-background border-b border-border shadow-sm">
         <div className="flex justify-between items-center p-3 px-4">
           <div className="flex items-center gap-3">

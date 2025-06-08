@@ -12,7 +12,7 @@ const isOnChatRoute = location.pathname.includes('/app/chat/')
 const isOnSettingsRoute = location.pathname.includes('/app/settings')
 
 return (
-    <div className="flex h-[100dvh] w-full overflow-hidden">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-white dark:bg-gray-900">
         {isMobile ? (
             <Outlet/>
         ) : (

@@ -48,7 +48,7 @@ export function Hero() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="font-medium px-8 py-6 text-lg rounded-full border-2 hover:bg-accent"
+              className="font-medium px-8 py-6 text-lg rounded-full border-2 hover:bg-accent cursor-pointer"
               onClick={scrollToFeatures}
             >
               Learn More

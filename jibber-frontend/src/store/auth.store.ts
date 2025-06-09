@@ -170,6 +170,8 @@ export const authStore = create<AuthState>((set, get) => ({
 
         try {
             const response = await refreshApi.post('/auth/refresh');
+            console.log(response);
+            
             const { accessToken } = response.data.data;
 
             try {

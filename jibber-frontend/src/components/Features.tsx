@@ -1,4 +1,4 @@
-import { MessageCircle, Lock, Shield, Check } from "lucide-react";
+import { Check, Key, Fingerprint, Eye } from "lucide-react";
 import { useState } from "react";
 
 interface FeatureProps {
@@ -57,62 +57,73 @@ export function Features() {
         <div className="text-center mb-12 relative z-10">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#eef0ff] dark:bg-[#2d2f6b] mb-4 cursor-pointer hover:bg-[#e9ecff] dark:hover:bg-[#34377c] transition-colors duration-300">
             <span className="animate-pulse w-2 h-2 rounded-full bg-[#5e63f9] mr-2"></span>
-            <span className="text-[#5e63f9] font-medium text-sm">Key Features</span>
+            <span className="text-[#5e63f9] font-medium text-sm">Advanced Cryptography</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Why Choose Jibber?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Military-Grade Security</h2>
+          <p className="text-muted-foreground text-lg max-w-3xl mx-auto mb-6">
+            Powered by cutting-edge cryptographic protocols that ensure your privacy and security at every level.
+          </p>
           
           <div className="h-1 w-20 bg-gradient-to-r from-[#5e63f9] to-[#a5a8ff] mx-auto mb-6 rounded-full"></div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto relative z-10">
           <Feature
-            icon={<Shield className="h-8 w-8 text-[#5e63f9]" />}
-            title="End-to-End Encryption"
-            description="Messages encrypted on your device, decrypted only by recipients."
+            icon={<Eye className="h-8 w-8 text-[#5e63f9]" />}
+            title="Zero Knowledge Auth"
+            description="OPAQUE protocol ensures passwords never leave your device, even during authentication."
             color="text-blue-600"
             highlightPoints={[
-              "256-bit AES encryption",
-              "Perfect forward secrecy"
+              "OPAQUE protocol implementation",
+              "Password-authenticated key exchange",
+              "No password transmission to server"
             ]}
           />
           <Feature
-            icon={<Lock className="h-8 w-8 text-[#5e63f9]" />}
-            title="Zero Access Design"
-            description="We can't read your messages. Keys never leave your device."
+            icon={<Key className="h-8 w-8 text-[#5e63f9]" />}
+            title="ECDH Key Exchange"
+            description="Elliptic Curve Diffie-Hellman for secure end-to-end encryption key generation."
             color="text-purple-600"
             highlightPoints={[
-              "No plain text on servers",
-              "Local-only key storage"
+              "P-256 elliptic curve cryptography",
+              "Perfect forward secrecy",
+              "Ephemeral key generation"
             ]}
           />
           <Feature
-            icon={<MessageCircle className="h-8 w-8 text-[#5e63f9]" />}
-            title="Modern Experience"
-            description="All features of a modern messaging app with added security."
+            icon={<Fingerprint className="h-8 w-8 text-[#5e63f9]" />}
+            title="Ed25519 Signatures"
+            description="EdDSA digital signatures for message authenticity and integrity verification."
             color="text-indigo-600"
             highlightPoints={[
-              "Rich media messaging",
-              "Multi-device syncing"
+              "Edwards-curve digital signatures",
+              "Message integrity verification",
+              "Non-repudiation guarantee"
             ]}
           />
         </div>
+       
         
         <div className="mt-14 bg-background dark:bg-card rounded-2xl shadow-md border border-border p-6 max-w-6xl mx-auto relative cursor-pointer hover:shadow-lg transition-all duration-300">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] opacity-5 rounded-2xl"></div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
             <div className="text-center p-3 hover:transform hover:scale-105 transition-transform duration-300">
-              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">100%</div>
-              <p className="text-muted-foreground text-sm">End-to-end encrypted</p>
+              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">256-bit</div>
+              <p className="text-muted-foreground text-sm">AES encryption</p>
             </div>
-            <div className="text-center p-3 border-t md:border-t-0 md:border-l md:border-r border-border hover:transform hover:scale-105 transition-transform duration-300">
-              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">10M+</div>
-              <p className="text-muted-foreground text-sm">Messages sent securely</p>
+            <div className="text-center p-3 border-t md:border-t-0 md:border-l border-border hover:transform hover:scale-105 transition-transform duration-300">
+              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">P-256</div>
+              <p className="text-muted-foreground text-sm">Elliptic curve</p>
             </div>
-            <div className="text-center p-3 border-t md:border-t-0 border-border hover:transform hover:scale-105 transition-transform duration-300">
-              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">99.9%</div>
-              <p className="text-muted-foreground text-sm">Uptime reliability</p>
+            <div className="text-center p-3 border-t md:border-t-0 md:border-l border-border hover:transform hover:scale-105 transition-transform duration-300">
+              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">Ed25519</div>
+              <p className="text-muted-foreground text-sm">Digital signatures</p>
+            </div>
+            <div className="text-center p-3 border-t md:border-t-0 md:border-l border-border hover:transform hover:scale-105 transition-transform duration-300">
+              <div className="text-3xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#7c7fff]">OPAQUE</div>
+              <p className="text-muted-foreground text-sm">Zero-knowledge auth</p>
             </div>
           </div>
         </div>

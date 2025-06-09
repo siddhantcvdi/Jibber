@@ -28,22 +28,22 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   return (
     <div className={`relative flex w-fit items-center rounded-full ${className}`}>
       <button
-        className={`${TOGGLE_CLASSES} ${selected === "light" ? "text-white" : "text-slate-300"
-          }`}
+        className={`${TOGGLE_CLASSES} ${selected === "light" ? "text-slate-800" : "text-slate-400"
+          } cursor-pointer`}
         onClick={() => setDarkMode(false)}
         aria-label="Light mode"
       >
         <FiSun className="relative z-10 text-md md:text-sm" />
-        <span className="relative z-10 hidden md:inline">Light</span>
+        
       </button>
       <button
         className={`${TOGGLE_CLASSES} ${selected === "dark" ? "text-white" : "text-slate-800"
-          }`}
+          } cursor-pointer`}
         onClick={() => setDarkMode(true)}
         aria-label="Dark mode"
       >
         <FiMoon className="relative z-10 text-md md:text-sm" />
-        <span className="relative z-10 hidden md:inline">Dark</span>
+        
       </button>
       <div
         className={`absolute inset-0 z-0 flex ${selected === "dark" ? "justify-end" : "justify-start"

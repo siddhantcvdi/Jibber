@@ -48,7 +48,7 @@ export function CTA() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium px-8 py-6 text-lg rounded-full"
+              className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium px-8 py-6 text-lg rounded-full cursor-pointer"
               onClick={scrollToFeatures}
             >
               Learn More

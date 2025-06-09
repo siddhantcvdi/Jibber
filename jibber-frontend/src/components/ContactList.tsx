@@ -35,24 +35,23 @@ const ContactList = () => {
   };
 
   return (
-    <div className="h-[100dvh] w-full md:w-1/4 md:min-w-[320px] flex flex-col bg-background border-r border-border poppins-regular">
+    <div className="h-[100dvh] w-full md:w-1/4 md:min-w-[400px] flex flex-col bg-background border-r border-border poppins-regular">
       <div className="p-4 border-border">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-foreground">Messages</h1>
-            <div className="px-2 py-0.5 bg-[#5e63f9] text-white text-xs font-medium rounded-full">3</div>
+            <h1 className="text-xl font-semibold text-foreground">Jibber</h1>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button 
               onClick={() => navigate('/app/settings')}
-              className="p-2 rounded-2xl hover:bg-accent text-muted-foreground transition-colors"
+              className="p-2 rounded-2xl hover:bg-accent text-muted-foreground transition-colors cursor-pointer"
             >
               <Settings size={18} />
             </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-2 rounded-2xl hover:bg-accent text-muted-foreground transition-colors">
+                <button className="p-2 rounded-2xl hover:bg-accent text-muted-foreground transition-colors cursor-pointer">
                   <MoreVertical size={18} />
                 </button>
               </DropdownMenuTrigger>
@@ -95,7 +94,7 @@ const ContactList = () => {
       <div className="flex border-b border-border px-2">
         <button 
           onClick={() => setActiveTab("all")}
-          className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+          className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === "all" 
               ? "text-[#5e63f9]" 
               : "text-muted-foreground hover:text-foreground"
@@ -108,7 +107,7 @@ const ContactList = () => {
         </button>
         <button 
           onClick={() => setActiveTab("find")}
-          className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+          className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === "find" 
               ? "text-[#5e63f9]" 
               : "text-muted-foreground hover:text-foreground"

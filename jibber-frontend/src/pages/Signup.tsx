@@ -95,7 +95,7 @@ const Signup = () => {
       {/* Back to home button */}
       <div className="absolute top-4 left-4 z-10">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs sm:text-sm">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs sm:text-sm cursor-pointer">
             <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Back to Home</span>
             <span className="sm:hidden">Back</span>
@@ -180,7 +180,7 @@ const Signup = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -226,7 +226,7 @@ const Signup = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -251,7 +251,7 @@ const Signup = () => {
               {/* Signup Button */}
               <Button
                 type="submit"
-                className="w-full h-11 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium text-sm sm:text-base transition-all duration-300 disabled:opacity-50"
+                className="w-full h-11 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium text-sm sm:text-base transition-all duration-300 disabled:opacity-50 cursor-pointer"
                 disabled={isAuthLoading || !isFormValid()}
               >
                 {isAuthLoading ? (
@@ -271,7 +271,7 @@ const Signup = () => {
                 Already have an account?{" "}
                 <Link 
                   to="/login" 
-                  className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors"
+                  className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors cursor-pointer"
                 >
                   Sign in here
                 </Link>

@@ -51,7 +51,7 @@ const Login = () => {
       {/* Back to home button */}
       <div className="absolute top-4 left-4 z-10">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground cursor-pointer">
             <ArrowLeft className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Back to Home</span>
             <span className="sm:hidden">Back</span>
@@ -117,7 +117,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -138,7 +138,7 @@ const Login = () => {
                 </div>
                 <Link 
                   to="/forgot-password" 
-                  className="text-sm text-[#5e63f9] hover:text-[#4f53e6] transition-colors text-left sm:text-right"
+                  className="text-sm text-[#5e63f9] hover:text-[#4f53e6] transition-colors text-left sm:text-right cursor-pointer"
                 >
                   Forgot password?
                 </Link>
@@ -147,7 +147,7 @@ const Login = () => {
               {/* Login Button */}
               <Button
                 type="submit"
-                className="w-full h-11 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium text-sm sm:text-base transition-all duration-300 disabled:opacity-50"
+                className="w-full h-11 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white font-medium text-sm sm:text-base transition-all duration-300 disabled:opacity-50 cursor-pointer"
                 disabled={isAuthLoading}
               >
                 {isAuthLoading ? (
@@ -167,7 +167,7 @@ const Login = () => {
                 Don't have an account?{" "}
                 <Link 
                   to="/signup" 
-                  className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors"
+                  className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors cursor-pointer"
                 >
                   Sign up for free
                 </Link>

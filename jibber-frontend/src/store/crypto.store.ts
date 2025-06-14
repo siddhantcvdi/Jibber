@@ -1,23 +1,45 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import sodium from 'libsodium-wrappers'
 
-type ThemeStore = {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-  setDarkMode: (isDark: boolean) => void;
+type CryptoStore = {
+  generateRawKeys: () => Promise<{
+    privateIdKey: Uint8Array<ArrayBufferLike>,
+    publicIdKey: Uint8Array<ArrayBufferLike>,
+    privateSigningKey: Uint8Array<ArrayBufferLike>,
+    publicSigningKey: Uint8Array<ArrayBufferLike>
+  }>,
+  rawToBase64: (key: Uint8Array<ArrayBufferLike>) => string,
+  base64toRaw: (key: string)  => Uint8Array<ArrayBufferLike>
+  // encryptPrivateKey: (key: string) => Uint8Array<ArrayBufferLike>
 };
 
-const useThemeStore = create<ThemeStore>()(
-  persist(
-    (set) => ({
-      isDarkMode: true,
-      toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
-      setDarkMode: (isDark) => set({ isDarkMode: isDark }),
-    }),
-    {
-      name: 'jibber-theme',
+const useCryptoStore = create<CryptoStore>(()=>({
+  generateRawKeys: async () => {
+    await sodium.ready
+    const {privateKey: privateSigningKey, publicKey: publicSigningKey} = sodium.crypto_sign_keypair();
+    const privateIdKey = sodium.crypto_sign_ed25519_sk_to_curve25519(privateSigningKey);
+    const publicIdKey = sodium.crypto_sign_ed25519_pk_to_curve25519(publicSigningKey);
+    return {
+      privateIdKey,
+      publicIdKey,
+      privateSigningKey,
+      publicSigningKey
     }
-  )
-);
+  },
 
-export default useThemeStore;
+  rawToBase64(key) {
+      return sodium.to_base64(key);
+  },
+
+  base64toRaw(key) {
+    return sodium.from_base64(key)
+  },
+
+  // encryptPrivateKey(key, password){
+
+  // }
+
+  
+}))
+
+export default useCryptoStore;

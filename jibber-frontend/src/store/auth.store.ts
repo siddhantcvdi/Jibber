@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import api, { refreshApi } from '@/services/api.ts';
 import * as opaque from '@serenity-kit/opaque';
+import useCryptoStore from './crypto.store';
 
 interface RegisterData {
   username: string;
@@ -63,11 +64,9 @@ export const authStore = create<AuthState>((set, get) => ({
   registerUser: async (userData) => {
     const backendURL = import.meta.env.VITE_BACKEND_URL;
     set({ isAuthLoading: true });
-
     try {
       const password = userData.password;
-      const { registrationRequest, clientRegistrationState } =
-        opaque.client.startRegistration({ password });
+      const { registrationRequest, clientRegistrationState } = opaque.client.startRegistration({ password });
 
       const { data: startData } = await api.post(
         `${backendURL}/auth/register-start`,
@@ -77,25 +76,30 @@ export const authStore = create<AuthState>((set, get) => ({
           registrationRequest,
         }
       );
-
+      
       const registrationResponse = startData.data;
       console.log('Registration started ✅');
-
       const { registrationRecord } = opaque.client.finishRegistration({
         clientRegistrationState,
         registrationResponse,
         password,
       });
-
+      
+      const generateRawKeys = useCryptoStore.getState().generateRawKeys;
+      const rawToBase64 = useCryptoStore.getState().rawToBase64;
+      const {privateIdKey, privateSigningKey, publicIdKey, publicSigningKey} = await generateRawKeys();
       const { data: finishData } = await api.post(
         `${backendURL}/auth/register-finish`,
         {
           username: userData.username,
           email: userData.email,
           registrationRecord,
+          encPrivateIdKey: rawToBase64(privateIdKey),
+          encPrivateSigningKey: rawToBase64(privateSigningKey),
+          publicIdKey: rawToBase64(publicIdKey),
+          publicSigningKey: rawToBase64(publicSigningKey)
         }
       );
-
       console.log('Registration finished ✅', finishData.data);
     } catch (err: unknown) {
       console.error('Registration error ❌', err);

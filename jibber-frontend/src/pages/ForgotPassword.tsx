@@ -1,27 +1,33 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Mail, ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
-import { Link } from "react-router-dom";
-import jibber from "../assets/jibber-new.png";
-import { motion } from "framer-motion";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Mail, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import jibber from '../assets/jibber-new.png';
+import { motion } from 'framer-motion';
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Simulate API call - replace with actual forgot password logic
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log("Password reset requested for:", email);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    console.log('Password reset requested for:', email);
     setIsLoading(false);
     setIsSubmitted(true);
   };
@@ -32,16 +38,20 @@ const ForgotPassword = () => {
         {/* Background decorative elements */}
         <div className="absolute -top-40 -left-40 w-80 h-80 bg-[#5e63f9]/10 rounded-full blur-3xl opacity-60"></div>
         <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-[#7c7fff]/10 rounded-full blur-3xl opacity-60"></div>
-        
+
         {/* Header with theme toggle */}
         <div className="absolute top-4 right-4 z-10">
           <ThemeToggle />
         </div>
-        
+
         {/* Back to login button */}
         <div className="absolute top-4 left-4 z-10">
           <Link to="/login">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Login
             </Button>
@@ -62,12 +72,13 @@ const ForgotPassword = () => {
                   <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-              
+
               <CardTitle className="text-2xl font-bold text-foreground">
                 Check your email
               </CardTitle>
               <CardDescription className="text-muted-foreground">
-                We've sent a password reset link to<br />
+                We've sent a password reset link to
+                <br />
                 <span className="font-medium text-foreground">{email}</span>
               </CardDescription>
             </CardHeader>
@@ -77,7 +88,7 @@ const ForgotPassword = () => {
                 <p className="text-sm text-muted-foreground">
                   Didn't receive the email? Check your spam folder or try again.
                 </p>
-                
+
                 <Button
                   onClick={() => setIsSubmitted(false)}
                   variant="outline"
@@ -85,7 +96,7 @@ const ForgotPassword = () => {
                 >
                   Try another email
                 </Button>
-                
+
                 <Link to="/login">
                   <Button className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white">
                     Back to Login
@@ -104,16 +115,20 @@ const ForgotPassword = () => {
       {/* Background decorative elements */}
       <div className="absolute -top-40 -left-40 w-80 h-80 bg-[#5e63f9]/10 rounded-full blur-3xl opacity-60"></div>
       <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-[#7c7fff]/10 rounded-full blur-3xl opacity-60"></div>
-      
+
       {/* Header with theme toggle */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
-      
+
       {/* Back to login button */}
       <div className="absolute top-4 left-4 z-10">
         <Link to="/login">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Login
           </Button>
@@ -134,7 +149,7 @@ const ForgotPassword = () => {
                 <img src={jibber} alt="Jibber Logo" className="h-8 w-8" />
               </div>
             </div>
-            
+
             <CardTitle className="text-2xl font-bold text-foreground">
               Forgot your password?
             </CardTitle>
@@ -153,7 +168,9 @@ const ForgotPassword = () => {
                     Important: Data Loss Warning
                   </h4>
                   <p className="text-xs text-amber-700 dark:text-amber-300">
-                    Resetting your password will permanently delete all your previous chat history and messages. This action cannot be undone.
+                    Resetting your password will permanently delete all your
+                    previous chat history and messages. This action cannot be
+                    undone.
                   </p>
                 </div>
               </div>
@@ -191,7 +208,7 @@ const ForgotPassword = () => {
                     <span>Sending reset link...</span>
                   </div>
                 ) : (
-                  "Send reset link"
+                  'Send reset link'
                 )}
               </Button>
             </form>
@@ -199,9 +216,9 @@ const ForgotPassword = () => {
             {/* Back to login link */}
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Remember your password?{" "}
-                <Link 
-                  to="/login" 
+                Remember your password?{' '}
+                <Link
+                  to="/login"
                   className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors"
                 >
                   Sign in here

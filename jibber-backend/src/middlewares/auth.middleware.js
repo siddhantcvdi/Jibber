@@ -31,10 +31,7 @@ const authMiddleware = (req, res, next) => {
             message = "Access token has expired. Please refresh your token.";
         } else if (err.name === 'JsonWebTokenError') {
             message = "Invalid access token format.";
-        } else if (err.name === 'NotBeforeError') {
-            message = "Access token not active yet.";
-        }
-
+        } 
         return errorResponse(res, { 
             message, 
             statusCode: 401 

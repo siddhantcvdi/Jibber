@@ -4,10 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="./src/assets/jibber-new.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jibber </title>
+    <title>Jibber</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      try {
+        const theme = JSON.parse(localStorage.getItem('jibber-theme'));
+        const isDark = theme?.state?.isDarkMode ?? false;
+        document.documentElement.classList.toggle('dark', isDark);
+        document.body.style.backgroundColor = isDark
+          ? 'oklch(0.145 0 0)'
+          : '#fff';
+      } catch (e) {}
+    </script>
   </body>
 </html>

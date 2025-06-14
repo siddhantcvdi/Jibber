@@ -1,27 +1,27 @@
-import { Search, Settings, MoreVertical, User, LogOut } from "lucide-react"
-import ChatPreview from "./ContactPreview"
-import { useState } from "react"
-import { ThemeToggle } from "./ui/theme-toggle"
-import { contactsData } from "../data/contactsData"
-import { useLocation, useNavigate } from "react-router-dom"
-import authStore from "../store/auth.store"
+import { Search, Settings, MoreVertical, User, LogOut } from 'lucide-react';
+import ChatPreview from './ContactPreview';
+import { useState } from 'react';
+import { ThemeToggle } from './ui/theme-toggle';
+import { contactsData } from '../data/contactsData';
+import { useLocation, useNavigate } from 'react-router-dom';
+import authStore from '../store/auth.store';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 
 const ContactList = () => {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
   const location = useLocation();
   const navigate = useNavigate();
   const { user, clearAuth } = authStore();
-  
+
   // Get current chat ID from URL to determine which chat is active
-  const currentChatId = location.pathname.includes('/app/chat/') 
-    ? location.pathname.split('/app/chat/')[1] 
+  const currentChatId = location.pathname.includes('/app/chat/')
+    ? location.pathname.split('/app/chat/')[1]
     : null;
 
   const handleLogout = () => {
@@ -43,7 +43,7 @@ const ContactList = () => {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <button 
+            <button
               onClick={() => navigate('/app/settings')}
               className="p-2 rounded-2xl hover:bg-accent text-muted-foreground transition-colors cursor-pointer"
             >
@@ -69,7 +69,7 @@ const ContactList = () => {
                     </p>
                   </div>
                 </div>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => navigate('/app/settings')}
                   className="flex items-center gap-3 p-3 cursor-pointer"
                 >
@@ -77,7 +77,7 @@ const ContactList = () => {
                   <span>Profile & Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
                   className="flex items-center gap-3 p-3 cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/50"
                 >
@@ -89,61 +89,66 @@ const ContactList = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Tabs */}
       <div className="flex border-b border-border px-2">
-        <button 
-          onClick={() => setActiveTab("all")}
+        <button
+          onClick={() => setActiveTab('all')}
           className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${
-            activeTab === "all" 
-              ? "text-[#5e63f9]" 
-              : "text-muted-foreground hover:text-foreground"
+            activeTab === 'all'
+              ? 'text-[#5e63f9]'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           All Chats
-          {activeTab === "all" && (
+          {activeTab === 'all' && (
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#5e63f9]"></div>
           )}
         </button>
-        <button 
-          onClick={() => setActiveTab("find")}
+        <button
+          onClick={() => setActiveTab('find')}
           className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${
-            activeTab === "find" 
-              ? "text-[#5e63f9]" 
-              : "text-muted-foreground hover:text-foreground"
+            activeTab === 'find'
+              ? 'text-[#5e63f9]'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           Find Users
-          {activeTab === "find" && (
+          {activeTab === 'find' && (
             <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#5e63f9]"></div>
           )}
         </button>
       </div>
-      
+
       {/* Chat list */}
       <div className="flex-1 overflow-y-auto p-2 pt-4 bg-background">
-        {activeTab === "find" ? (
+        {activeTab === 'find' ? (
           <div className="p-2">
             <div className="relative mb-4">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search users by username" 
+              <Search
+                size={16}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+              />
+              <input
+                type="text"
+                placeholder="Search users by username"
                 className="bg-muted dark:bg-muted/80 w-full rounded-full py-2 pl-10 pr-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-blue-100 transition-all"
               />
             </div>
-            <p className="text-sm text-muted-foreground text-center">Enter a username to find contacts</p>
+            <p className="text-sm text-muted-foreground text-center">
+              Enter a username to find contacts
+            </p>
           </div>
         ) : (
           <div>
             <div>
               {contactsData.map((contact) => (
-                <ChatPreview 
+                <ChatPreview
                   key={contact.id}
-                  name={contact.name} 
-                  lastChatText={contact.lastChatText} 
-                  icon={contact.icon} 
-                  id={contact.id} 
+                  name={contact.name}
+                  lastChatText={contact.lastChatText}
+                  icon={contact.icon}
+                  id={contact.id}
                   time={contact.time}
                   unread={contact.unread}
                   isActive={currentChatId === contact.id}
@@ -155,7 +160,7 @@ const ContactList = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ContactList
+export default ContactList;

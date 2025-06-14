@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (isAuthLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-white dark:bg-gray-900">
+      <div className="flex items-center justify-center h-screen bg-background dark:bg-background">
         <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );

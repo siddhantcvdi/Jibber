@@ -1,35 +1,33 @@
-import { Route, Routes } from "react-router-dom";
-import Landing from "./pages/Index";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
-import MainLayout from "./Layouts/MainLayout";
-import ContactList from "./components/ContactList";
-import ChatWindow from "./components/ChatWindow";
-import Settings from "./components/Settings";
-import { Toaster } from "@/components/ui/sonner";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
-import { useEffect } from "react";
-import authStore from "./store/auth.store";
-import useThemeStore from "./store/themeStore";
+import { Route, Routes } from 'react-router-dom';
+import Landing from './pages/Index';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
+import MainLayout from './Layouts/MainLayout';
+import ContactList from './components/ContactList';
+import ChatWindow from './components/ChatWindow';
+import Settings from './components/Settings';
+import { Toaster } from '@/components/ui/sonner';
+import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
+import { useEffect } from 'react';
+import authStore from './store/auth.store';
+import useThemeStore from './store/themeStore';
 
 function App() {
-
-  const {isAuthLoading, silentRefresh} = authStore()
-  const { isDarkMode } = useThemeStore()
+  const { isAuthLoading, silentRefresh } = authStore();
+  const { isDarkMode } = useThemeStore();
 
   useEffect(() => {
     // Try to silently refresh token on app startup
     const initializeAuth = async () => {
       await silentRefresh();
     };
-    
+
     initializeAuth();
   }, [silentRefresh]);
 
   useEffect(() => {
-    // Apply dark mode class to document element
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -44,7 +42,6 @@ function App() {
       </div>
     );
   }
-
 
   return (
     <>

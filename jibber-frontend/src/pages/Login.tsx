@@ -1,40 +1,45 @@
 import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import jibber from "../assets/jibber-new.png";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import jibber from '../assets/jibber-new.png';
 import authStore from '@/store/auth.store';
 import { toast } from 'sonner';
 
 const Login = () => {
-  const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const {isAuthLoading, loginUser} = authStore()
-
+  const { isAuthLoading, loginUser } = authStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try{
+    try {
       loginUser({
         usernameOrEmail: emailOrUsername,
-        password
+        password,
       });
-      toast.success("Logged In Successfully");
-    }catch(err: any){
-      const message = err.response.data.message || err.message || "An error occured";
+      toast.success('Logged In Successfully');
+    } catch (err: any) {
+      const message =
+        err.response.data.message || err.message || 'An error occured';
       console.log(err);
-      toast.error(message)
-      
+      toast.error(message);
     }
-    
-    console.log("Login attempt:", { emailOrUsername, password, rememberMe });
+
+    console.log('Login attempt:', { emailOrUsername, password, rememberMe });
   };
 
   return (
@@ -42,16 +47,20 @@ const Login = () => {
       {/* Background decorative elements */}
       <div className="absolute -top-40 -left-40 w-80 h-80 bg-[#5e63f9]/10 rounded-full blur-3xl opacity-60"></div>
       <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-[#7c7fff]/10 rounded-full blur-3xl opacity-60"></div>
-      
+
       {/* Header with theme toggle */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
-      
+
       {/* Back to home button */}
       <div className="absolute top-4 left-4 z-10">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground cursor-pointer">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground cursor-pointer"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Back to Home</span>
             <span className="sm:hidden">Back</span>
@@ -68,7 +77,7 @@ const Login = () => {
                 <img src={jibber} alt="Jibber Logo" className="h-8 w-8" />
               </div>
             </div>
-            
+
             <CardTitle className="text-2xl sm:text-3xl font-bold text-foreground">
               Welcome back
             </CardTitle>
@@ -81,7 +90,10 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email/Username Field */}
               <div className="space-y-2">
-                <Label htmlFor="emailOrUsername" className="text-sm font-medium">
+                <Label
+                  htmlFor="emailOrUsername"
+                  className="text-sm font-medium"
+                >
                   Email or Username
                 </Label>
                 <div className="relative">
@@ -107,7 +119,7 @@ const Login = () => {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -119,7 +131,11 @@ const Login = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -130,14 +146,19 @@ const Login = () => {
                   <Checkbox
                     id="remember"
                     checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    onCheckedChange={(checked) =>
+                      setRememberMe(checked === true)
+                    }
                   />
-                  <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">
+                  <Label
+                    htmlFor="remember"
+                    className="text-sm text-muted-foreground cursor-pointer"
+                  >
                     Remember me
                   </Label>
                 </div>
-                <Link 
-                  to="/forgot-password" 
+                <Link
+                  to="/forgot-password"
                   className="text-sm text-[#5e63f9] hover:text-[#4f53e6] transition-colors text-left sm:text-right cursor-pointer"
                 >
                   Forgot password?
@@ -156,7 +177,7 @@ const Login = () => {
                     <span>Signing in...</span>
                   </div>
                 ) : (
-                  "Sign in"
+                  'Sign in'
                 )}
               </Button>
             </form>
@@ -164,9 +185,9 @@ const Login = () => {
             {/* Sign up link */}
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link 
-                  to="/signup" 
+                Don't have an account?{' '}
+                <Link
+                  to="/signup"
                   className="text-[#5e63f9] hover:text-[#4f53e6] font-medium transition-colors cursor-pointer"
                 >
                   Sign up for free

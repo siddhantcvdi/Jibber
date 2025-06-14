@@ -12,8 +12,9 @@ const EmptyChatState = () => {
             Welcome to Jibber
           </h3>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Select a conversation from the sidebar to start chatting with your contacts. 
-            Your messages are end-to-end encrypted for privacy and security.
+            Select a conversation from the sidebar to start chatting with your
+            contacts. Your messages are end-to-end encrypted for privacy and
+            security.
           </p>
         </div>
       </div>

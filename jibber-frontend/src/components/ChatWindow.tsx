@@ -1,33 +1,36 @@
-import React, { useState, useEffect, useRef } from "react";
-import ChatBubble from "./ChatBubble";
-import { SendHorizonal, MoreVertical } from "lucide-react";
-import { ThemeToggle } from "./ui/theme-toggle";
-import { useParams } from "react-router-dom";
-import { findContactById, type Message } from "../data/contactsData";
+import React, { useState, useEffect, useRef } from 'react';
+import ChatBubble from './ChatBubble';
+import { SendHorizonal, MoreVertical } from 'lucide-react';
+import { ThemeToggle } from './ui/theme-toggle';
+import { useParams } from 'react-router-dom';
+import { findContactById, type Message } from '../data/contactsData';
 
 const ChatWindow = () => {
   const { id } = useParams<{ id: string }>();
-  const contact = findContactById(id || "");
-  
+  const contact = findContactById(id || '');
+
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSendMessage = () => {
-    if (newMessage.trim() === "") return;
+    if (newMessage.trim() === '') return;
 
-    const currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
     setMessages([
       ...messages,
       { text: newMessage, isSentByMe: true, timestamp: currentTime },
     ]);
-    setNewMessage("");
+    setNewMessage('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -35,8 +38,9 @@ const ChatWindow = () => {
 
   const autoResizeTextarea = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + 'px';
     }
   };
 
@@ -49,7 +53,7 @@ const ChatWindow = () => {
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
@@ -63,8 +67,12 @@ const ChatWindow = () => {
       <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-3xl overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h3 className="text-lg font-medium text-foreground mb-2">Contact not found</h3>
-            <p className="text-muted-foreground">The chat you're looking for doesn't exist.</p>
+            <h3 className="text-lg font-medium text-foreground mb-2">
+              Contact not found
+            </h3>
+            <p className="text-muted-foreground">
+              The chat you're looking for doesn't exist.
+            </p>
           </div>
         </div>
       </div>
@@ -90,7 +98,9 @@ const ChatWindow = () => {
             </div>
             <div>
               <h3 className="font-medium text-foreground">{contact.name}</h3>
-              <p className="text-xs text-muted-foreground">{contact.isOnline ? 'Online' : 'Offline'}</p>
+              <p className="text-xs text-muted-foreground">
+                {contact.isOnline ? 'Online' : 'Offline'}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">

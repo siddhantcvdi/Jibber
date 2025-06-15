@@ -144,8 +144,9 @@ const ChatWindow = () => {
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg overflow-hidden">
-      <div className="bg-background border-b border-border shadow-sm">
+    <div className="h-[100dvh] flex-1 p-2 md:pl-0 bg-muted dark:bg-background overflow-hidden">
+      <div className='w-full h-full flex flex-col'>
+      <div className="bg-background dark:bg-muted/25 rounded-2xl border-border shadow-lg">
         <div className="flex justify-between items-center p-3 px-4">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -176,7 +177,8 @@ const ChatWindow = () => {
             </button>
           </div>
         </div>
-      </div>      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 bg-background/75">
+      </div>      
+      <div className="flex-1 shadow-lg overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 bg-background dark:bg-muted/25 mt-2 rounded-2xl">
         {groupMessages(messages).map((message, index) => (
           <ChatBubble
             key={index}
@@ -189,12 +191,11 @@ const ChatWindow = () => {
 
         <div ref={messagesEndRef} />
       </div>
-
-      <div className="bg-background border-border p-2 sm:p-3">
-        <div className="flex items-center gap-2 bg-background rounded-3xl border border-border pl-3 px-1.5 py-1.5">
+      <div className="bg-background dark:bg-muted/25 md:p-1 mt-2 border-border rounded-2xl shadow-2xl">
+        <div className="flex items-center gap-2 rounded-2xl h-14 pl-3 px-1.5 py-1.5">
           <textarea
             ref={textareaRef}
-            className="flex-1 resize-none outline-none max-h-32 text-foreground py-0 leading-normal placeholder:text-muted-foreground my-auto bg-transparent"
+            className="flex-1 resize-none outline-none max-h-32 text-neutral-600 dark:text-foreground py-0 leading-normal placeholder:text-muted-foreground my-auto "
             placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
@@ -202,13 +203,15 @@ const ChatWindow = () => {
             rows={1}
           />
           <button
-            className="p-2 sm:p-3 rounded-2xl bg-[#5e63f9] text-white hover:shadow-md transition-all"
+            className="p-3 sm:p-3 rounded-lg md:rounded-2xl bg-[#5e63f9] text-white hover:shadow-md transition-all"
             onClick={handleSendMessage}
           >
             <SendHorizonal size={18} />
           </button>
         </div>
       </div>
+      </div>
+
     </div>
   );
 };

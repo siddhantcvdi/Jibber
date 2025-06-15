@@ -65,8 +65,10 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-[100dvh] bg-background">
+    <div className="flex-1 flex flex-col p-2 pl-0 h-[100dvh] bg-muted dark:bg-background">
       {/* Header */}
+      <div className='bg-background dark:bg-muted/20 h-full rounded-2xl shadow-lg'>
+
       <div className="border-b border-border p-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] rounded-full flex items-center justify-center">
@@ -371,6 +373,8 @@ const Settings = () => {
           )}
         </div>
       </div>
+      </div>
+
     </div>
   );
 };

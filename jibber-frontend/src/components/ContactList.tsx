@@ -84,7 +84,9 @@ const ContactList = () => {
   };
 
   return (
-    <div className="h-[100dvh] w-full md:w-1/4 md:min-w-[400px] flex flex-col bg-background border-r border-border poppins-regular">
+    <div className="h-[100dvh] p-2 w-full md:w-1/4 md:min-w-[400px] flex flex-col bg-muted dark:bg-background poppins-regular">
+      <div className='h-full bg-background dark:bg-muted/20 rounded-2xl shadow-lg'>
+
       <div className="p-4 border-border">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -170,8 +172,9 @@ const ContactList = () => {
       </div>
 
       {/* Chat list */}
-      <div className="flex-1 overflow-y-auto p-2 pt-4 bg-background">
-        {activeTab === 'find' ? (          <div className="p-2">
+      <div className="flex-1 overflow-y-auto p-2 pt-4">
+        {activeTab === 'find' ? (          
+          <div className="p-2">
             <div className="relative mb-4">
               <Search
                 size={16}
@@ -265,7 +268,10 @@ const ContactList = () => {
           </div>
         )}
       </div>
+      </div>
+
     </div>
+
   );
 };
 

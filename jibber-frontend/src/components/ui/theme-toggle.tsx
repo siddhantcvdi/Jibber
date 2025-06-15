@@ -36,7 +36,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
         onClick={() => setDarkMode(false)}
         aria-label="Light mode"
       >
-        <FiSun className="relative z-10 text-md md:text-sm" />
+        <FiSun className="relative z-10 text-md md:text-sm text-white" />
       </button>
       <button
         className={`${TOGGLE_CLASSES} ${

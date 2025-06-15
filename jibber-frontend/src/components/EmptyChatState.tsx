@@ -2,8 +2,9 @@ import { MessageCircle } from 'lucide-react';
 
 const EmptyChatState = () => {
   return (
-    <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-3xl overflow-hidden">
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-background/75">
+    <div className="flex flex-col h-[100dvh] flex-1 dark:bg-background bg-muted shadow-lg p-2 pl-0  overflow-hidden">
+      <div className='h-full flex'>
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-background dark:bg-muted/20 rounded-2xl shadow-lg">
         <div className="text-center max-w-md">
           <div className="w-16 h-16 mx-auto mb-6 text-muted-foreground/40">
             <MessageCircle size={64} strokeWidth={1} />
@@ -18,6 +19,8 @@ const EmptyChatState = () => {
           </p>
         </div>
       </div>
+      </div>
+
     </div>
   );
 };

@@ -66,7 +66,8 @@ export const authStore = create<AuthState>((set, get) => ({
     set({ isAuthLoading: true });
     try {
       const password = userData.password;
-      const { registrationRequest, clientRegistrationState } = opaque.client.startRegistration({ password });
+      const { registrationRequest, clientRegistrationState } =
+        opaque.client.startRegistration({ password });
 
       const { data: startData } = await api.post(
         `${backendURL}/auth/register-start`,
@@ -76,7 +77,7 @@ export const authStore = create<AuthState>((set, get) => ({
           registrationRequest,
         }
       );
-      
+
       const registrationResponse = startData.data;
       console.log('Registration started ✅');
       const { registrationRecord } = opaque.client.finishRegistration({
@@ -84,10 +85,11 @@ export const authStore = create<AuthState>((set, get) => ({
         registrationResponse,
         password,
       });
-      
+
       const generateRawKeys = useCryptoStore.getState().generateRawKeys;
       const rawToBase64 = useCryptoStore.getState().rawToBase64;
-      const {privateIdKey, privateSigningKey, publicIdKey, publicSigningKey} = await generateRawKeys();
+      const { privateIdKey, privateSigningKey, publicIdKey, publicSigningKey } =
+        await generateRawKeys();
       const { data: finishData } = await api.post(
         `${backendURL}/auth/register-finish`,
         {
@@ -97,7 +99,7 @@ export const authStore = create<AuthState>((set, get) => ({
           encPrivateIdKey: rawToBase64(privateIdKey),
           encPrivateSigningKey: rawToBase64(privateSigningKey),
           publicIdKey: rawToBase64(publicIdKey),
-          publicSigningKey: rawToBase64(publicSigningKey)
+          publicSigningKey: rawToBase64(publicSigningKey),
         }
       );
       console.log('Registration finished ✅', finishData.data);

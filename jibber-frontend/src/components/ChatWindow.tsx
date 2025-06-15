@@ -5,6 +5,10 @@ import { ThemeToggle } from './ui/theme-toggle';
 import { useParams } from 'react-router-dom';
 import { findContactById, type Message } from '../data/contactsData';
 
+interface GroupedMessage extends Message {
+  showTimestamp: boolean;
+}
+
 const ChatWindow = () => {
   const { id } = useParams<{ id: string }>();
   const contact = findContactById(id || '');
@@ -13,6 +17,66 @@ const ChatWindow = () => {
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Function to group messages by time and sender
+  const groupMessages = (messages: Message[]): GroupedMessage[] => {
+    if (messages.length === 0) return [];
+
+    const grouped: GroupedMessage[] = [];
+    
+    for (let i = 0; i < messages.length; i++) {
+      const currentMessage = messages[i];
+      const nextMessage = messages[i + 1];
+      
+      // Check if we should show timestamp for this message
+      let showTimestamp = true;
+      
+      if (nextMessage) {
+        // Parse timestamps to compare times
+        const currentTime = parseTimeString(currentMessage.timestamp);
+        const nextTime = parseTimeString(nextMessage.timestamp);
+        
+        // Check if messages are from same sender and within 1 minute
+        if (
+          currentMessage.isSentByMe === nextMessage.isSentByMe &&
+          nextTime &&
+          currentTime &&
+          Math.abs(nextTime.getTime() - currentTime.getTime()) <= 60000 // 1 minute = 60000ms
+        ) {
+          showTimestamp = false;
+        }
+      }
+      
+      grouped.push({
+        ...currentMessage,
+        showTimestamp
+      });
+    }
+    
+    return grouped;
+  };
+
+  // Helper function to parse time string (assumes format like "11:30 AM")
+  const parseTimeString = (timeStr: string): Date | null => {
+    try {
+      // Create a date object with today's date and the given time
+      const today = new Date();
+      const [time, meridiem] = timeStr.split(' ');
+      const [hours, minutes] = time.split(':').map(Number);
+      
+      let hour24 = hours;
+      if (meridiem === 'PM' && hours !== 12) {
+        hour24 += 12;
+      } else if (meridiem === 'AM' && hours === 12) {
+        hour24 = 0;
+      }
+      
+      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour24, minutes);
+      return date;
+    } catch {
+      return null;
+    }
+  };
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
@@ -112,15 +176,14 @@ const ChatWindow = () => {
             </button>
           </div>
         </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 bg-background/75">
-        {messages.map((message, index) => (
+      </div>      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 sm:py-6 bg-background/75">
+        {groupMessages(messages).map((message, index) => (
           <ChatBubble
             key={index}
             text={message.text}
             isSentByMe={message.isSentByMe}
             timestamp={message.timestamp}
+            showTimestamp={message.showTimestamp}
           />
         ))}
 

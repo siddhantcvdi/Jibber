@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import debounce from 'lodash.debounce';
 import api from '@/services/api';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface SearchUser {
   username: string;
@@ -170,8 +171,7 @@ const ContactList = () => {
 
       {/* Chat list */}
       <div className="flex-1 overflow-y-auto p-2 pt-4 bg-background">
-        {activeTab === 'find' ? (
-          <div className="p-2">
+        {activeTab === 'find' ? (          <div className="p-2">
             <div className="relative mb-4">
               <Search
                 size={16}
@@ -183,20 +183,53 @@ const ContactList = () => {
                 className="bg-muted dark:bg-muted/80 w-full rounded-full py-2 pl-10 pr-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-blue-100 transition-all"
                 onChange={(e) => setQuery(e.target.value)}
               />
-            </div>            {results.length === 0 && query === '' && (
-              <p className="text-sm text-muted-foreground text-center">
-                Enter a username to find contacts
-              </p>
-            )}
-            {query && results.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center">
+            </div>
+            <AnimatePresence mode="wait">              {results.length === 0 && query === '' && (
+                <motion.p 
+                  key="empty-state"
+                  className="text-sm text-muted-foreground text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Enter a username to find contacts
+                </motion.p>
+              )}            {query && results.length === 0 && (
+              <motion.p 
+                key="no-results"
+                className="text-sm text-muted-foreground text-center"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
                 No users found
-              </p>
+              </motion.p>
             )}            {results.length > 0 && (
-              <div className="space-y-2">                {results.map((user: SearchUser) => (
-                  <div
+              <motion.div 
+                key="results"
+                className="space-y-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >                {results.map((user: SearchUser, index) => (
+                  <motion.div
                     key={user.publicIdKey}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      duration: 0.3, 
+                      delay: index * 0.1,
+                      ease: "easeOut"
+                    }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      transition: { duration: 0.2 }
+                    }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <UserAvatar user={user} />
                     <div className="flex-1 min-w-0">
@@ -206,11 +239,11 @@ const ContactList = () => {
                       <p className="text-xs text-muted-foreground truncate">
                         {user.email}
                       </p>
-                    </div>
-                  </div>
+                    </div>                    </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         ) : (
           <div>

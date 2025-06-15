@@ -2,6 +2,16 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+@-moz-document url-prefix() {
+  @-moz-document url-prefix() {
+  .firefox-card {
+    backdrop-filter: none !important;
+    background-color: rgba(23, 23, 23, 0.8); /* fallback */
+  }
+}
+}
+
+
 @custom-variant dark (&:is(.dark *));
 
 .poppins-thin {

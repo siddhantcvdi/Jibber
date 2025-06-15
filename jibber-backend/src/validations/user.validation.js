@@ -36,4 +36,8 @@ export const RegisterFinishParams = z.object({
   encPrivateSigningKey: noProtoString,
   publicSigningKey: noProtoString,
   registrationRecord: noProtoString,
+  idKeyNonce: noProtoString, 
+  idKeySalt: noProtoString,
+  signingKeyNonce: noProtoString, 
+  signingKeySalt: noProtoString
 });

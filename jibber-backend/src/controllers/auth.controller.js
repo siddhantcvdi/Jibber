@@ -72,33 +72,30 @@ const registerFinish = asyncHandler(async (req, res) => {
 
   // Verify the body using zod schema
   console.log(req.body);
-  
-  let username, registrationRecord, email, encPrivateIdKey, encPrivateSigningKey, publicSigningKey, publicIdKey;
+  let values;
   try {
-    const values = RegisterFinishParams.parse(req.body);
-    username = values.username;
-    registrationRecord = values.registrationRecord;
-    email = values.email;
-    encPrivateIdKey = values.encPrivateIdKey,
-    encPrivateSigningKey = values.encPrivateSigningKey,
-    publicSigningKey = values.publicSigningKey,
-    publicIdKey = values.publicIdKey
+    values = RegisterFinishParams.parse(req.body);
   } catch (err) {
     return errorResponse(res, {
       message: 'Invalid Input Values',
       statusCode: 400,
     });
   }
+  const {username, email, registrationRecord ,encPrivateIdKey, encPrivateSigningKey, publicIdKey, publicSigningKey, idKeyNonce, idKeySalt, signingKeyNonce, signingKeySalt} = values
 
   // Create a user
-  const user = await User.create({
+  await User.create({
     username,
     email,
     registrationRecord,
     encPrivateIdKey,
     encPrivateSigningKey,
     publicIdKey,
-    publicSigningKey
+    publicSigningKey,
+    idKeyNonce,
+    signingKeyNonce,
+    idKeySalt,
+    signingKeySalt
   });
 
   const returnUser = await User.findOne({ username }).select(

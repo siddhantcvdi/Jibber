@@ -14,10 +14,18 @@ interface LoginData {
   password: string;
 }
 
-interface User {
+export interface User {
   id: string;
   username: string;
   email: string;
+  encPrivateIdKey: string,
+  encPrivateSigningKey: string,
+  publicIdKey: string,
+  publicSigningKey: string,
+  idKeyNonce: string,
+  signingKeyNonce: string,
+  idKeySalt: string,
+  signingKeySalt: string
 }
 
 interface AuthState {
@@ -88,18 +96,27 @@ export const authStore = create<AuthState>((set, get) => ({
 
       const generateRawKeys = useCryptoStore.getState().generateRawKeys;
       const rawToBase64 = useCryptoStore.getState().rawToBase64;
-      const { privateIdKey, privateSigningKey, publicIdKey, publicSigningKey } =
-        await generateRawKeys();
+      const encryptKey = useCryptoStore.getState().encryptKey;
+      const { privateIdKey, privateSigningKey, publicIdKey, publicSigningKey } = await generateRawKeys();
+      // console.log(privateIdKey.length, password, privateSigningKey);
+      
+      const encPrivateIdKey = await encryptKey(privateIdKey, password);
+      const encPrivateSigningKey = await encryptKey(privateSigningKey, password);
+
       const { data: finishData } = await api.post(
         `${backendURL}/auth/register-finish`,
         {
           username: userData.username,
           email: userData.email,
           registrationRecord,
-          encPrivateIdKey: rawToBase64(privateIdKey),
-          encPrivateSigningKey: rawToBase64(privateSigningKey),
+          encPrivateIdKey: rawToBase64(encPrivateIdKey.key),
           publicIdKey: rawToBase64(publicIdKey),
+          idKeyNonce: rawToBase64(encPrivateIdKey.nonce),
+          idKeySalt: rawToBase64(encPrivateIdKey.salt),
+          encPrivateSigningKey: rawToBase64(encPrivateSigningKey.key),
           publicSigningKey: rawToBase64(publicSigningKey),
+          signingKeyNonce: rawToBase64(encPrivateIdKey.nonce),
+          signingKeySalt: rawToBase64(encPrivateIdKey.salt),
         }
       );
       console.log('Registration finished ✅', finishData.data);
@@ -168,13 +185,20 @@ export const authStore = create<AuthState>((set, get) => ({
 
       const { user, accessToken } = finishData.data;
       console.log('Login successful, user:', user);
-
+      const base64toRaw = useCryptoStore.getState().base64toRaw;
+      useCryptoStore.setState({privateIdKey: base64toRaw(user.encPrivateIdKey), privateSigningKey: base64toRaw(user.encPrivateSigningKey)});
+      
       set({
         user,
         accessToken,
         isAuthenticated: true,
         isAuthLoading: false,
       });
+
+      const storeKek = useCryptoStore.getState().storeKek;
+      await storeKek(user, password);
+      
+
     } catch (err: unknown) {
       console.error('Login error ❌', err);
       set({ isAuthLoading: false });
@@ -198,10 +222,11 @@ export const authStore = create<AuthState>((set, get) => ({
         const userResponse = await api.get('/auth/me');
         const user = userResponse.data.data.user;
         setAuth(accessToken, user);
+        const base64toRaw = useCryptoStore.getState().base64toRaw;
+        useCryptoStore.setState({privateIdKey: base64toRaw(user.encPrivateIdKey), privateSigningKey: base64toRaw(user.encPrivateSigningKey)});
       } catch {
         setAuth(accessToken, null);
       }
-
       return { success: true };
     } catch {
       setLoading(false);

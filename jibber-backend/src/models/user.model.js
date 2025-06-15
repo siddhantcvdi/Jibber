@@ -7,7 +7,11 @@ const User = new mongoose.Schema({
   encPrivateSigningKey: { type: String, required: true, unique: true },
   publicIdKey: { type: String, required: true, unique: true },
   publicSigningKey: { type: String, required: true, unique: true },
-    resetCode: {
+  idKeyNonce: { type: String, required: true},
+  idKeySalt: { type: String, required: true},
+  signingKeyNonce: { type: String, required: true},
+  signingKeySalt: { type: String, required: true},
+  resetCode: {
     code: String,
     expiresAt: Date,
   },

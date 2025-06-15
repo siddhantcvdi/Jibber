@@ -1,6 +1,6 @@
 import { Search, Settings, MoreVertical, User, LogOut } from 'lucide-react';
 import ChatPreview from './ContactPreview';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ThemeToggle } from './ui/theme-toggle';
 import { contactsData } from '../data/contactsData';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,14 +12,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import debounce from 'lodash.debounce';
+import api from '@/services/api';
+
+interface SearchUser {
+  username: string;
+  publicIdKey: string;
+  publicSigningKey: string;
+  email: string;
+  profilePhoto?: string;
+}
 
 const ContactList = () => {
   const [activeTab, setActiveTab] = useState('all');
   const location = useLocation();
   const navigate = useNavigate();
   const { user, clearAuth } = authStore();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchUser[]>([]);
+  const fetchUsers = debounce(async (q) => {
+    if (!q) {
+      setResults([]);
+      return;
+    }
 
-  // Get current chat ID from URL to determine which chat is active
+    const res = await api.get(`/users/getUsers?query=${q}`);
+    const data = res.data.data;
+    setResults(data);
+  }, 300);
+
+  useEffect(() => {
+    fetchUsers(query);
+    return fetchUsers.cancel;
+  }, [query, fetchUsers]);
+
+
   const currentChatId = location.pathname.includes('/app/chat/')
     ? location.pathname.split('/app/chat/')[1]
     : null;
@@ -28,10 +55,31 @@ const ContactList = () => {
     clearAuth();
     navigate('/');
   };
-
-  // Get first letter of username for avatar
   const getInitial = (username: string) => {
     return username ? username.charAt(0).toUpperCase() : 'U';
+  };
+
+  const UserAvatar = ({ user }: { user: SearchUser }) => {
+    const [imageError, setImageError] = useState(false);
+    
+    if (!user.profilePhoto || imageError) {
+      return (
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] flex items-center justify-center text-white font-semibold">
+          {getInitial(user.username)}
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-10 h-10 rounded-full overflow-hidden">
+        <img 
+          src={user.profilePhoto} 
+          alt={user.username}
+          className="w-full h-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      </div>
+    );
   };
 
   return (
@@ -133,11 +181,36 @@ const ContactList = () => {
                 type="text"
                 placeholder="Search users by username"
                 className="bg-muted dark:bg-muted/80 w-full rounded-full py-2 pl-10 pr-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-blue-100 transition-all"
+                onChange={(e) => setQuery(e.target.value)}
               />
-            </div>
-            <p className="text-sm text-muted-foreground text-center">
-              Enter a username to find contacts
-            </p>
+            </div>            {results.length === 0 && query === '' && (
+              <p className="text-sm text-muted-foreground text-center">
+                Enter a username to find contacts
+              </p>
+            )}
+            {query && results.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center">
+                No users found
+              </p>
+            )}            {results.length > 0 && (
+              <div className="space-y-2">                {results.map((user: SearchUser) => (
+                  <div
+                    key={user.publicIdKey}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                  >
+                    <UserAvatar user={user} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground truncate">
+                        {user.username}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div>

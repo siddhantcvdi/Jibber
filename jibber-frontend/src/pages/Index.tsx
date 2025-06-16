@@ -29,14 +29,18 @@ const Index = () => {
     if (targetElement) {
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  };  // Navigation function for keyboard
+  const navigateToSection = (sectionId: string) => {
+    const targetElement = document.getElementById(sectionId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setActiveSection(sectionId);
+    }
   };
 
-  // Add smooth scrolling to all anchor links with hash
   useEffect(() => {
-    // This adds smooth scrolling globally to the document
     document.documentElement.style.scrollBehavior = 'smooth';
 
-    // Intersection Observer to track active section
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -60,17 +64,35 @@ const Index = () => {
       }
     });
 
+    // Keyboard navigation
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const sections = ['hero', 'features', 'security', 'about'];
+      const currentIndex = sections.indexOf(activeSection);
+      
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        const nextIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
+        navigateToSection(sections[nextIndex]);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
+        navigateToSection(sections[prevIndex]);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
     return () => {
       // Clean up when component unmounts
       document.documentElement.style.scrollBehavior = '';
       observer.disconnect();
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
-
+  }, [activeSection]);
   return (
     <div className="min-h-screen flex flex-col font-[Poppins] bg-background">
       {/* Header */}
-      <header className="py-4 px-6 md:px-10 flex items-center justify-between border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur-sm">
+      <header className="py-4 glassmorphism-header px-6 md:px-10 flex items-center justify-between border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur-sm">
         <div className="flex items-center">
           <div className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] p-2 rounded-lg">
             <img src={jibber} alt="Jibber Logo" className="h-6 w-6" />

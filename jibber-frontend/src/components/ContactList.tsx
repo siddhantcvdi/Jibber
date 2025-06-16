@@ -1,4 +1,4 @@
-import { Search, Settings, MoreVertical, User, LogOut } from 'lucide-react';
+import { Search, Settings, MoreVertical, User, LogOut, MessageCircle, X } from 'lucide-react';
 import ChatPreview from './ContactPreview';
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { ThemeToggle } from './ui/theme-toggle';
@@ -12,11 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import debounce from 'lodash.debounce';
 import api from '@/services/api';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface SearchUser {
+  _id: string
   username: string;
   publicIdKey: string;
   publicSigningKey: string;
@@ -33,6 +35,8 @@ const ContactList = () => {
   const { user, clearAuth } = authStore();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchUser[]>([]);
+  const [showChatPopup, setShowChatPopup] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<SearchUser | null>(null);
 
   const tabs = useMemo(() => [
     { id: 'all', label: 'All Chats' },
@@ -49,7 +53,7 @@ const ContactList = () => {
     if (activeButton) {
       const containerRect = tabsRef.current.getBoundingClientRect();
       const buttonRect = activeButton.getBoundingClientRect();
-      
+
       setPillStyle({
         width: buttonRect.width,
         left: buttonRect.left - containerRect.left,
@@ -90,6 +94,26 @@ const ContactList = () => {
   const handleLogout = () => {
     clearAuth();
     navigate('/');
+  };
+
+  const handleUserClick = (user: SearchUser) => {
+    setSelectedUser(user);
+    setShowChatPopup(true);
+  };
+
+  const handleStartChat = async () => {
+    if (!selectedUser) return;
+
+    // Here you would typically create a new chat or navigate to existing chat
+    // For now, we'll just navigate to a chat with the user's ID
+    setShowChatPopup(false);
+    setSelectedUser(null);
+    navigate(`/app/chat/${selectedUser._id}`);
+  };
+
+  const handleClosePopup = () => {
+    setShowChatPopup(false);
+    setSelectedUser(null);
   };
   const getInitial = (username: string) => {
     return username ? username.charAt(0).toUpperCase() : 'U';
@@ -173,9 +197,9 @@ const ContactList = () => {
               </DropdownMenu>
             </div>
           </div>
-        </div>        
+        </div>
         {/* Tabs */}
-        <div 
+        <div
           ref={tabsRef}
           className="relative flex border-b border-border px-2 pr-6"
         >
@@ -188,16 +212,15 @@ const ContactList = () => {
               bottom: '0px',
             }}
           />
-          
+
           {tabs.map(({ id, label }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${
-                activeTab === id
-                  ? 'text-[#5e63f9]'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${activeTab === id
+                ? 'text-[#5e63f9]'
+                : 'text-muted-foreground hover:text-foreground'
+                }`}
             >
               {label}
             </button>
@@ -254,6 +277,7 @@ const ContactList = () => {
                   <motion.div
                     key={user.publicIdKey}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                    onClick={() => handleUserClick(user)}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
@@ -299,9 +323,80 @@ const ContactList = () => {
                 ))}
               </div>
             </div>
-          )}
-        </div>
-      </div>
+          )}        </div>
+      </div>      {/* Start Chat Popup */}
+      <AnimatePresence>
+        {showChatPopup && selectedUser && (
+          <motion.div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          animate={{ opacity: 1, backdropFilter: "blur(4px)" }}
+          exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+          transition={{ duration: 0.3 }}
+          onClick={handleClosePopup}
+        >
+          <motion.div 
+            className="bg-background dark:bg-muted backdrop-blur-sm border border-border/50 rounded-2xl p-4 w-full max-w-sm shadow-2xl ring-1 ring-white/10"
+            initial={{ opacity: 0, scale: 0.8, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 30 }}
+            transition={{
+              type: "spring",
+              damping: 25,
+              stiffness: 300,
+              duration: 0.4
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-foreground">Start a Chat</h3>
+              </div>
+              <button
+                onClick={handleClosePopup}
+                className="p-1.5 cursor-pointer rounded-full hover:bg-red-400/10 transition-all duration-200 hover:scale-110"
+              >
+                <X size={18} className="text-red-400 dark:text-red-300" />
+              </button>
+            </div>
+
+            {/* User Info Card */}
+            <div className="bg-background/20 rounded-xl p-3 mb-4 border border-border/30">
+              <div className="flex items-center gap-3">
+                <UserAvatar user={selectedUser} />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-foreground">
+                    {selectedUser.username}
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedUser.email}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2.5">
+              <Button
+                variant="outline"
+                onClick={handleClosePopup}
+                className="cursor-pointer flex-1 h-10 rounded-lg border-2 hover:bg-accent/50 transition-all duration-200"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleStartChat}
+                className="cursor-pointer flex-1 h-10 rounded-lg bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4c52f7] hover:to-[#6b70fd] text-white border-0 shadow-lg transition-all duration-200"
+              >
+                <MessageCircle size={16} className="mr-1.5" />
+                Start Chat
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
 

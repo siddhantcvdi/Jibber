@@ -128,7 +128,8 @@ const ChatWindow = () => {
   // If no contact found, show error or redirect
   if (!contact) {
     return (
-      <div className="flex flex-col h-[100dvh] flex-1 bg-muted/50 shadow-lg rounded-3xl overflow-hidden">
+      <div className=" h-[100dvh] flex-1 bg-muted pl-0 max-md:pl-2 p-2 shadow-lg overflow-hidden">
+        <div className='h-full w-full flex bg-background rounded-2xl'>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <h3 className="text-lg font-medium text-foreground mb-2">
@@ -138,6 +139,7 @@ const ChatWindow = () => {
               The chat you're looking for doesn't exist.
             </p>
           </div>
+        </div>
         </div>
       </div>
     );

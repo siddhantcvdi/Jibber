@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Check, Shield } from 'lucide-react';
+import { Check} from 'lucide-react';
 
 interface ChatPreviewProps {
   name: string;
@@ -34,8 +34,8 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
 
   return (
     <div
-      className={`flex gap-2 sm:gap-3 items-center cursor-pointer hover:bg-accent p-2 sm:p-3 rounded-2xl transition-all duration-200 mb-1
-                ${isActive ? 'bg-accent/50 dark:bg-accent/30 border-l-4 border-[#5e63f9]' : ''}`}
+      className={`flex gap-2 sm:gap-3 items-center cursor-pointer hover:bg-muted p-2 sm:p-3 rounded-2xl transition-all duration-200 mb-1
+                ${isActive ? 'bg-muted dark:bg-accent/30 border-l-4 border-[#5e63f9]' : ''}`}
       onClick={() => handleNavigate()}
     >
       <div className="relative flex-shrink-0">
@@ -49,7 +49,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
 
       <div className="flex-1 min-w-0 overflow-hidden">
         <div className="flex justify-between items-center">
-          <span className="font-medium text-foreground truncate text-sm sm:text-base">
+          <span className="text-foreground truncate text-sm sm:text-base">
             {name}
           </span>
           <span className="text-xs text-muted-foreground ml-1 flex-shrink-0">
@@ -62,7 +62,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
               <Check size={14} className="text-[#5e63f9] mr-1 flex-shrink-0" />
             )}
             <span
-              className={`truncate ${unread > 0 ? 'font-medium text-foreground' : 'text-muted-foreground'}`}
+              className={`truncate ${unread > 0 ? ' text-foreground' : 'text-muted-foreground'}`}
             >
               {lastChatText}
             </span>
@@ -72,10 +72,6 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
             <div className="bg-[#5e63f9] text-white rounded-full h-5 w-5 flex items-center justify-center text-xs font-medium flex-shrink-0 ml-1">
               {unread}
             </div>
-          )}
-
-          {id === '1234' && (
-            <Shield size={14} className="text-[#5e63f9] flex-shrink-0 ml-1" />
           )}
         </div>
       </div>

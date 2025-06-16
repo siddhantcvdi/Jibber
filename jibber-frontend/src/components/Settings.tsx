@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +16,7 @@ import {
 
 const Settings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
   const [profileData, setProfileData] = useState({
     username: 'siddhantcvdi',
     email: 'siddhant@example.com',
@@ -31,7 +32,39 @@ const Settings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<
     'profile' | 'account' | 'security'
-  >('profile');
+  >('profile');  const [pillStyle, setPillStyle] = useState({ width: 0, left: 0 });
+
+  const tabs = useMemo(() => [
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'account', label: 'Account', icon: Mail },
+    { id: 'security', label: 'Security', icon: Lock },
+  ], []);
+  const updatePillPosition = useCallback((activeTab: string) => {
+    if (!tabsRef.current) return;
+
+    const tabButtons = tabsRef.current.querySelectorAll('button');
+    const activeIndex = tabs.findIndex(tab => tab.id === activeTab);
+    const activeButton = tabButtons[activeIndex];
+
+    if (activeButton) {
+      const containerRect = tabsRef.current.getBoundingClientRect();
+      const buttonRect = activeButton.getBoundingClientRect();
+      
+      setPillStyle({
+        width: buttonRect.width,
+        left: buttonRect.left - containerRect.left,
+      });
+    }
+  }, [tabs]);
+  React.useEffect(() => {
+    updatePillPosition(activeSection);
+  }, [activeSection, updatePillPosition]);
+
+  React.useEffect(() => {
+    const handleResize = () => updatePillPosition(activeSection);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activeSection, updatePillPosition]);
 
   const handleInputChange = (field: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
@@ -65,7 +98,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col p-2 pl-0 h-[100dvh] bg-muted dark:bg-background">
+    <div className="flex-1 flex flex-col p-2 md:pl-0 h-[100dvh] bg-muted dark:bg-background">
       {/* Header */}
       <div className='bg-background dark:bg-muted/20 h-full rounded-2xl shadow-lg'>
 
@@ -84,22 +117,29 @@ const Settings = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto p-6 space-y-6">
-          {/* Navigation Tabs */}
-          <div className="flex space-x-1 bg-muted rounded-lg p-1">
-            {[
-              { id: 'profile', label: 'Profile', icon: User },
-              { id: 'account', label: 'Account', icon: Mail },
-              { id: 'security', label: 'Security', icon: Lock },
-            ].map(({ id, label, icon: Icon }) => (
+        <div className="max-w-2xl mx-auto p-6 space-y-6">          {/* Navigation Tabs */}
+          <div 
+            ref={tabsRef}
+            className="relative flex space-x-1 bg-muted rounded-lg p-1 pr-2"
+          >
+            {/* Animated Pill */}
+            <div
+              className="absolute top-1 bottom-1 bg-background rounded-md shadow-sm transition-all duration-300 ease-out"
+              style={{
+                width: `${pillStyle.width}px`,
+                transform: `translateX(${pillStyle.left}px)`,
+              }}
+            />
+            
+            {tabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() =>
                   setActiveSection(id as 'profile' | 'account' | 'security')
                 }
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all ${
+                className={`relative z-10 flex-1 flex items-center justify-center gap-2 -ml-1 px-4 py-2 rounded-md transition-colors duration-200 ${
                   activeSection === id
-                    ? 'bg-background text-foreground shadow-sm'
+                    ? 'text-foreground'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >

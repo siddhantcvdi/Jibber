@@ -6,10 +6,10 @@ import {
   RegisterFinishParams,
   RegisterStartParams,
 } from '../validations/user.validation.js';
-import User from '../models/user.model.js';
 import * as opaque from '@serenity-kit/opaque';
 import { LoginState } from '../models/loginstate.model.js';
 import jwt from 'jsonwebtoken';
+import { User } from '../models/user.model.js';
 
 const generateJwtTokens = (user) => {
   const accessToken = jwt.sign(

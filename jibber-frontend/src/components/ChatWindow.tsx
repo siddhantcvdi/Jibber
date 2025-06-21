@@ -4,6 +4,8 @@ import { SendHorizonal, MoreVertical, ImageUp } from 'lucide-react';
 import { ThemeToggle } from './ui/theme-toggle';
 import { useParams } from 'react-router-dom';
 import { findContactById, type Message } from '../data/contactsData';
+import api from '@/services/api';
+import authStore from '@/store/auth.store';
 
 interface GroupedMessage extends Message {
   showTimestamp: boolean;
@@ -56,10 +58,8 @@ const ChatWindow = () => {
     return grouped;
   };
 
-  // Helper function to parse time string (assumes format like "11:30 AM")
   const parseTimeString = (timeStr: string): Date | null => {
     try {
-      // Create a date object with today's date and the given time
       const today = new Date();
       const [time, meridiem] = timeStr.split(' ');
       const [hours, minutes] = time.split(':').map(Number);
@@ -107,13 +107,24 @@ const ChatWindow = () => {
         textareaRef.current.scrollHeight + 'px';
     }
   };
+  
 
-  // Initialize messages when contact changes
+  const {user} = authStore();
   useEffect(() => {
-    if (contact) {
-      setMessages(contact.messages);
+    if(id){
+      api.post('/messages/getMessages', {
+        users: [
+          user?._id, id
+        ]
+      })
+      .then((res)=>{
+        console.log(res.data.data);
+      })
+      .catch(err => {
+        console.log("Error Fetching Messages", err);
+      })
     }
-  }, [contact]);
+  }, [id]);
 
   useEffect(() => {
     if (messagesEndRef.current) {

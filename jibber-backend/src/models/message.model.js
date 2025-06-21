@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
-  sessionId: {
+  chatId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Session',
+    ref: 'Chat',
     required: true,
   },
   sender: {

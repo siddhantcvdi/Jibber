@@ -14,7 +14,7 @@ class CryptoDB extends Dexie {
   constructor() {
     super('CryptoStore');
     this.version(1).stores({
-      userSecrets: 'key' // `value` is not indexed, just stored
+      userSecrets: 'key' 
     });
   }
 }

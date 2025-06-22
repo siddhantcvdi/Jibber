@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   idKeySalt: { type: String, required: true},
   signingKeyNonce: { type: String, required: true},
   signingKeySalt: { type: String, required: true},
+  profilePhoto: {type: String, required: false, default: ''},
   resetCode: {
     code: String,
     expiresAt: Date,

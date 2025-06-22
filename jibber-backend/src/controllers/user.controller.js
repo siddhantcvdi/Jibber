@@ -16,7 +16,7 @@ const findUsers = asyncHandler(async (req, res) => {
     $or: [{ username: safeRegex }, { email: safeRegex }],
   })
     .limit(10)
-    .select('username email publicIdKey publicSigningKey');
+    .select('username email profilePhoto');
   return successResponse(res, {
     message: 'Users found',
     data: users,

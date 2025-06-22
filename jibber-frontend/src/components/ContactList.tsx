@@ -1,9 +1,8 @@
-import { Search, Settings, MoreVertical, User, LogOut } from 'lucide-react';
+import { Search, Settings, MoreVertical, User, LogOut, MessageCircle, X } from 'lucide-react';
 import ChatPreview from './ContactPreview';
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo} from 'react';
 import { ThemeToggle } from './ui/theme-toggle';
-import { contactsData } from '../data/contactsData';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import authStore from '../store/auth.store';
 import {
   DropdownMenu,
@@ -12,34 +11,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import debounce from 'lodash.debounce';
 import api from '@/services/api';
 import { motion, AnimatePresence } from 'motion/react';
+import {useChatStore} from "@/store/chats.store.ts";
 
 interface SearchUser {
   _id: string
   username: string;
-  publicIdKey: string;
-  publicSigningKey: string;
   email: string;
   profilePhoto?: string;
 }
 
 const ContactList = () => {
+  const navigate = useNavigate();
+  const { user, clearAuth } = authStore();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchUser[]>([]);
+  const [showChatPopup, setShowChatPopup] = useState(false);
+  const [selectedSearchUser, setSelectedSearchUser] = useState<SearchUser | null>(null);
+
+  //################################# UI Logic ##################################################
+
   const [activeTab, setActiveTab] = useState('all');
   const tabsRef = useRef<HTMLDivElement>(null);
   const [pillStyle, setPillStyle] = useState({ width: 0, left: 0 });
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { user, clearAuth } = authStore();  
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchUser[]>([]);
-
   const tabs = useMemo(() => [
     { id: 'all', label: 'All Chats' },
     { id: 'find', label: 'Find Users' },
   ], []);
-
   const updatePillPosition = useCallback((activeTabId: string) => {
     if (!tabsRef.current) return;
 
@@ -57,50 +58,79 @@ const ContactList = () => {
       });
     }
   }, [tabs]);
-
   useEffect(() => {
     updatePillPosition(activeTab);
   }, [activeTab, updatePillPosition]);
-
   useEffect(() => {
     const handleResize = () => updatePillPosition(activeTab);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [activeTab, updatePillPosition]);
+
+  //##############################################################################################
+ // ###################################### Fetch & Search ########################################
+
+  const {fetchChats, isLoading, chats, selectedChatId, selectChat } = useChatStore()
+  const fetchChatsCallback = useCallback(fetchChats, [fetchChats]);
+  useEffect(() => {
+    fetchChatsCallback();
+  }, [fetchChatsCallback]);
   const fetchUsers = debounce(async (q) => {
     if (!q) {
       setResults([]);
       return;
     }
-
     const res = await api.get(`/users/getUsers?query=${q}`);
     const data = res.data.data;
     setResults(data);
   }, 300);
-
   useEffect(() => {
     fetchUsers(query);
     return fetchUsers.cancel;
   }, [query, fetchUsers]);
-
-
-  const currentChatId = location.pathname.includes('/app/chat/')
-    ? location.pathname.split('/app/chat/')[1]
-    : null;
-
   const handleLogout = () => {
     clearAuth();
     navigate('/');
   };
 
-  //Fetch messages from backend
+  //##############################################################################################
+
+
+
+  // ############################## Popup Handling #######################################
   const handleUserClick = (user: SearchUser) => {
-    navigate(`/app/chat/${user._id}`);
+        setSelectedSearchUser(user);
+        setShowChatPopup(true);
   };
+  const handleStartChat = async () => {
+    if (!selectedSearchUser) return;
+    try{
+      const res = await api.post('/chats/createChat', {
+        users: [user?._id, selectedSearchUser?._id]
+      })
+      const chatId = res.data.data._id;      setShowChatPopup(false);
+      setSelectedSearchUser(null);
+      await fetchChats();
+      selectChat(chatId);
+      navigate(`/app/chat/${chatId}`);
+    }catch(err: unknown) {
+      console.log("Error creating chat", err);
+      setShowChatPopup(false);
+      setSelectedSearchUser(null);
+    }
+  };
+  const handleClosePopup = () => {
+    setShowChatPopup(false);
+    setSelectedSearchUser(null);
+  };
+
+  // ########################################################################################
+
+
+
   const getInitial = (username: string) => {
     return username ? username.charAt(0).toUpperCase() : 'U';
   };
-
   const UserAvatar = ({ user }: { user: SearchUser }) => {
     const [imageError, setImageError] = useState(false);
 
@@ -121,8 +151,7 @@ const ContactList = () => {
           onError={() => setImageError(true)}
         />
       </div>
-    );
-  };
+    );  };
 
   return (
     <div className="h-[100dvh] p-2 w-full md:w-1/4 md:min-w-[400px] flex flex-col bg-muted dark:bg-background poppins-regular">
@@ -225,89 +254,178 @@ const ContactList = () => {
                   onChange={(e) => setQuery(e.target.value)}
                 />
               </div>
-              <AnimatePresence mode="wait">              {results.length === 0 && query === '' && (
-                <motion.p
-                  key="empty-state"
-                  className="text-sm text-muted-foreground text-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  Enter a username to find contacts
-                </motion.p>
-              )}            {query && results.length === 0 && (
-                <motion.p
-                  key="no-results"
-                  className="text-sm text-muted-foreground text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  No users found
-                </motion.p>
-              )}            {results.length > 0 && (
-                <motion.div
-                  key="results"
-                  className="space-y-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >                {results.map((user: SearchUser, index) => (
-                  <motion.div
-                    key={user.publicIdKey}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors cursor-pointer"
-                    onClick={() => handleUserClick(user)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: index * 0.1,
-                      ease: "easeOut"
-                    }}
-                    whileHover={{
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                    whileTap={{ scale: 0.98 }}
+              <AnimatePresence mode="wait">
+                {results.length === 0 && query === '' && (
+                  <motion.p
+                    key="empty-state"
+                    className="text-sm text-muted-foreground text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
                   >
-                    <UserAvatar user={user} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">
-                        {user.username}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {user.email}
-                      </p>
-                    </div>                    </motion.div>
-                ))}
-                </motion.div>
-              )}
+                    Enter a username to find contacts
+                  </motion.p>
+                )}
+                {query && results.length === 0 && (
+                  <motion.p
+                    key="no-results"
+                    className="text-sm text-muted-foreground text-center"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    No users found
+                  </motion.p>
+                )}
+                {results.length > 0 && (
+                  <motion.div
+                    key="results"
+                    className="space-y-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {results.map((user: SearchUser, index) => (
+                      <motion.div
+                        key={index}
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+                        onClick={() => handleUserClick(user)}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.3,
+                          delay: index * 0.1,
+                          ease: "easeOut"
+                        }}
+                        whileHover={{
+                          scale: 1.02,
+                          transition: { duration: 0.2 }
+                        }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <UserAvatar user={user} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground truncate">
+                            {user.username}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
               </AnimatePresence>
-            </div>
-          ) : (
+            </div>          ) : (
             <div>
-              <div>
-                {contactsData.map((contact) => (
-                  <ChatPreview
-                    key={contact.id}
-                    name={contact.name}
-                    lastChatText={contact.lastChatText}
-                    icon={contact.icon}
-                    id={contact.id}
-                    time={contact.time}
-                    unread={contact.unread}
-                    isActive={currentChatId === contact.id}
-                    isOnline={contact.isOnline}
-                  />
-                ))}
-              </div>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-sm text-muted-foreground">Loading chats...</div>
+                </div>
+              ) : chats.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <MessageCircle size={48} className="text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground">No chats yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">Start a conversation by finding users</p>
+                </div>
+              ) : (                <div>
+                  {chats.map((chat) => (
+                      <div key={chat._id}>
+                      <ChatPreview
+                        chatId={chat._id}
+                        name={chat.details.username}
+                        lastChatText={chat.lastMessage}
+                        icon={chat.details.profilePhoto || ""}
+                        id={chat.details._id}
+                        unread={chat.unreadCount}
+                        isActive={selectedChatId === chat._id}
+                      />
+                      </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}        </div>
+          )}
+        </div>
       </div>
+      
+      {/* Start Chat Popup */}
+      <AnimatePresence>
+        {showChatPopup && selectedSearchUser && (
+          <motion.div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(4px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            transition={{ duration: 0.3 }}
+            onClick={handleClosePopup}
+          >
+            <motion.div 
+              className="bg-background dark:bg-muted backdrop-blur-sm border border-border/50 rounded-2xl p-4 w-full max-w-sm shadow-2xl ring-1 ring-white/10"
+              initial={{ opacity: 0, scale: 0.8, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 30 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 300,
+                duration: 0.4
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-foreground">Start a Chat</h3>
+                </div>
+                <button
+                  onClick={handleClosePopup}
+                  className="p-1.5 cursor-pointer rounded-full hover:bg-red-400/10 transition-all duration-200 hover:scale-110"
+                >
+                  <X size={18} className="text-red-400 dark:text-red-300" />
+                </button>
+              </div>
+              
+              {/* User Info Card */}
+              <div className="bg-background/20 rounded-xl p-3 mb-4 border border-border/30">
+                <div className="flex items-center gap-3">
+                  <UserAvatar user={selectedSearchUser} />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground">
+                      {selectedSearchUser.username}
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedSearchUser.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
+              {/* Action Buttons */}
+              <div className="flex gap-2.5">
+                <Button
+                  variant="outline"
+                  onClick={handleClosePopup}
+                  className="cursor-pointer flex-1 h-10 rounded-lg border-2 hover:bg-accent/50 transition-all duration-200"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleStartChat}
+                  className="cursor-pointer flex-1 h-10 rounded-lg bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4c52f7] hover:to-[#6b70fd] text-white border-0 shadow-lg transition-all duration-200"
+                >
+                  <MessageCircle size={16} className="mr-1.5" />
+                  Start Chat
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

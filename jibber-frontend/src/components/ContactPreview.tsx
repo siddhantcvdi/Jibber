@@ -1,19 +1,24 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Check} from 'lucide-react';
+import { useChatStore } from '@/store/chats.store';
 
 interface ChatPreviewProps {
   name: string;
-  lastChatText: string;
+  chatId: string,
+  lastChatText: {
+    cipher: string,
+    iv: string
+  } | undefined;
   icon: string;
   id: string;
   time?: string;
   unread?: number;
   isActive?: boolean;
-  isOnline?: boolean;
 }
 
 const ChatPreview: React.FC<ChatPreviewProps> = ({
+    chatId,
   name,
   lastChatText,
   icon,
@@ -21,30 +26,40 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
   time = '11:30 AM',
   unread = 0,
   isActive = false,
-  isOnline = true,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { selectChat } = useChatStore();
 
   const handleNavigate = () => {
+    selectChat(chatId);
     // If we're already in a chat route, replace the current entry instead of pushing
     const isCurrentlyInChat = location.pathname.startsWith('/app/chat/');
-    navigate(`/app/chat/${id}`, { replace: isCurrentlyInChat });
+    navigate(`/app/chat/${chatId}`, { replace: isCurrentlyInChat });
+  };
+
+    const getInitial = (username: string) => {
+    return username ? username.charAt(0).toUpperCase() : 'U';
   };
 
   return (
     <div
       className={`flex gap-2 sm:gap-3 items-center cursor-pointer hover:bg-muted p-2 sm:p-3 rounded-2xl transition-all duration-200 mb-1
                 ${isActive ? 'bg-muted dark:bg-accent/30 border-l-4 border-[#5e63f9]' : ''}`}
-      onClick={() => handleNavigate()}
+      onClick={() => {
+        handleNavigate()
+      }}
     >
       <div className="relative flex-shrink-0">
         <div className="rounded-full h-10 w-10 sm:h-12 sm:w-12 bg-gradient-to-br from-blue-100 to-purple-100 text-white flex justify-center items-center overflow-hidden shadow-sm">
-          <img src={icon} alt="" className="h-full w-full object-cover" />
+          {
+            icon != ""
+            ?<img src={icon} alt="" className="h-full w-full object-cover" />
+            :<div className="w-10 h-10 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] flex items-center justify-center text-white font-semibold">
+                      {getInitial(name || '')}
+            </div>
+          }
         </div>
-        {isOnline && (
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-        )}
       </div>
 
       <div className="flex-1 min-w-0 overflow-hidden">
@@ -62,9 +77,9 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
               <Check size={14} className="text-[#5e63f9] mr-1 flex-shrink-0" />
             )}
             <span
-              className={`truncate ${unread > 0 ? ' text-foreground' : 'text-muted-foreground'}`}
+              className={`truncate text-xs ${unread > 0 ? ' text-foreground' : 'text-muted-foreground'}`}
             >
-              {lastChatText}
+              {lastChatText?.cipher || 'No messages yet'}
             </span>
           </div>
 

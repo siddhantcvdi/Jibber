@@ -3,96 +3,28 @@ import ChatBubble from './ChatBubble';
 import { SendHorizonal, MoreVertical, ImageUp } from 'lucide-react';
 import { ThemeToggle } from './ui/theme-toggle';
 import { useParams } from 'react-router-dom';
-import { findContactById, type Message } from '../data/contactsData';
 import api from '@/services/api';
-import authStore from '@/store/auth.store';
+import { useMessageStore } from '@/store/message.store';
+import {useChatStore, useSelectedChatUser, useIsChatValid} from "@/store/chats.store.ts";
 
-interface GroupedMessage extends Message {
-  showTimestamp: boolean;
-}
 
 const ChatWindow = () => {
   const { id } = useParams<{ id: string }>();
-  const contact = findContactById(id || '');
-
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Function to group messages by time and sender
-  const groupMessages = (messages: Message[]): GroupedMessage[] => {
-    if (messages.length === 0) return [];
-
-    const grouped: GroupedMessage[] = [];
-
-    for (let i = 0; i < messages.length; i++) {
-      const currentMessage = messages[i];
-      const nextMessage = messages[i + 1];
-
-      // Check if we should show timestamp for this message
-      let showTimestamp = true;
-
-      if (nextMessage) {
-        // Parse timestamps to compare times
-        const currentTime = parseTimeString(currentMessage.timestamp);
-        const nextTime = parseTimeString(nextMessage.timestamp);
-
-        // Check if messages are from same sender and within 1 minute
-        if (
-          currentMessage.isSentByMe === nextMessage.isSentByMe &&
-          nextTime &&
-          currentTime &&
-          Math.abs(nextTime.getTime() - currentTime.getTime()) <= 60000 // 1 minute = 60000ms
-        ) {
-          showTimestamp = false;
-        }
-      }
-
-      grouped.push({
-        ...currentMessage,
-        showTimestamp
-      });
+  const {groupMessages, messages, handleSendMessage} = useMessageStore();
+  const {selectChat} = useChatStore();
+  const selectedChatUser = useSelectedChatUser();
+  const isValidChatId = useIsChatValid();
+  
+  // Set selected chat ID when component mounts or ID changes
+  useEffect(() => {
+    if(id) {
+      selectChat(id);
     }
-
-    return grouped;
-  };
-
-  const parseTimeString = (timeStr: string): Date | null => {
-    try {
-      const today = new Date();
-      const [time, meridiem] = timeStr.split(' ');
-      const [hours, minutes] = time.split(':').map(Number);
-
-      let hour24 = hours;
-      if (meridiem === 'PM' && hours !== 12) {
-        hour24 += 12;
-      } else if (meridiem === 'AM' && hours === 12) {
-        hour24 = 0;
-      }
-
-      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour24, minutes);
-      return date;
-    } catch {
-      return null;
-    }
-  };
-
-  const handleSendMessage = () => {
-    if (newMessage.trim() === '') return;
-
-    const currentTime = new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-
-    setMessages([
-      ...messages,
-      { text: newMessage, isSentByMe: true, timestamp: currentTime },
-    ]);
-    setNewMessage('');
-  };
-
+  }, [id, selectChat]);
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -107,16 +39,9 @@ const ChatWindow = () => {
         textareaRef.current.scrollHeight + 'px';
     }
   };
-  
-
-  const {user} = authStore();
-  useEffect(() => {
+    useEffect(() => {
     if(id){
-      api.post('/messages/getMessages', {
-        users: [
-          user?._id, id
-        ]
-      })
+      api.get(`/messages/${id}`)
       .then((res)=>{
         console.log(res.data.data);
       })
@@ -126,18 +51,24 @@ const ChatWindow = () => {
     }
   }, [id]);
 
+  // Go to the bottom of page
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
+  // Text Area auto resizer
   useEffect(() => {
     autoResizeTextarea();
   }, [newMessage]);
 
-  // If no contact found, show error or redirect
-  if (!contact) {
+    const getInitial = (username: string) => {
+      return username ? username.charAt(0).toUpperCase() : 'U';
+    };
+
+  
+  if (!isValidChatId) {
     return (
       <div className=" h-[100dvh] flex-1 bg-muted pl-0 max-md:pl-2 p-2 shadow-lg overflow-hidden">
         <div className='h-full w-full flex bg-background rounded-2xl'>
@@ -164,21 +95,17 @@ const ChatWindow = () => {
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-10 h-10 overflow-hidden rounded-full bg-blue-100 dark:bg-blue-900/30 flex justify-center items-center">
-                  <img
-                    src={contact.icon}
-                    className="object-cover h-full w-full"
-                    alt={contact.name}
-                  />
+                 {
+                   selectedChatUser?.profilePhoto
+                  ?<img src={selectedChatUser?.profilePhoto} alt="" className="h-full w-full object-cover" />
+                  :<div className="w-10 h-10 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] flex items-center justify-center text-white font-semibold">
+                      {getInitial(selectedChatUser?.username || '')}
+                   </div>
+                }
                 </div>
-                {contact.isOnline && (
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-                )}
               </div>
               <div>
-                <h3 className="font-medium text-foreground">{contact.name}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {contact.isOnline ? 'Online' : 'Offline'}
-                </p>
+                <h3 className="font-medium text-foreground">{selectedChatUser?.username}</h3>
               </div>
             </div>
             <div className="flex items-center gap-2">

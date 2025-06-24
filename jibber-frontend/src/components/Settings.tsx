@@ -13,6 +13,7 @@ import {
   Camera,
   AtSign,
 } from 'lucide-react';
+import api from '@/services/api';
 
 const Settings = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,8 +25,8 @@ const Settings = () => {
     newPassword: '',
     confirmPassword: '',
   });
-
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -69,10 +70,10 @@ const Settings = () => {
   const handleInputChange = (field: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
   };
-
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setProfileImage(e.target?.result as string);
@@ -80,6 +81,30 @@ const Settings = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const updateImage = async (file: File) => {
+  if (!file) return;
+  setIsLoading(true)
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'jibber'); 
+
+  const res = await fetch('https://api.cloudinary.com/v1_1/dooinh7tf/image/upload', {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await res.json();
+  setProfileImage(data.secure_url); 
+
+  const updateRes = await api.post('/users/updateProfilePhoto', {
+    url: data.secure_url
+  })
+
+  console.log(updateRes.data);
+  setIsLoading(false)
+};
+
 
   const handleSaveChanges = async (section: string) => {
     setIsLoading(true);
@@ -183,50 +208,58 @@ const Settings = () => {
                         className="hidden"
                       />
                     </label>
-                  </div>
-                  <div>
+                  </div>                  <div>
                     <h3 className="font-medium text-foreground">
                       Profile Picture
                     </h3>
                     <p className="text-sm text-muted-foreground">
                       Upload a new avatar for your profile
                     </p>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Image
+                      </Button>                      {profileImage && selectedFile && (
+                        <Button
+                          size="sm"
+                          onClick={() => updateImage(selectedFile)}
+                          disabled={isLoading}
+                          className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white"
+                        >
+                          {isLoading ? 'Updating...' : 'Update Image'}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>                {/* Username */}
+                <div className="space-y-2">
+                  <Label htmlFor="profile-username">Username</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="profile-username"
+                        value={profileData.username}
+                        onChange={(e) =>
+                          handleInputChange('username', e.target.value)
+                        }
+                        className="pl-10"
+                        placeholder="Enter your username"
+                      />
+                    </div>
                     <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() => handleSaveChanges('username')}
+                      disabled={isLoading}
+                      className="bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white"
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Image
+                      {isLoading ? 'Updating...' : 'Update Username'}
                     </Button>
                   </div>
                 </div>
-
-                {/* Username */}
-                <div className="space-y-2">
-                  <Label htmlFor="profile-username">Username</Label>
-                  <div className="relative">
-                    <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input
-                      id="profile-username"
-                      value={profileData.username}
-                      onChange={(e) =>
-                        handleInputChange('username', e.target.value)
-                      }
-                      className="pl-10"
-                      placeholder="Enter your username"
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => handleSaveChanges('profile')}
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-[#5e63f9] to-[#7c7fff] hover:from-[#4f53e6] hover:to-[#6c70e8] text-white"
-                >
-                  {isLoading ? 'Saving...' : 'Save Profile Changes'}
-                </Button>
               </CardContent>
             </Card>
           )}

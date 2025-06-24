@@ -28,50 +28,51 @@ interface ChatStore{
   selectedChatId: string,
   fetchChats: () => Promise<void>,
   selectChat: (chatId: string) => void,
-  clearSelection: () => void
+  clearSelection: () => void,
+  getSelectedChat: () => Chat | null,
+  getSelectedChatUser: () => ChatUser | null,
+  isChatValid: () => boolean
 }
 
-export const useChatStore = create<ChatStore>((set, get)=>({
+export const useChatStore = create<ChatStore>((set, get) => ({
   isLoading: false,
   chats: [],
   selectedChatId: '',
+
   fetchChats: async () => {
     try {
-      set({isLoading: true});
+      set({ isLoading: true });
       const response = await api.get('/chats/getAllChatsOfUser');
-      set({chats: response.data.data || []});
+      set({ chats: response.data.data || [] });
     } catch (error) {
       console.error('Error fetching chats:', error);
-      set({chats: [], isLoading: false})
+      set({ chats: [], isLoading: false })
     } finally {
-      set({isLoading: false});
+      set({ isLoading: false });
     }
   },
+
   selectChat: (chatId: string) => {
-    const { chats } = get();
-    const chatExists = chats.some(chat => chat._id === chatId);
-    if (chatExists || chatId === '') {
-      set({selectedChatId: chatId});
-    }
+    set({ selectedChatId: chatId });
   },
+
   clearSelection: () => {
-    set({selectedChatId: ''});
+    set({ selectedChatId: '' });
+  },
+
+  getSelectedChat: () => {
+    const { chats, selectedChatId } = get(); // <-- Use `get()` instead of `useChatStore.getState()` here
+    return chats.find(chat => chat._id === selectedChatId) || null;
+  },
+
+  getSelectedChatUser: () => {
+    const selectedChat = get().getSelectedChat();
+    return selectedChat?.details || null;
+  },
+
+  isChatValid: () => {
+    const selectedChat = get().getSelectedChat();
+    const { selectedChatId } = get();
+    return selectedChatId === '' || selectedChat !== null;
   }
-}))
-
-// Computed selectors
-export const useSelectedChat = () => {
-  const { chats, selectedChatId } = useChatStore();
-  return chats.find(chat => chat._id === selectedChatId) || null;
-};
-
-export const useSelectedChatUser = () => {
-  const selectedChat = useSelectedChat();
-  return selectedChat?.details || null;
-};
-
-export const useIsChatValid = () => {
-  const selectedChat = useSelectedChat();
-  const { selectedChatId } = useChatStore();
-  return selectedChatId === '' || selectedChat !== null;
-};
+}));

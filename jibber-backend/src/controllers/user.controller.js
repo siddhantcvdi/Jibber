@@ -23,4 +23,28 @@ const findUsers = asyncHandler(async (req, res) => {
   });
 });
 
+export const updateImage = asyncHandler(async(req, res)=> {
+  const {url} = req.body;
+  const user = req.user.userId;
+  
+  if (!url) {
+    return errorResponse(res, 'URL is required', 400);
+  }
+  
+  const updatedUser = await User.findByIdAndUpdate(
+    user, 
+    { profilePhoto: url }, 
+    { new: true, select: 'username email profilePhoto' }
+  );
+  
+  if (!updatedUser) {
+    return errorResponse(res, 'User not found', 404);
+  }
+  
+  return successResponse(res, {
+    message: "Profile Photo Updated Successfully", 
+    data: updatedUser
+  });
+})
+
 export { findUsers };

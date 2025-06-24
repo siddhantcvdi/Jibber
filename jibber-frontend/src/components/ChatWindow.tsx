@@ -1,22 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import ChatBubble from './ChatBubble';
 import { SendHorizonal, MoreVertical, ImageUp } from 'lucide-react';
 import { ThemeToggle } from './ui/theme-toggle';
 import { useParams } from 'react-router-dom';
-import api from '@/services/api';
 import { useMessageStore } from '@/store/message.store';
-import {useChatStore, useSelectedChatUser, useIsChatValid} from "@/store/chats.store.ts";
+import {useChatStore} from "@/store/chats.store.ts";
 
 
 const ChatWindow = () => {
   const { id } = useParams<{ id: string }>();
-  const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const {groupMessages, messages, handleSendMessage} = useMessageStore();
-  const {selectChat} = useChatStore();
-  const selectedChatUser = useSelectedChatUser();
-  const isValidChatId = useIsChatValid();
+  const {groupMessages, messages, handleSendMessage, fetchMessages} = useMessageStore();
+  const {selectChat, getSelectedChatUser, isChatValid} = useChatStore();
+  const selectedChatUser = getSelectedChatUser();
+  const isValidChatId = isChatValid();
   
   // Set selected chat ID when component mounts or ID changes
   useEffect(() => {
@@ -39,16 +37,8 @@ const ChatWindow = () => {
         textareaRef.current.scrollHeight + 'px';
     }
   };
-    useEffect(() => {
-    if(id){
-      api.get(`/messages/${id}`)
-      .then((res)=>{
-        console.log(res.data.data);
-      })
-      .catch(err => {
-        console.log("Error Fetching Messages", err);
-      })
-    }
+  useEffect(() => {
+    fetchMessages(id);
   }, [id]);
 
   // Go to the bottom of page
@@ -59,13 +49,14 @@ const ChatWindow = () => {
   }, [messages]);
 
   // Text Area auto resizer
+  const {newMessage, setNewMessage} = useMessageStore()
   useEffect(() => {
     autoResizeTextarea();
   }, [newMessage]);
 
-    const getInitial = (username: string) => {
-      return username ? username.charAt(0).toUpperCase() : 'U';
-    };
+  const getInitial = (username: string) => {
+    return username ? username.charAt(0).toUpperCase() : 'U';
+  };
 
   
   if (!isValidChatId) {
@@ -135,7 +126,9 @@ const ChatWindow = () => {
           <div className="flex items-center gap-2 rounded-2xl h-14 pl-3 px-1.5 py-1.5">
             <button
               className="p-3 -ml-2 sm:p-3 rounded-lg md:rounded-2xl cursor-pointer hover:bg-muted/50 text-foreground hover:shadow-md transition-all"
-              onClick={handleSendMessage}
+              onClick={() => {
+                handleSendMessage()
+              }}
             >
               <ImageUp size={18} />
             </button>

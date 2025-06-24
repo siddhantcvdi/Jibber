@@ -68,7 +68,6 @@ export const getAllChatsOfUser = asyncHandler(async(req, res)=>{
       updatedAt: chat.updatedAt
     };
   });
-  console.log(formattedChats);
 
   return successResponse(res, {
     message: "Chats retrieved successfully",

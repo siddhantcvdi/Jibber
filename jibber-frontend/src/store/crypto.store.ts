@@ -37,20 +37,25 @@ type CryptoStore = {
     key: Uint8Array,
     salt: Uint8Array,
     nonce: Uint8Array
-  }>, 
+  }>,
+  decryptKeys: (encPrivateIdKey: Uint8Array, encPrivateSigningKey: Uint8Array) => Promise<{
+    privateIdKey: Uint8Array,
+    privateSigningKey: Uint8Array
+  }>,
   storeKek: (user: User, password: string) => Promise<void>
-  getValuefromDB: (key: string) => Promise<Uint8Array | undefined>
-  clearSecrets: () => Promise<void>
+  getValueFromDB: (key: string) => Promise<Uint8Array | undefined>
+  clearSecrets: () => Promise<void>,
+  encryptMessage: (message: string, recipientPublicIdKey: Uint8Array) => Promise<Uint8Array>,
+  signMessage: (message: Uint8Array) => Promise<Uint8Array>,
 };
 
-const useCryptoStore = create<CryptoStore>(()=>({
+const useCryptoStore = create<CryptoStore>((_, get)=>({
   privateIdKey: null,
   privateSigningKey: null,
   generateRawKeys: async () => {
     await sodium.ready
     const {privateKey: privateSigningKey, publicKey: publicSigningKey} = sodium.crypto_sign_keypair();
-    const privateIdKey = sodium.crypto_sign_ed25519_sk_to_curve25519(privateSigningKey);
-    const publicIdKey = sodium.crypto_sign_ed25519_pk_to_curve25519(publicSigningKey);
+    const { privateKey: privateIdKey, publicKey: publicIdKey } = sodium.crypto_box_keypair();
     return {
       privateIdKey,
       publicIdKey,
@@ -90,8 +95,25 @@ const useCryptoStore = create<CryptoStore>(()=>({
     }
   },
 
+  decryptKeys: async (encPrivateIdKey, encPrivateSigningKey) => {
+    await sodium.ready;
+    const idKeyKek = await get().getValueFromDB('idKeyKek');
+    const idKeyNonce = await get().getValueFromDB('idKeyNonce');
+    const signingKeyKek = await get().getValueFromDB('signingKeyKek');
+    const signingKeyNonce = await get().getValueFromDB('signingKeyNonce');
+    if(!idKeyNonce || !signingKeyNonce || !idKeyKek || !signingKeyKek) throw new Error('Problem extracting Key from DB');
+    const privateIdKey = sodium.crypto_secretbox_open_easy(encPrivateIdKey, idKeyNonce, idKeyKek);
+    if (!privateIdKey) throw new Error('Failed to decrypt Private ID Key');
+    const privateSigningKey = sodium.crypto_secretbox_open_easy(encPrivateSigningKey, signingKeyNonce, signingKeyKek);
+    if (!privateSigningKey) throw new Error('Failed to decrypt Private Signing Key');
+    return {
+      privateIdKey,
+      privateSigningKey
+    }
+  },
+
   async storeKek(user: User, password) {
-      const base64toRaw = useCryptoStore.getState().base64toRaw;
+      const base64toRaw = get().base64toRaw;
       const {idKeySalt, signingKeySalt, idKeyNonce, signingKeyNonce} = user;
       const idKeyKek = sodium.crypto_pwhash(
         32,
@@ -115,16 +137,35 @@ const useCryptoStore = create<CryptoStore>(()=>({
       await db.userSecrets.put({ key: 'signingKeyNonce', value: base64toRaw(signingKeyNonce) })
   },
 
-  async getValuefromDB(key: string){
+  async getValueFromDB(key: string){
     const value =  await db.userSecrets.get(key);
     return value?.value;  
   },
 
   clearSecrets: async () => {
     await db.userSecrets.clear();
+  },
+
+  async encryptMessage(message, recipientPublicIdKey){
+    await sodium.ready;
+    const nonce = sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES);
+    const {privateIdKey} = get()
+    if(!privateIdKey) throw new Error("Private id Key not found");
+    const cipher = sodium.crypto_box_easy(
+      message,
+      nonce,
+      recipientPublicIdKey,
+      privateIdKey
+    );
+    return cipher;
+  },
+
+  async signMessage(message){
+    await sodium.ready;
+    const {privateSigningKey} = get();
+    if(!privateSigningKey) throw new Error("Private signing key not present");
+    return sodium.crypto_sign_detached(message, privateSigningKey );
   }
-
-
 
 })) 
 

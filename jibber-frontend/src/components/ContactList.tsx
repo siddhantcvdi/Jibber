@@ -177,9 +177,13 @@ const ContactList = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-60 glassmorphism-header">
                   <div className="flex items-center gap-3 p-3 border-b border-border">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] flex items-center justify-center text-white font-semibold">
-                      {getInitial(user?.username || '')}
-                    </div>
+                    {
+                      user?.profilePhoto != ""
+                      ?<img src={user?.profilePhoto} alt="" className="w-10 h-10 sm:h-12 sm:w-12 rounded-full object-cover" />
+                      :<div className="w-10 h-10 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-[#5e63f9] to-[#7c7fff] flex items-center justify-center text-white font-semibold">
+                      {getInitial(user.username || '')}
+                      </div>
+                    }
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-foreground truncate">
                         {user?.username || 'User'}

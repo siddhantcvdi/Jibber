@@ -25,7 +25,8 @@ export interface User {
   idKeyNonce: string,
   signingKeyNonce: string,
   idKeySalt: string,
-  signingKeySalt: string
+  signingKeySalt: string,
+  profilePhoto: string,
 }
 
 interface AuthState {
@@ -115,8 +116,8 @@ export const authStore = create<AuthState>((set, get) => ({
           idKeySalt: rawToBase64(encPrivateIdKey.salt),
           encPrivateSigningKey: rawToBase64(encPrivateSigningKey.key),
           publicSigningKey: rawToBase64(publicSigningKey),
-          signingKeyNonce: rawToBase64(encPrivateIdKey.nonce),
-          signingKeySalt: rawToBase64(encPrivateIdKey.salt),
+          signingKeyNonce: rawToBase64(encPrivateSigningKey.nonce),
+          signingKeySalt: rawToBase64(encPrivateSigningKey.salt),
         }
       );
       console.log('Registration finished ✅', finishData.data);
@@ -223,7 +224,8 @@ export const authStore = create<AuthState>((set, get) => ({
         const user = userResponse.data.data.user;
         setAuth(accessToken, user);
         const base64toRaw = useCryptoStore.getState().base64toRaw;
-        useCryptoStore.setState({privateIdKey: base64toRaw(user.encPrivateIdKey), privateSigningKey: base64toRaw(user.encPrivateSigningKey)});
+        const {privateIdKey, privateSigningKey} = await useCryptoStore.getState().decryptKeys(base64toRaw(user.encPrivateIdKey), base64toRaw(user.encPrivateSigningKey));
+        useCryptoStore.setState({privateIdKey, privateSigningKey});
       } catch {
         setAuth(accessToken, null);
       }

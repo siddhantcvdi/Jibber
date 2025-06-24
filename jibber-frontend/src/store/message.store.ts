@@ -1,4 +1,7 @@
 import {create} from 'zustand'
+import api from "@/services/api.ts";
+import useCryptoStore from '@/store/crypto.store.ts';
+import { useChatStore } from '@/store/chats.store.ts';
 
 export interface Message {
   text: string;
@@ -16,6 +19,8 @@ interface MessageStore{
   groupMessages: (messages: Message[]) => GroupedMessage[],
   parseTimeString: (timeStr: string) => Date | null,
   handleSendMessage:() => Promise<void>
+  setNewMessage: (message: string) => void,
+  fetchMessages: (id: string | undefined) => Promise<void>,
 }
 
 export const useMessageStore = create<MessageStore>((set, get)=>({
@@ -82,5 +87,33 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
         { text: newMessage, isSentByMe: true, timestamp: currentTime },
       ]
     })
+    const {encryptMessage, signMessage, base64toRaw} = useCryptoStore.getState()
+    const {getSelectedChatUser} = useChatStore.getState()
+    const recipientPublicIdKey = getSelectedChatUser()?.publicIdKey;
+    let encryptedMessage, signedMessage;
+    if(recipientPublicIdKey){
+      encryptedMessage = await encryptMessage(newMessage, base64toRaw(recipientPublicIdKey));
+    }
+    if(encryptedMessage){
+      signedMessage = await signMessage(encryptedMessage);
+    }
+    console.log(signedMessage);
+    set({newMessage: ''})
+  },
+  setNewMessage: (message: string) => {
+    set({newMessage: message})
+  },
+
+  async fetchMessages(id){
+    if(id) {
+      api.get(`/messages/${id}`)
+          .then((res) => {
+            console.log("Messages fetched", res.data.data);
+            set({messages: res.data.data})
+          })
+          .catch(err => {
+            console.log("Error Fetching Messages", err);
+          })
+    }
   }
 }))

@@ -20,7 +20,11 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true,
   }, 
-  iv: {
+  nonce: {
+    type: String,
+    required: true
+  },
+  signature: {
     type: String,
     required: true
   }

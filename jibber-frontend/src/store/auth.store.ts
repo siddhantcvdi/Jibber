@@ -215,13 +215,15 @@ export const authStore = create<AuthState>((set, get) => ({
 
     try {
       const response = await refreshApi.post('/auth/refresh');
-      console.log(response);
+      console.log("Refreshing in silentRefresh");
 
       const { accessToken } = response.data.data;
+      set({accessToken})
 
       try {
         const userResponse = await api.get('/auth/me');
         const user = userResponse.data.data.user;
+        console.log("Calling whoami in silentRefresh");
         setAuth(accessToken, user);
         const base64toRaw = useCryptoStore.getState().base64toRaw;
         const {privateIdKey, privateSigningKey} = await useCryptoStore.getState().decryptKeys(base64toRaw(user.encPrivateIdKey), base64toRaw(user.encPrivateSigningKey));

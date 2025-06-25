@@ -76,6 +76,8 @@ api.interceptors.response.use(
       try {
         const refreshResponse = await refreshApi.post('/auth/refresh', {});
         const { accessToken } = refreshResponse.data.data;
+        console.log("Refreshing in interceptor");
+        
 
         const { user } = authStore.getState();
         authStore.getState().setAuth(accessToken, user);

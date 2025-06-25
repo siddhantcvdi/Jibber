@@ -36,7 +36,7 @@ export const createChat = asyncHandler(async (req, res) => {
 
 
 export const getAllChatsOfUser = asyncHandler(async(req, res)=>{
-  const currentUserId = req.user.userId;
+  const currentUserId = req.user._id;
   
   if (!currentUserId) {
     return errorResponse(res, { message: "User not authenticated", statusCode: 401 });
@@ -55,10 +55,9 @@ export const getAllChatsOfUser = asyncHandler(async(req, res)=>{
   })
   .lean()
   .exec();
-
   const formattedChats = chatsWithUnreadCounts.map(chat => {
     const otherUser = chat.users.find(u => u._id.toString() !== currentUserId.toString());
-    const unreadCount = chat.unreadCounts?.find(u => u.userId.toString() === currentUserId.toString())?.count || 0;
+    const unreadCount = chat.unreadCounts?.find(u => u._id.toString() === currentUserId.toString())?.count || 0;
     return {
       _id: chat._id,
       details: otherUser,

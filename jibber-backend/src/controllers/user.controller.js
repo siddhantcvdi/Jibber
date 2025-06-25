@@ -25,7 +25,7 @@ const findUsers = asyncHandler(async (req, res) => {
 
 export const updateImage = asyncHandler(async(req, res)=> {
   const {url} = req.body;
-  const user = req.user.userId;
+  const user = req.user._id;
   
   if (!url) {
     return errorResponse(res, 'URL is required', 400);

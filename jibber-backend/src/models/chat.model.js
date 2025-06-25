@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
 const unreadCountSchema = new Schema({
-  userId: { type: Types.ObjectId, ref: 'User', required: true },
+  _id: { type: Types.ObjectId, ref: 'User', required: true },
   count:  { type: Number, default: 0 }
 }, { _id: false });
 
@@ -49,7 +49,7 @@ chatSchema.methods.getOtherUser = function (currentUserId) {
 
 chatSchema.methods.incUnread = async function (receiverId) {
   await this.updateOne({
-    'unreadCounts.userId': receiverId
+    'unreadCounts._id': receiverId
   }, {
     $inc: { 'unreadCounts.$.count': 1 }
   });
@@ -57,7 +57,7 @@ chatSchema.methods.incUnread = async function (receiverId) {
 
 chatSchema.methods.resetUnread = async function (userId) {
   await this.updateOne({
-    'unreadCounts.userId': userId
+    'unreadCounts._id': userId
   }, {
     $set: { 'unreadCounts.$.count': 0 }
   });

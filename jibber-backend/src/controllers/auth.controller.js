@@ -13,12 +13,12 @@ import { User } from '../models/user.model.js';
 
 const generateJwtTokens = (user) => {
   const accessToken = jwt.sign(
-    { userId: user._id, email: user.email },
+    { _id: user._id, email: user.email },
     process.env.JWT_ACCESS_SECRET,
     { expiresIn: '15m' }
   );
   const refreshToken = jwt.sign(
-    { userId: user._id },
+    { _id: user._id },
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
   );
@@ -239,8 +239,7 @@ const refresh = asyncHandler(async (req, res) => {
       statusCode: 403,
     });
   }
-
-  const user = await User.findById(decoded.userId).select(
+  const user = await User.findById(decoded._id).select(
     '-registrationRecord'
   );
   if (!user) {
@@ -288,7 +287,7 @@ const logout = asyncHandler(async (req, res) => {
 
 const whoami = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select(
+    const user = await User.findById(req.user._id).select(
       '-registrationRecord'
     );
     if (!user) {

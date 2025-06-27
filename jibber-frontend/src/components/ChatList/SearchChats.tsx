@@ -14,7 +14,7 @@ const SearchChats = () => {
   const [results, setResults] = useState<SearchUser[]>([]);
   const [selectedSearchUser, setSelectedSearchUser] = useState<SearchUser | null>(null);
   const [showChatPopup, setShowChatPopup] = useState(false);
-  const { user } = authStore();
+  const  user  = authStore(select=>select.user);
   const navigate = useNavigate();
 
 

@@ -13,7 +13,7 @@ import authStore from '@/store/auth.store';
 
 const ChatListHeader = () => {
   const navigate = useNavigate();
-  const user  = authStore((state)=>state.user)
+  const user  = authStore(select=>select.user)
   const getInitial = (username: string) => {
     return username ? username.charAt(0).toUpperCase() : 'U';
   };

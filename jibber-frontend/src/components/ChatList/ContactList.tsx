@@ -8,7 +8,7 @@ import AllChats from './AllChats';
 
 const ChatList = () => {
   const [activeTab, setActiveTab] = useState('all');
-  const fetchChats = useChatStore((state)=>state.fetchChats)
+  const fetchChats = useChatStore(select=>select.fetchChats)
   const fetchChatsCallback = useCallback(fetchChats, [fetchChats]);
   useEffect(() => {
     fetchChatsCallback();

@@ -16,12 +16,13 @@ import { useSocketStore } from './store/socket.store';
 import ChatList from './components/ChatList/ContactList';
 
 function App() {
-  const { isAuthLoading, silentRefresh } = authStore();
-  const { isDarkMode } = useThemeStore();
-  const {connectSocket, disconnectSocket} = useSocketStore();
+  const isAuthLoading = authStore(select=>select.isAuthLoading);
+  const silentRefresh  = authStore(select=>select.silentRefresh);
+  const  isDarkMode  = useThemeStore(select=>select.isDarkMode);
+  const connectSocket = useSocketStore(select=>select.connectSocket);
+  const disconnectSocket = useSocketStore(select=>select.disconnectSocket);
 
   useEffect(() => {
-    // Try to silently refresh token on app startup
     const initializeAuth = async () => {
       const {success} = await silentRefresh();
       if(success){

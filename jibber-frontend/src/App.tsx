@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import MainLayout from './Layouts/MainLayout';
-import ContactList from './components/ContactList';
 import ChatWindow from './components/ChatWindow';
 import Settings from './components/Settings';
 import { Toaster } from '@/components/ui/sonner';
@@ -14,6 +13,7 @@ import { useEffect } from 'react';
 import authStore from './store/auth.store';
 import useThemeStore from './store/themeStore';
 import { useSocketStore } from './store/socket.store';
+import ChatList from './components/ChatList/ContactList';
 
 function App() {
   const { isAuthLoading, silentRefresh } = authStore();
@@ -94,7 +94,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<ContactList />} />
+          <Route index element={<ChatList />} />
           <Route path="chat/:id" element={<ChatWindow />} />
           <Route path="settings" element={<Settings />} />
         </Route>

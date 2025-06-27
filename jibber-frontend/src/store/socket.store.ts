@@ -5,16 +5,7 @@ import authStore from './auth.store';
 import useCryptoStore from './crypto.store';
 import { useChatStore } from './chats.store';
 import { useMessageStore } from './message.store';
-
-interface Message{
-  chatId: string,
-  senderId: string,
-  receiverId: string,
-  cipher: string,
-  iv: string,
-  senderPublicIdKey: string,
-  senderPublicSigningKey: string
-}
+import type { EncryptedMessage } from '@/types';
 
 interface SocketState {
   socket: Socket | null;
@@ -44,7 +35,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       console.log('Socket disconnected ❌');
     });
 
-    socket.on('receivedMessage', async (data: Message)=>{
+    socket.on('receivedMessage', async (data: EncryptedMessage)=>{
       const {decryptMessage} = useCryptoStore.getState()
       const {getSelectedChat} = useChatStore.getState()
       const {addReceivedMessage} = useMessageStore.getState()

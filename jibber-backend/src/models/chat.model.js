@@ -7,10 +7,6 @@ const chatSchema = new Schema({
     ref: 'User',
     required: true
   }],
-  lastMessageId: {
-    type: Types.ObjectId,
-    ref: 'Message'
-  },
   unreadCounts: {
     type: Map,
     of: Number,

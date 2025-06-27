@@ -13,7 +13,6 @@ const AllChats = () => {
   const isLoading = useChatStore((state) => state.isLoading)
   const chats = useChatStore((state) => state.chats)
   const selectedChatId = useChatStore((state) => state.selectedChatId)
-
   return (
     <div>
       {isLoading ? (
@@ -35,7 +34,7 @@ const AllChats = () => {
                   <ChatPreview
                     chatId={chat._id}
                     name={chat.details.username}
-                    lastChatText={chat.lastMessage}
+                    lastEncryptedMessage={chat.lastMessage}
                     icon={chat.details.profilePhoto || ""}
                     id={chat.details._id}
                     unread={chat.unreadCount}

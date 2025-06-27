@@ -2,6 +2,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 import { Chat } from '../models/chat.model.js';
 import { User } from '../models/user.model.js';
+import { Message } from '../models/message.model.js';
 
 export const createChat = asyncHandler(async (req, res) => {
   const {users} = req.body;
@@ -47,28 +48,31 @@ export const getAllChatsOfUser = asyncHandler(async(req, res)=>{
   })
   .populate({
     path: 'users',
-    select: 'username profilePhoto email publicIdKey publicSigningKey', // or whatever public fields you want
-  })
-  .populate({
-    path: 'lastMessageId',
-    select: 'cipher iv createdAt sender'
+    select: 'username profilePhoto email publicIdKey publicSigningKey',
   })
   .lean()
   .exec();
-  const formattedChats = chatsWithUnreadCounts.map(chat => {
-    const otherUser = chat.users.find(u => u._id.toString() !== currentUserId.toString());
-    const unreadCount = chat.unreadCounts?.[currentUserId.toString()] || 0;
-    console.log(chat);
-    
-    return {
-      _id: chat._id,
-      details: otherUser,
-      lastMessage: chat.lastMessageId,
-      unreadCount,
-      createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt
-    };
-  });
+
+  // Get last messages for all chats in parallel
+  const formattedChats = await Promise.all(
+    chatsWithUnreadCounts.map(async (chat) => {
+      const otherUser = chat.users.find(u => u._id.toString() !== currentUserId.toString());
+      const unreadCount = chat.unreadCounts?.[currentUserId.toString()] || 0;
+      
+      const lastMessage = await Message.findOne({ chatId: chat._id })
+        .sort({ timestamp: -1 })
+        .lean();
+
+      return {
+        _id: chat._id,
+        details: otherUser,
+        lastMessage,
+        unreadCount,
+        createdAt: chat.createdAt,
+        updatedAt: chat.updatedAt
+      };
+    })
+  );
 
   return successResponse(res, {
     message: "Chats retrieved successfully",

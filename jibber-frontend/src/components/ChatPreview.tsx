@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Check} from 'lucide-react';
 import { useChatStore } from '@/store/chats.store';
+import type { EncryptedMessage } from '@/types';
+import useCryptoStore from '@/store/crypto.store';
+import authStore from '@/store/auth.store';
 
 interface ChatPreviewProps {
   name: string;
   chatId: string,
-  lastChatText: {
-    cipher: string,
-    iv: string
-  } | undefined;
+  lastEncryptedMessage: EncryptedMessage | undefined;
   icon: string;
   id: string;
   time?: string;
@@ -18,18 +18,39 @@ interface ChatPreviewProps {
 }
 
 const ChatPreview: React.FC<ChatPreviewProps> = ({
-    chatId,
+  chatId,
   name,
-  lastChatText,
+  lastEncryptedMessage,
   icon,
   id,
   time = '11:30 AM',
   unread = 0,
   isActive = false,
 }) => {
+  const decryptMessage = useCryptoStore(select => select.decryptMessage);
   const navigate = useNavigate();
   const location = useLocation();
   const { selectChat } = useChatStore();
+  const {user} = authStore()
+  const [lastChatText, setLastChatText] = useState<string>('');
+
+  useEffect(() => {
+    const decryptLastMessage = async () => {
+      if (lastEncryptedMessage) {
+        try {
+          const decrypted = await decryptMessage(lastEncryptedMessage);
+          setLastChatText(decrypted);
+        } catch (error) {
+          console.error('Failed to decrypt message:', error);
+          setLastChatText('Unable to decrypt message');
+        }
+      } else {
+        setLastChatText('');
+      }
+    };
+
+    decryptLastMessage();
+  }, [lastEncryptedMessage, decryptMessage]);
 
   const handleNavigate = () => {
     selectChat(chatId);
@@ -78,8 +99,9 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
             )}
             <span
               className={`truncate text-xs ${unread > 0 ? ' text-foreground' : 'text-muted-foreground'}`}
-            >
-              {lastChatText?.cipher || 'No messages yet'}
+            > 
+              {(lastEncryptedMessage?.sender == user?._id )?'You: ': ''}
+              {lastChatText || 'No messages yet'}
             </span>
           </div>
 

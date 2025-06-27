@@ -1,5 +1,6 @@
 import {create} from 'zustand'
 import api from "@/services/api.ts";
+import type { EncryptedMessage } from '@/types';
 
 interface ChatUser {
   _id: string;
@@ -14,10 +15,7 @@ interface Chat {
   _id: string;
   details: ChatUser;
   unreadCount: number;
-  lastMessage: {
-    cipher: string,
-    iv: string
-  } | undefined;
+  lastMessage: EncryptedMessage | undefined;
   createdAt: string;
   updatedAt: string;
 }

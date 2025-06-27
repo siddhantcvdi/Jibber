@@ -57,7 +57,9 @@ export const getAllChatsOfUser = asyncHandler(async(req, res)=>{
   .exec();
   const formattedChats = chatsWithUnreadCounts.map(chat => {
     const otherUser = chat.users.find(u => u._id.toString() !== currentUserId.toString());
-    const unreadCount = chat.unreadCounts?.find(u => u._id.toString() === currentUserId.toString())?.count || 0;
+    const unreadCount = chat.unreadCounts?.[currentUserId.toString()] || 0;
+    console.log(chat);
+    
     return {
       _id: chat._id,
       details: otherUser,

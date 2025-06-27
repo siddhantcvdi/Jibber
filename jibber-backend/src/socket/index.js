@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Message } from '../models/message.model.js';
+import { Chat } from '../models/chat.model.js';
 
 const userMap = new Map();
 
@@ -26,7 +27,7 @@ export default function socketHandler(io) {
 
     socket.on('disconnect', () => {
       console.log(`❌ Socket disconnected: ${socket.id}`);
-      userMap.delete(socket.user?.id);
+      userMap.delete(socket.user?._id);
     });
 
     socket.on('sendMessage', async (data)=>{
@@ -47,6 +48,11 @@ export default function socketHandler(io) {
       if(userMap.has(receiver)){
       const receiverSocket = userMap.get(receiver)
       receiverSocket.emit('receivedMessage', message)
+      }else{
+        const chat = await Chat.findById(chatId)
+        console.log("Updating");
+        
+        await chat.incUnread(receiver);
       }
     })
   });

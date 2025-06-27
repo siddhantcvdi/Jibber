@@ -1,11 +1,6 @@
 import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
-const unreadCountSchema = new Schema({
-  _id: { type: Types.ObjectId, ref: 'User', required: true },
-  count:  { type: Number, default: 0 }
-}, { _id: false });
-
 const chatSchema = new Schema({
   users: [{
     type: Types.ObjectId,
@@ -16,7 +11,11 @@ const chatSchema = new Schema({
     type: Types.ObjectId,
     ref: 'Message'
   },
-  unreadCounts: [unreadCountSchema]
+  unreadCounts: {
+    type: Map,
+    of: Number,
+    default: new Map()
+  }
 }, {
   timestamps: true
 });
@@ -48,19 +47,18 @@ chatSchema.methods.getOtherUser = function (currentUserId) {
 };
 
 chatSchema.methods.incUnread = async function (receiverId) {
-  await this.updateOne({
-    'unreadCounts._id': receiverId
-  }, {
-    $inc: { 'unreadCounts.$.count': 1 }
-  });
+  const currentCount = this.unreadCounts.get(receiverId.toString()) || 0;
+  this.unreadCounts.set(receiverId.toString(), currentCount + 1);
+  await this.save();
 };
 
 chatSchema.methods.resetUnread = async function (userId) {
-  await this.updateOne({
-    'unreadCounts._id': userId
-  }, {
-    $set: { 'unreadCounts.$.count': 0 }
-  });
+  this.unreadCounts.set(userId.toString(), 0);
+  await this.save();
+};
+
+chatSchema.methods.getUnreadCount = function (userId) {
+  return this.unreadCounts.get(userId.toString()) || 0;
 };
 
 export const Chat = mongoose.model('Chat', chatSchema);

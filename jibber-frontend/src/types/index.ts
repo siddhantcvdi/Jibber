@@ -10,3 +10,10 @@ export interface EncryptedMessage{
   timestamp: string
 }
 
+
+export interface SearchUser {
+  _id: string
+  username: string;
+  email: string;
+  profilePhoto?: string;
+}

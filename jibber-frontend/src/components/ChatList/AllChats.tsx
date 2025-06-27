@@ -1,12 +1,18 @@
 import { useChatStore } from "@/store/chats.store"
-import { MessageCircle } from "lucide-react"
-import ChatPreview from "../ContactPreview"
+import { MessageCircle, Trash } from "lucide-react"
+import ChatPreview from "../ChatPreview"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 
 const AllChats = () => {
 
-  const isLoading = useChatStore((state)=>state.isLoading)
-  const chats = useChatStore((state)=>state.chats)
-  const selectedChatId = useChatStore((state)=>state.selectedChatId)
+  const isLoading = useChatStore((state) => state.isLoading)
+  const chats = useChatStore((state) => state.chats)
+  const selectedChatId = useChatStore((state) => state.selectedChatId)
 
   return (
     <div>
@@ -20,21 +26,29 @@ const AllChats = () => {
           <p className="text-sm text-muted-foreground">No chats yet</p>
           <p className="text-xs text-muted-foreground mt-1">Start a conversation by finding users</p>
         </div>
-      ) : (<div>
-        {chats.map((chat) => (
-          <div key={chat._id}>
-            <ChatPreview
-              chatId={chat._id}
-              name={chat.details.username}
-              lastChatText={chat.lastMessage}
-              icon={chat.details.profilePhoto || ""}
-              id={chat.details._id}
-              unread={chat.unreadCount}
-              isActive={selectedChatId === chat._id}
-            />
-          </div>
-        ))}
-      </div>
+      ) : (
+        <>
+          {chats.map((chat) => (
+            <div key={chat._id}>
+              <ContextMenu>
+                <ContextMenuTrigger>
+                  <ChatPreview
+                    chatId={chat._id}
+                    name={chat.details.username}
+                    lastChatText={chat.lastMessage}
+                    icon={chat.details.profilePhoto || ""}
+                    id={chat.details._id}
+                    unread={chat.unreadCount}
+                    isActive={selectedChatId === chat._id}
+                  />
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem className="bg-red-500/5 focus:bg-red-500/10  cursor-pointer text-red-500 focus:text-red-600"><Trash className="text-red-500" size={16}/>Delete Chat</ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            </div>
+          ))}
+        </>
       )}
     </div>
   )

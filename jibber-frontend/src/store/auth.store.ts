@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import api, { refreshApi } from '@/services/api.ts';
 import * as opaque from '@serenity-kit/opaque';
 import useCryptoStore from './crypto.store';
+import { useSocketStore } from './socket.store';
 
 interface RegisterData {
   username: string;
@@ -198,7 +199,8 @@ export const authStore = create<AuthState>((set, get) => ({
 
       const storeKek = useCryptoStore.getState().storeKek;
       await storeKek(user, password);
-      
+      const { connectSocket } = useSocketStore.getState();
+      connectSocket();
 
     } catch (err: unknown) {
       console.error('Login error ❌', err);

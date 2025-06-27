@@ -26,7 +26,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({
         className={`max-w-xs px-4 py-2 rounded-[24px] ${
           isSentByMe
             ? 'bg-[#5e63f9]/90 backdrop-blur-sm text-white rounded-tr-[8px] shadow-lg shadow-[#5e63f9]/20 dark:shadow-[#5e63f9]/10'
-            : 'bg-[#5e63f9]/30 dark:bg-accent/70 text-foreground rounded-tl-[8px]'
+            : 'bg-neutral-200 dark:bg-accent/70 text-foreground rounded-tl-[8px]'
         }`}
         style={{
           whiteSpace: 'pre-wrap',

@@ -1,5 +1,5 @@
+import ChatList from '@/components/ChatList/ContactList.tsx';
 import EmptyChatState from '../components/EmptyChatState.tsx';
-import ContactList from '@/components/ContactList';
 import { useMediaQuery } from 'react-responsive';
 import { Outlet, useLocation } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ const MainLayout = () => {
         <Outlet />
       ) : (
         <>
-          <ContactList />
+          <ChatList />
           {isOnChatRoute || isOnSettingsRoute ? <Outlet /> : <EmptyChatState />}
         </>
       )}

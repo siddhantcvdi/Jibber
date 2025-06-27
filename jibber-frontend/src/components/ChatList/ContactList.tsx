@@ -1,12 +1,12 @@
-import ChatListHeader from './ChatList/ChatListHeader';
-import ChatListTabs from './ChatList/ChatListTabs';
-import AllChats from './ChatList/AllChats';
-import SearchChats from './ChatList/SearchChats';
 import { useCallback, useEffect, useState } from 'react';
 import { useChatStore } from '@/store/chats.store';
+import ChatListHeader from './ChatListHeader';
+import ChatListTabs from './ChatListTabs';
+import SearchChats from './SearchChats';
+import AllChats from './AllChats';
 
 
-const ContactList = () => {
+const ChatList = () => {
   const [activeTab, setActiveTab] = useState('all');
   const fetchChats = useChatStore((state)=>state.fetchChats)
   const fetchChatsCallback = useCallback(fetchChats, [fetchChats]);
@@ -27,4 +27,4 @@ const ContactList = () => {
   );
 };
 
-export default ContactList;
+export default ChatList;

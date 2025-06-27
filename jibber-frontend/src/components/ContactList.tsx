@@ -1,6 +1,6 @@
 import { Search, MessageCircle, X } from 'lucide-react';
 import ChatPreview from './ContactPreview';
-import { useEffect, useState, useRef, useCallback, useMemo} from 'react';
+import { useEffect, useState, useCallback} from 'react';
 import { useNavigate } from 'react-router-dom';
 import authStore from '../store/auth.store';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import api from '@/services/api';
 import { motion, AnimatePresence } from 'motion/react';
 import {useChatStore} from "@/store/chats.store.ts";
 import ChatListHeader from './ChatList/ChatListHeader';
+import ChatListTabs from './ChatList/ChatListTabs';
 
 interface SearchUser {
   _id: string
@@ -24,42 +25,11 @@ const ContactList = () => {
   const [results, setResults] = useState<SearchUser[]>([]);
   const [showChatPopup, setShowChatPopup] = useState(false);
   const [selectedSearchUser, setSelectedSearchUser] = useState<SearchUser | null>(null);
+  const [activeTab, setActiveTab] = useState('all');
 
   //################################# UI Logic ##################################################
 
-  const [activeTab, setActiveTab] = useState('all');
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const [pillStyle, setPillStyle] = useState({ width: 0, left: 0 });
-  const tabs = useMemo(() => [
-    { id: 'all', label: 'All Chats' },
-    { id: 'find', label: 'Find Users' },
-  ], []);
-  const updatePillPosition = useCallback((activeTabId: string) => {
-    if (!tabsRef.current) return;
-
-    const tabButtons = tabsRef.current.querySelectorAll('button');
-    const activeIndex = tabs.findIndex(tab => tab.id === activeTabId);
-    const activeButton = tabButtons[activeIndex];
-
-    if (activeButton) {
-      const containerRect = tabsRef.current.getBoundingClientRect();
-      const buttonRect = activeButton.getBoundingClientRect();
-
-      setPillStyle({
-        width: buttonRect.width,
-        left: buttonRect.left - containerRect.left,
-      });
-    }
-  }, [tabs]);
-  useEffect(() => {
-    updatePillPosition(activeTab);
-  }, [activeTab, updatePillPosition]);
-  useEffect(() => {
-    const handleResize = () => updatePillPosition(activeTab);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [activeTab, updatePillPosition]);
-
+ 
   //##############################################################################################
  // ###################################### Fetch & Search ########################################
 
@@ -148,33 +118,8 @@ const ContactList = () => {
       <div className='h-full bg-background dark:bg-muted/25 rounded-2xl shadow-lg'>
         <ChatListHeader/>
         {/* Tabs */}
-        <div
-          ref={tabsRef}
-          className="relative flex border-b border-border px-2 pr-6"
-        >
-          {/* Animated underline */}
-          <div
-            className="absolute h-0.5 bg-[#5e63f9] transition-all duration-300 ease-out"
-            style={{
-              width: `${pillStyle.width}px`,
-              transform: `translateX(${pillStyle.left}px)`,
-              bottom: '0px',
-            }}
-          />
-
-          {tabs.map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex-1 py-3 text-sm font-medium transition-colors relative cursor-pointer ${activeTab === id
-                ? 'text-[#5e63f9]'
-                : 'text-muted-foreground hover:text-foreground'
-                }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <ChatListTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+       
 
         {/* Chat list */}
         <div className="flex-1 overflow-y-auto p-2 pt-4">

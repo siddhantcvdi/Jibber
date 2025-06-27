@@ -13,19 +13,26 @@ import PublicRoute from './components/PublicRoute';
 import { useEffect } from 'react';
 import authStore from './store/auth.store';
 import useThemeStore from './store/themeStore';
+import { useSocketStore } from './store/socket.store';
 
 function App() {
   const { isAuthLoading, silentRefresh } = authStore();
   const { isDarkMode } = useThemeStore();
+  const {connectSocket, disconnectSocket} = useSocketStore();
 
   useEffect(() => {
     // Try to silently refresh token on app startup
     const initializeAuth = async () => {
-      await silentRefresh();
+      const {success} = await silentRefresh();
+      if(success){
+        connectSocket();
+      }
     };
-
     initializeAuth();
-  }, [silentRefresh]);
+    return(()=>{
+      disconnectSocket()
+    })
+  }, [silentRefresh, connectSocket, disconnectSocket]);
 
   useEffect(() => {
     if (isDarkMode) {

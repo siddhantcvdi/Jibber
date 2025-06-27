@@ -2,12 +2,16 @@ import {create} from 'zustand'
 import api from "@/services/api.ts";
 import useCryptoStore from '@/store/crypto.store.ts';
 import { useChatStore } from '@/store/chats.store.ts';
-
+import { useSocketStore } from './socket.store';
+import authStore from './auth.store';
+import type { EncryptedMessage } from '@/types';
 export interface Message {
   text: string;
   isSentByMe: boolean;
   timestamp: string;
 }
+
+
 
 interface GroupedMessage extends Message {
   showTimestamp: boolean;
@@ -21,6 +25,7 @@ interface MessageStore{
   handleSendMessage:() => Promise<void>
   setNewMessage: (message: string) => void,
   fetchMessages: (id: string | undefined) => Promise<void>,
+  addReceivedMessage: (message: string) => void;
 }
 
 export const useMessageStore = create<MessageStore>((set, get)=>({
@@ -76,7 +81,8 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
   async handleSendMessage(){
     const newMessage = get().newMessage;
     const messages = get().messages;
-     if (newMessage.trim() === '') return;
+    
+    if (newMessage.trim() === '') return;
     const currentTime = new Date().toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
@@ -87,33 +93,82 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
         { text: newMessage, isSentByMe: true, timestamp: currentTime },
       ]
     })
-    const {encryptMessage, signMessage, base64toRaw} = useCryptoStore.getState()
-    const {getSelectedChatUser} = useChatStore.getState()
-    const recipientPublicIdKey = getSelectedChatUser()?.publicIdKey;
-    let encryptedMessage, signedMessage;
-    if(recipientPublicIdKey){
-      encryptedMessage = await encryptMessage(newMessage, base64toRaw(recipientPublicIdKey));
+
+
+    //  Encrypt and sign message
+    const {encryptMessage, signMessage} = useCryptoStore.getState()
+    const {getSelectedChatUser, getSelectedChat} = useChatStore.getState()
+    const receiverPublicIdKey = getSelectedChatUser()?.publicIdKey;
+    let encryptedMessage,signature;
+    if(receiverPublicIdKey){
+      encryptedMessage = await encryptMessage(newMessage, receiverPublicIdKey);
     }
     if(encryptedMessage){
-      signedMessage = await signMessage(encryptedMessage);
+      signature = await signMessage(encryptedMessage.cipher);
     }
-    console.log(signedMessage);
+
+    const { user } = authStore.getState();
+    const { emitMessage } = useSocketStore.getState();
+    const message = {
+      chatId: getSelectedChat()?._id ,
+      sender: user?._id,
+      receiver: getSelectedChatUser()?._id,
+      cipher: encryptedMessage?.cipher,
+      iv: encryptedMessage?.iv,
+      signature,
+      senderPublicIdKey: user?.publicIdKey,
+      senderPublicSigningKey: user?.publicSigningKey,
+      receiverPublicIdKey,
+      timestamp: currentTime
+    }
+    emitMessage('sendMessage', message);
     set({newMessage: ''})
   },
+
+
   setNewMessage: (message: string) => {
     set({newMessage: message})
   },
 
-  async fetchMessages(id){
-    if(id) {
-      api.get(`/messages/${id}`)
-          .then((res) => {
-            console.log("Messages fetched", res.data.data);
-            set({messages: res.data.data})
-          })
-          .catch(err => {
-            console.log("Error Fetching Messages", err);
-          })
+  async fetchMessages(id) {
+  if (id) {
+    try {
+      const res = await api.get(`/messages/${id}`);
+      console.log("Messages fetched", res.data.data);
+      const encryptedMessages = res.data.data;
+
+      const { decryptMessage } = useCryptoStore.getState();
+      const { user } = authStore.getState();
+
+      const decryptedMessages = await Promise.all(
+        encryptedMessages.map(async (message: EncryptedMessage) => {
+          return {
+            text: await decryptMessage(message),
+            isSentByMe: message.sender === user?._id,
+            timestamp: message.timestamp
+          };
+        })
+      );
+
+      console.log(decryptedMessages);
+      set({ messages: decryptedMessages });
+    } catch (err) {
+      console.log("Error Fetching Messages", err);
     }
+  }
+},
+
+  addReceivedMessage: (message) => {
+    const messages = get().messages;
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    set({
+      messages: [
+        ...messages,
+        { text: message, isSentByMe: false, timestamp: currentTime },
+      ]
+    })
   }
 }))

@@ -14,6 +14,8 @@ const ChatWindow = () => {
   const {groupMessages, messages, handleSendMessage, fetchMessages} = useMessageStore();
   const {selectChat, getSelectedChatUser, isChatValid} = useChatStore();
   const selectedChatUser = getSelectedChatUser();
+  console.log("Selected");
+  
   const isValidChatId = isChatValid();
   
   // Set selected chat ID when component mounts or ID changes
@@ -34,9 +36,10 @@ const ChatWindow = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + 'px';
+      textareaRef.current.scrollHeight + 'px';
     }
   };
+
   useEffect(() => {
     fetchMessages(id);
   }, [id]);

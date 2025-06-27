@@ -20,17 +20,33 @@ const messageSchema = new mongoose.Schema({
     type: String,
     required: true,
   }, 
-  nonce: {
+  iv: {
     type: String,
     required: true
   },
   signature: {
     type: String,
     required: true
+  },
+  senderPublicIdKey: {
+    type: String,
+    required: true
+  },
+  receiverPublicIdKey: {
+    type: String,
+    required: true
+  },
+  senderPublicSigningKey: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: String,
+    required: true
   }
 });
 
-messageSchema.index({ sessionId: 1, timestamp: -1 });
+messageSchema.index({ chatId: 1, timestamp: -1 });
 messageSchema.index({ receiver: 1 });
 
 export const Message = mongoose.model('Message', messageSchema);

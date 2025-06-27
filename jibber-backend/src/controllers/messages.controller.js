@@ -18,10 +18,7 @@ export const getMessages = asyncHandler(async (req, res) => {
   
   // Find messages for this chat
   const messages = await Message.find({ chatId })
-    .populate('sender', 'username email')
-    .populate('receiver', 'username email')
-    .populate('chatId', 'users')
-    .sort({ createdAt: 1 })
+    .sort({ createdAt: -1 })
     .limit(50);
   
   return successResponse(res, {

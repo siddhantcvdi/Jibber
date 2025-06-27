@@ -1,5 +1,4 @@
 import { Search, MessageCircle, X } from 'lucide-react';
-import ChatPreview from './ContactPreview';
 import { useEffect, useState, useCallback} from 'react';
 import { useNavigate } from 'react-router-dom';
 import authStore from '../store/auth.store';
@@ -10,6 +9,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {useChatStore} from "@/store/chats.store.ts";
 import ChatListHeader from './ChatList/ChatListHeader';
 import ChatListTabs from './ChatList/ChatListTabs';
+import AllChats from './ChatList/AllChats';
 
 interface SearchUser {
   _id: string
@@ -27,13 +27,7 @@ const ContactList = () => {
   const [selectedSearchUser, setSelectedSearchUser] = useState<SearchUser | null>(null);
   const [activeTab, setActiveTab] = useState('all');
 
-  //################################# UI Logic ##################################################
-
- 
-  //##############################################################################################
- // ###################################### Fetch & Search ########################################
-
-  const {fetchChats, isLoading, chats, selectedChatId, selectChat } = useChatStore()
+  const {fetchChats, selectChat } = useChatStore()
   const fetchChatsCallback = useCallback(fetchChats, [fetchChats]);
   useEffect(() => {
     fetchChatsCallback();
@@ -117,11 +111,7 @@ const ContactList = () => {
     <div className="h-[100dvh] p-2 w-full md:w-1/4 md:min-w-[400px] flex flex-col bg-muted dark:bg-background poppins-regular">
       <div className='h-full bg-background dark:bg-muted/25 rounded-2xl shadow-lg'>
         <ChatListHeader/>
-        {/* Tabs */}
         <ChatListTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-       
-
-        {/* Chat list */}
         <div className="flex-1 overflow-y-auto p-2 pt-4">
           {activeTab === 'find' ? (
             <div className="p-2">
@@ -203,36 +193,7 @@ const ContactList = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>          ) : (
-            <div>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="text-sm text-muted-foreground">Loading chats...</div>
-                </div>
-              ) : chats.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <MessageCircle size={48} className="text-muted-foreground mb-3" />
-                  <p className="text-sm text-muted-foreground">No chats yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Start a conversation by finding users</p>
-                </div>
-              ) : (                <div>
-                  {chats.map((chat) => (
-                      <div key={chat._id}>
-                      <ChatPreview
-                        chatId={chat._id}
-                        name={chat.details.username}
-                        lastChatText={chat.lastMessage}
-                        icon={chat.details.profilePhoto || ""}
-                        id={chat.details._id}
-                        unread={chat.unreadCount}
-                        isActive={selectedChatId === chat._id}
-                      />
-                      </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+            </div>          ) : <AllChats/>}
         </div>
       </div>
       

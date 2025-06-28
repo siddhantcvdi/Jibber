@@ -188,7 +188,6 @@ export const authStore = create<AuthState>((set, get) => ({
       const { user, accessToken } = finishData.data;
       console.log('Login successful, user:', user);
       const base64toRaw = useCryptoStore.getState().base64toRaw;
-      useCryptoStore.setState({privateIdKey: base64toRaw(user.encPrivateIdKey), privateSigningKey: base64toRaw(user.encPrivateSigningKey)});
       
       set({
         user,
@@ -196,9 +195,11 @@ export const authStore = create<AuthState>((set, get) => ({
         isAuthenticated: true,
         isAuthLoading: false,
       });
-
+      
       const storeKek = useCryptoStore.getState().storeKek;
       await storeKek(user, password);
+      const {privateIdKey, privateSigningKey} = await useCryptoStore.getState().decryptKeys(base64toRaw(user.encPrivateIdKey), base64toRaw(user.encPrivateSigningKey));
+      useCryptoStore.setState({privateIdKey, privateSigningKey});
       const { connectSocket } = useSocketStore.getState();
       connectSocket();
 

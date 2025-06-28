@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
     code: String,
     expiresAt: Date,
   },
+  refreshTokenHash: { type: String, required: false, defaul: null },
 });
 
 export const User =  mongoose.model('User', userSchema);

@@ -10,6 +10,11 @@ import * as opaque from '@serenity-kit/opaque';
 import { LoginState } from '../models/loginstate.model.js';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js';
+import crypto from 'crypto';
+
+const hashRefreshToken = (token) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
+};
 
 const generateJwtTokens = (user) => {
   const accessToken = jwt.sign(
@@ -202,6 +207,10 @@ const loginFinish = asyncHandler(async (req, res) => {
 
   const { refreshToken, accessToken } = generateJwtTokens(user);
 
+  // Hash and store the refresh token
+  const refreshTokenHash = hashRefreshToken(refreshToken);
+  await User.findByIdAndUpdate(user._id, { refreshTokenHash });
+
   await LoginState.deleteOne({ email: loginState.email });
 
   const COOKIE_OPTIONS = {
@@ -246,7 +255,20 @@ const refresh = asyncHandler(async (req, res) => {
     return errorResponse(res, { message: 'User not found', statusCode: 404 });
   }
 
+  // Verify the refresh token hash
+  const providedTokenHash = hashRefreshToken(token);
+  if (!user.refreshTokenHash || user.refreshTokenHash !== providedTokenHash) {
+    return errorResponse(res, {
+      message: 'Invalid refresh token',
+      statusCode: 403,
+    });
+  }
+
   const { accessToken, refreshToken } = generateJwtTokens(user);
+
+  // Update the stored refresh token hash
+  const newRefreshTokenHash = hashRefreshToken(refreshToken);
+  await User.findByIdAndUpdate(user._id, { refreshTokenHash: newRefreshTokenHash });
 
   const COOKIE_OPTIONS = {
     httpOnly: true,
@@ -265,6 +287,20 @@ const refresh = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
+  // Get the refresh token to identify the user
+  const token = req.cookies?.refreshToken;
+  
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      // Clear the refresh token hash from the database
+      await User.findByIdAndUpdate(decoded._id, { refreshTokenHash: null });
+    } catch (err) {
+      // Token might be invalid, but we still clear cookies
+      console.log('Invalid token during logout, clearing cookies anyway');
+    }
+  }
+
   // Clear cookies
   res.clearCookie('accessToken', {
     httpOnly: false,

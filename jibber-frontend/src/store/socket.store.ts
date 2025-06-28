@@ -20,6 +20,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   connectSocket: () => {
     const accessToken = authStore.getState().accessToken
     const socket = io('http://localhost:5000', {
+      autoConnect: true,
       auth: {
         token: accessToken,
       },
@@ -33,6 +34,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     socket.on('disconnect', () => {
       console.log('Socket disconnected ❌');
+      set({socket: null})
     });
 
     socket.on('receivedMessage', async (data: EncryptedMessage)=>{

@@ -29,6 +29,7 @@ interface ChatStore{
   clearSelection: () => void,
   getSelectedChat: () => Chat | null,
   getSelectedChatUser: () => ChatUser | null,
+  doesChatExist: (userId: string) => string | undefined
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -65,5 +66,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   getSelectedChatUser: () => {
     const selectedChat = get().getSelectedChat();
     return selectedChat?.details || null;
+  },
+  doesChatExist: (userId) => {
+    const { chats } = get(); 
+    const chat = chats.find(chat => chat.details._id === userId);
+    return chat?._id
   }
 }));

@@ -13,7 +13,10 @@ const findUsers = asyncHandler(async (req, res) => {
   }
   const safeRegex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
   const users = await User.find({
-    $or: [{ username: safeRegex }, { email: safeRegex }],
+    $and: [
+      { _id: { $ne: req.user._id } },
+      { $or: [{ username: safeRegex }, { email: safeRegex }] }
+    ]
   })
     .limit(10)
     .select('username email profilePhoto');

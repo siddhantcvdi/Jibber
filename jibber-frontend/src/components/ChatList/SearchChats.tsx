@@ -19,7 +19,7 @@ const SearchChats = () => {
 
 
 
-  const {fetchChats, selectChat } = useChatStore()
+  const {fetchChats, selectChat, doesChatExist } = useChatStore()
 
 
   const fetchUsers = debounce(async (q) => {
@@ -47,9 +47,10 @@ const SearchChats = () => {
       setSelectedSearchUser(null);
       await fetchChats();
       selectChat(chatId);
-      navigate(`/app/chat/${chatId}`);
+      navigate(`/app/chat`);
     } catch (err: unknown) {
       console.log("Error creating chat", err);
+      selectChat('')
       setShowChatPopup(false);
       setSelectedSearchUser(null);
     }
@@ -83,8 +84,14 @@ const SearchChats = () => {
   };
 
   const handleUserClick = (user: SearchUser) => {
-    setSelectedSearchUser(user);
-    setShowChatPopup(true);
+    const chatId = doesChatExist(user._id)
+    if(chatId){
+      selectChat(chatId)
+      navigate('/app/chat', {replace: true})
+    }else{
+      setSelectedSearchUser(user);
+      setShowChatPopup(true);
+    }
   };
 
   return (

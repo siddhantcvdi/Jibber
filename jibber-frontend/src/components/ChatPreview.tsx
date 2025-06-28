@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Check} from 'lucide-react';
+import { useNavigate} from 'react-router-dom';
 import { useChatStore } from '@/store/chats.store';
 import type { EncryptedMessage } from '@/types';
 import useCryptoStore from '@/store/crypto.store';
@@ -11,8 +10,6 @@ interface ChatPreviewProps {
   chatId: string,
   lastEncryptedMessage: EncryptedMessage | undefined;
   icon: string;
-  id: string;
-  time?: string;
   unread?: number;
   isActive?: boolean;
 }
@@ -22,16 +19,13 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
   name,
   lastEncryptedMessage,
   icon,
-  id,
-  time = '11:30 AM',
   unread = 0,
   isActive = false,
 }) => {
   const decryptMessage = useCryptoStore(select => select.decryptMessage);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { selectChat } = useChatStore();
-  const {user} = authStore()
+  const selectChat = useChatStore(select => select.selectChat)
+  const user = authStore(select => select.user)
   const [lastChatText, setLastChatText] = useState<string>('');
 
   useEffect(() => {
@@ -48,15 +42,12 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
         setLastChatText('');
       }
     };
-
     decryptLastMessage();
   }, [lastEncryptedMessage, decryptMessage]);
 
   const handleNavigate = () => {
     selectChat(chatId);
-    // If we're already in a chat route, replace the current entry instead of pushing
-    const isCurrentlyInChat = location.pathname.startsWith('/app/chat/');
-    navigate(`/app/chat/${chatId}`, { replace: isCurrentlyInChat });
+    navigate('/app/chat',{replace: true})
   };
 
     const getInitial = (username: string) => {
@@ -89,14 +80,11 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
             {name}
           </span>
           <span className="text-xs text-muted-foreground ml-1 flex-shrink-0">
-            {time}
+            {lastEncryptedMessage?.timestamp}
           </span>
         </div>
         <div className="flex justify-between items-center mt-0.5 sm:mt-1">
           <div className="flex items-center text-muted-foreground text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] sm:max-w-[180px]">
-            {id === '1234' && (
-              <Check size={14} className="text-[#5e63f9] mr-1 flex-shrink-0" />
-            )}
             <span
               className={`truncate text-xs ${unread > 0 ? ' text-foreground' : 'text-muted-foreground'}`}
             > 

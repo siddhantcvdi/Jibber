@@ -36,7 +36,6 @@ const AllChats = () => {
                     name={chat.details.username}
                     lastEncryptedMessage={chat.lastMessage}
                     icon={chat.details.profilePhoto || ""}
-                    id={chat.details._id}
                     unread={chat.unreadCount}
                     isActive={selectedChatId === chat._id}
                   />

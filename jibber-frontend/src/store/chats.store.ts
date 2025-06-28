@@ -29,7 +29,6 @@ interface ChatStore{
   clearSelection: () => void,
   getSelectedChat: () => Chat | null,
   getSelectedChatUser: () => ChatUser | null,
-  isChatValid: () => boolean
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -59,18 +58,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   getSelectedChat: () => {
-    const { chats, selectedChatId } = get(); // <-- Use `get()` instead of `useChatStore.getState()` here
+    const { chats, selectedChatId } = get(); 
     return chats.find(chat => chat._id === selectedChatId) || null;
   },
 
   getSelectedChatUser: () => {
     const selectedChat = get().getSelectedChat();
     return selectedChat?.details || null;
-  },
-
-  isChatValid: () => {
-    const selectedChat = get().getSelectedChat();
-    const { selectedChatId } = get();
-    return selectedChatId === '' || selectedChat !== null;
   }
 }));

@@ -8,7 +8,7 @@ const MainLayout = () => {
   const location = useLocation();
 
   // Check if we're on a specific chat route or settings
-  const isOnChatRoute = location.pathname.includes('/app/chat/');
+  const isOnChatRoute = location.pathname.includes('/app/chat');
   const isOnSettingsRoute = location.pathname.includes('/app/settings');
 
   return (

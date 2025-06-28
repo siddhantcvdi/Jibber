@@ -2,28 +2,27 @@ import React, { useEffect, useRef } from 'react';
 import ChatBubble from '../ChatBubble';
 import { SendHorizonal, MoreVertical, ImageUp } from 'lucide-react';
 import { ThemeToggle } from '../ui/theme-toggle';
-import { useParams } from 'react-router-dom';
 import { useMessageStore } from '@/store/message.store';
 import {useChatStore} from "@/store/chats.store.ts";
 
 
 const ChatWindow = () => {
-  const { id } = useParams<{ id: string }>();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const {groupMessages, messages, handleSendMessage, fetchMessages} = useMessageStore();
-  const {selectChat, getSelectedChatUser, isChatValid} = useChatStore();
+  const groupMessages = useMessageStore(select => select.groupMessages)
+  const messages = useMessageStore(select => select.messages)
+  const handleSendMessage = useMessageStore(select => select.handleSendMessage)
+  const fetchMessages = useMessageStore(select => select.fetchMessages)
+  const newMessage = useMessageStore(select => select.newMessage)
+  const setNewMessage = useMessageStore(select => select.setNewMessage)
+  const getSelectedChatUser = useChatStore(select => select.getSelectedChatUser);
+  const selectedChatId = useChatStore(select => select.selectedChatId);
   const selectedChatUser = getSelectedChatUser();
-  console.log("Selected");
-  
-  const isValidChatId = isChatValid();
-  
-  // Set selected chat ID when component mounts or ID changes
-  useEffect(() => {
-    if(id) {
-      selectChat(id);
-    }
-  }, [id, selectChat]);
+
+  useEffect(()=>{
+    fetchMessages(selectedChatId)
+  },[selectedChatId, fetchMessages])  
+
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -32,6 +31,13 @@ const ChatWindow = () => {
     }
   };
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+  
+  // Text Area auto resizer
   const autoResizeTextarea = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -39,20 +45,6 @@ const ChatWindow = () => {
       textareaRef.current.scrollHeight + 'px';
     }
   };
-
-  useEffect(() => {
-    fetchMessages(id);
-  }, [id]);
-
-  // Go to the bottom of page
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
-
-  // Text Area auto resizer
-  const {newMessage, setNewMessage} = useMessageStore()
   useEffect(() => {
     autoResizeTextarea();
   }, [newMessage]);
@@ -62,17 +54,17 @@ const ChatWindow = () => {
   };
 
   
-  if (!isValidChatId) {
+  if (!selectedChatId) {
     return (
       <div className=" h-[100dvh] flex-1 bg-muted pl-0 max-md:pl-2 p-2 shadow-lg overflow-hidden">
         <div className='h-full w-full flex bg-background rounded-2xl'>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <h3 className="text-lg font-medium text-foreground mb-2">
-              Contact not found
+              There was an issue loading the chat.
             </h3>
             <p className="text-muted-foreground">
-              The chat you're looking for doesn't exist.
+              Please try refreshing.
             </p>
           </div>
         </div>
@@ -145,7 +137,7 @@ const ChatWindow = () => {
               rows={1}
             />
             <button
-              className="p-3 sm:p-3 rounded-lg md:rounded-2xl bg-[#5e63f9] cursor-pointer hover:bg-[#5358f8] text-white hover:shadow-md transition-all"
+              className="p-3 sm:p-3 rounded-xl md:rounded-2xl bg-[#5e63f9] cursor-pointer hover:bg-[#5358f8] text-white hover:shadow-md transition-all"
               onClick={handleSendMessage}
             >
               <SendHorizonal size={18} />

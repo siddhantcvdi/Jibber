@@ -96,7 +96,7 @@ function App() {
           }
         >
           <Route index element={<ChatList />} />
-          <Route path="chat/:id" element={<ChatWindow />} />
+          <Route path="chat" element={<ChatWindow />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

@@ -134,7 +134,6 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
   if (id) {
     try {
       const res = await api.get(`/messages/${id}`);
-      console.log("Messages fetched", res.data.data);
       const encryptedMessages = res.data.data;
 
       const { decryptMessage } = useCryptoStore.getState();
@@ -150,7 +149,6 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
         })
       );
 
-      console.log(decryptedMessages);
       set({ messages: decryptedMessages });
     } catch (err) {
       console.log("Error Fetching Messages", err);

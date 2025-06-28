@@ -29,13 +29,13 @@ const Index = () => {
     e.preventDefault();
     const targetElement = document.getElementById(targetId);
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };  // Navigation function for keyboard
   const navigateToSection = (sectionId: string) => {
     const targetElement = document.getElementById(sectionId);
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setActiveSection(sectionId);
     }
   };

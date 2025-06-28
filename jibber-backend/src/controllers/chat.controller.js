@@ -60,7 +60,7 @@ export const getAllChatsOfUser = asyncHandler(async(req, res)=>{
       const unreadCount = chat.unreadCounts?.[currentUserId.toString()] || 0;
       
       const lastMessage = await Message.findOne({ chatId: chat._id })
-        .sort({ timestamp: -1 })
+        .sort({ createdAt: 1 })
         .lean();
 
       return {

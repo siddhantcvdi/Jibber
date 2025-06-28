@@ -4,7 +4,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import MainLayout from './Layouts/MainLayout';
-import ChatWindow from './components/ChatWindow';
+import ChatWindow from './components/ChatWindow/ChatWindow';
 import Settings from './components/Settings';
 import { Toaster } from '@/components/ui/sonner';
 import ProtectedRoute from './components/ProtectedRoute';

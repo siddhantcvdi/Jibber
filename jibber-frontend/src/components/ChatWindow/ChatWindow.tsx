@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import ChatBubble from './ChatBubble';
+import ChatBubble from '../ChatBubble';
 import { SendHorizonal, MoreVertical, ImageUp } from 'lucide-react';
-import { ThemeToggle } from './ui/theme-toggle';
+import { ThemeToggle } from '../ui/theme-toggle';
 import { useParams } from 'react-router-dom';
 import { useMessageStore } from '@/store/message.store';
 import {useChatStore} from "@/store/chats.store.ts";

@@ -1,16 +1,38 @@
 import { Button } from '@/components/ui/button';
 import jibberold from '../assets/jibber.png';
-
 import { useNavigate } from 'react-router-dom';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function Hero() {
   const navigate = useNavigate();
+  const [isHovering, setIsHovering] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const encryptedTextRef = useRef<HTMLSpanElement>(null);
 
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
     if (featuresSection) {
       featuresSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLSpanElement>) => {
+    if (encryptedTextRef.current) {
+      const rect = encryptedTextRef.current.getBoundingClientRect();
+      setMousePosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+    }
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
   };
 
   return (
@@ -31,8 +53,99 @@ export function Hero() {
         <div className="space-y-6 max-w-4xl">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 leading-tight text-foreground">
             Private conversations.
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#a5a8ff] block mt-2">
-              End-to-end encrypted.
+            <span 
+              ref={encryptedTextRef}
+              className="bg-clip-text text-transparent bg-gradient-to-r from-[#5e63f9] to-[#a5a8ff] block mt-2 relative cursor-pointer"
+              onMouseMove={handleMouseMove}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                position: 'relative',
+              }}
+            >
+              {/* Original text - always visible */}
+              <span className="relative z-10">
+                End-to-end encrypted.
+              </span>
+              
+              {/* Magnifying glass effect with revealed text */}
+              <AnimatePresence>
+                {isHovering && (
+                  <>
+                    {/* White circular mask to hide original text */}
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 25,
+                        duration: 0.2 
+                      }}
+                      className="absolute rounded-full pointer-events-none z-12"
+                      style={{
+                        width: '160px',
+                        height: '160px',
+                        left: `${mousePosition.x - 80}px`,
+                        top: `${mousePosition.y - 80}px`,
+                        backgroundColor: 'var(--background)',
+                      }}
+                    />
+                    
+                    {/* Revealed text - positioned to match original text exactly */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.1 }}
+                      className="absolute top-0 left-0 pointer-events-none z-15 flex items-center justify-center"
+                      style={{
+                        clipPath: `circle(80px at ${mousePosition.x}px ${mousePosition.y}px)`,
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    >
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500 text-3xl md:text-5xl font-bold tracking-tight leading-tight text-center">
+                        🔒Yes, your chats are secure!🔒
+                      </span>
+                    </motion.div>
+                    
+                    {/* Magnifying glass lens */}
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 300, 
+                        damping: 20,
+                        duration: 0.25
+                      }}
+                      className="absolute rounded-full border-4 pointer-events-none z-20 dark:border-white/80 border-gray-400/60"
+                      style={{
+                        width: '160px',
+                        height: '160px',
+                        left: `${mousePosition.x - 80}px`,
+                        top: `${mousePosition.y - 80}px`,
+                        background: `
+                          linear-gradient(135deg, 
+                            rgba(0,0,0,0.15) 0%, 
+                            rgba(0,0,0,0.08) 50%, 
+                            rgba(0,0,0,0.03) 100%
+                          )
+                        `,
+                        boxShadow: `
+                          inset 0 2px 8px rgba(0,0,0,0.15), 
+                          inset 0 -2px 8px rgba(255,255,255,0.2),
+                          0 4px 12px rgba(0,0,0,0.1)
+                        `,
+                        filter: 'none',
+                      }}
+                    />
+                  </>
+                )}
+              </AnimatePresence>
             </span>
           </h2>
 

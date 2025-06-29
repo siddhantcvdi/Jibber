@@ -44,10 +44,10 @@ const Security = () => {
                     </div>
                     <div className="min-w-0">
                       <h3 className="font-semibold text-foreground text-sm">
-                        ECDH P-256
+                        Curve25519
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        Perfect forward secrecy
+                        Shared Secret Generation
                       </p>
                     </div>
                   </div>
@@ -98,7 +98,7 @@ const Security = () => {
                     </div>
                     <div className="text-center">
                       <div className="font-mono text-[#5e63f9] font-bold">
-                        P-256
+                        X-25519
                       </div>
                       <span className="text-muted-foreground">ECDH</span>
                     </div>

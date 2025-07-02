@@ -47,7 +47,9 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
 
   const handleNavigate = () => {
     selectChat(chatId);
-    navigate('/app/chat',{replace: true})
+  const isOnChatRoute = location.pathname.includes('/app/chat');
+    if(!isOnChatRoute)
+      navigate('/app/chat')
   };
 
     const getInitial = (username: string) => {

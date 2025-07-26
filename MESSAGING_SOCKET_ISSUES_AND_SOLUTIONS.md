@@ -17,46 +17,31 @@ This document outlines critical issues found in the Jibber messaging and socket 
 
 ---
 
+## 🔍 **Note About Existing Implementation**
+
+The backend already has several key features implemented:
+- **Token Refresh Logic**: The `/auth/refresh` endpoint is fully functional
+- **JWT Authentication**: Access and refresh token generation is working
+- **Basic Socket Authentication**: Socket middleware authenticates users with JWT
+- **Cookie-based Refresh Tokens**: Refresh tokens are stored in HTTP-only cookies
+- **User Authentication Flow**: Login/register with OPAQUE protocol is implemented
+
+The solutions below focus on **enhancing and fixing issues** with the existing implementation rather than rebuilding from scratch.
+
+---
+
 ## 1. Socket Authentication & Security Issues
 
 ### Problems
-- Socket tokens expire without refresh mechanism
+- Socket tokens expire without refresh mechanism leveraging existing `/auth/refresh` endpoint
 - Hard-coded backend URLs
 - No automatic reconnection on auth failure
 
 ### Solutions
 
-#### A. Implement Token Refresh for Socket Connections
+#### A. Leverage Existing Token Refresh for Socket Connections
 
-**Backend: Add socket token refresh endpoint**
-```javascript
-// src/controllers/auth.controller.js
-export const refreshSocketToken = asyncHandler(async (req, res) => {
-  const token = req.cookies?.refreshToken;
-  
-  if (!token) {
-    return errorResponse(res, { message: 'Refresh token required', statusCode: 401 });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    const user = await User.findById(decoded._id);
-    
-    if (!user || !user.refreshTokenHash) {
-      return errorResponse(res, { message: 'Invalid refresh token', statusCode: 403 });
-    }
-
-    const { accessToken } = generateJwtTokens(user);
-    
-    return successResponse(res, {
-      message: 'Socket token refreshed',
-      data: { accessToken }
-    });
-  } catch (err) {
-    return errorResponse(res, { message: 'Token refresh failed', statusCode: 403 });
-  }
-});
-```
+**Note**: The backend already has refresh token logic implemented in `/auth/refresh` endpoint. We can use this existing endpoint for socket authentication.
 
 **Frontend: Enhanced socket store with token refresh**
 ```typescript
@@ -110,9 +95,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     newSocket.on('connect_error', async (error) => {
       console.error('Socket connection error:', error);
       
-      if (error.message === 'Invalid token') {
+      if (error.message === 'Invalid token' || error.message === 'Authentication failed') {
         try {
-          await get().handleTokenRefresh();
+          // Use existing refresh endpoint
+          await authStore.getState().silentRefresh();
           get().handleReconnect();
         } catch (refreshError) {
           console.error('Token refresh failed:', refreshError);
@@ -124,16 +110,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     set({ socket: newSocket });
-  },
-
-  async handleTokenRefresh() {
-    try {
-      const response = await api.post('/auth/refresh-socket-token');
-      const { accessToken } = response.data.data;
-      authStore.getState().setAuth(accessToken, authStore.getState().user);
-    } catch (error) {
-      throw new Error('Failed to refresh socket token');
-    }
   },
 
   handleReconnect() {
@@ -1921,8 +1897,8 @@ volumes:
 ## Implementation Priority
 
 ### Phase 1 (Critical - Week 1)
-1. Fix message model schema and sorting issue
-2. Implement proper socket authentication with token refresh
+1. Fix message model schema and sorting issue (existing `timestamp` vs `createdAt` mismatch)
+2. Integrate existing refresh endpoint with socket authentication 
 3. Add comprehensive error handling
 4. Fix memory leaks in socket management
 

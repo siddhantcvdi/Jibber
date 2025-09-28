@@ -72,7 +72,3 @@ export interface MessageData {
   messageType: 'text' | 'image' | 'file';
 }
 
-export interface TypingData {
-  chatId: string;
-  isTyping: boolean;
-}

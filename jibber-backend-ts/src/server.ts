@@ -17,37 +17,10 @@ const io = new SocketIOServer(server, {
   },
 });
 
-// Socket.IO connection handling
+// Socket.IO basic connection handling
 io.on('connection', (socket) => {
   logger.info(`User connected: ${socket.id}`);
 
-  // Handle user authentication and join rooms
-  socket.on('join-user', (userId: string) => {
-    socket.join(`user-${userId}`);
-    logger.info(`User ${userId} joined their personal room`);
-  });
-
-  // Handle joining chat rooms
-  socket.on('join-chat', (chatId: string) => {
-    socket.join(`chat-${chatId}`);
-    logger.info(`Socket ${socket.id} joined chat ${chatId}`);
-  });
-
-  // Handle leaving chat rooms
-  socket.on('leave-chat', (chatId: string) => {
-    socket.leave(`chat-${chatId}`);
-    logger.info(`Socket ${socket.id} left chat ${chatId}`);
-  });
-
-  // Handle typing indicators
-  socket.on('typing', (data: { chatId: string; isTyping: boolean; userId: string }) => {
-    socket.to(`chat-${data.chatId}`).emit('user-typing', {
-      userId: data.userId,
-      isTyping: data.isTyping,
-    });
-  });
-
-  // Handle disconnection
   socket.on('disconnect', () => {
     logger.info(`User disconnected: ${socket.id}`);
   });

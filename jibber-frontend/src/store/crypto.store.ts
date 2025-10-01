@@ -23,33 +23,42 @@ const db = new CryptoDB();
 
 
 type CryptoStore = {
-  privateIdKey: Uint8Array | null,
-  privateSigningKey: Uint8Array | null,
+  privateIdKey: string | null;
+  privateSigningKey: string | null;
   generateRawKeys: () => Promise<{
-    privateIdKey: Uint8Array,
-    publicIdKey: Uint8Array,
-    privateSigningKey: Uint8Array,
-    publicSigningKey: Uint8Array
-  }>,
-  rawToBase64: (key: Uint8Array) => string,
-  base64toRaw: (key: string)  => Uint8Array
-  encryptKey: (key: Uint8Array, password: string) =>  Promise<{
-    key: Uint8Array,
-    salt: Uint8Array,
-    nonce: Uint8Array
-  }>,
-  decryptKeys: (encPrivateIdKey: Uint8Array, encPrivateSigningKey: Uint8Array) => Promise<{
-    privateIdKey: Uint8Array,
-    privateSigningKey: Uint8Array
-  }>,
-  storeKek: (user: User, password: string) => Promise<void>
-  getValueFromDB: (key: string) => Promise<Uint8Array | undefined>
-  clearSecrets: () => Promise<void>,
-  encryptMessage: (message: string, recipientPublicIdKey: string) => Promise<{
-    cipher: string,
-    iv: string
-  }>,
-  signMessage: (message: string) => Promise<string>,
+    privateIdKey: string;
+    publicIdKey: string;
+    privateSigningKey: string;
+    publicSigningKey: string;
+  }>;
+  rawToBase64: (key: Uint8Array) => string;
+  base64toRaw: (key: string) => Uint8Array;
+  encryptKey: (
+    key: string,
+    password: string
+  ) => Promise<{
+    key: string;
+    salt: string;
+    nonce: string;
+  }>;
+  decryptKeys: (
+    encPrivateIdKey: string,
+    encPrivateSigningKey: string
+  ) => Promise<{
+    privateIdKey: string;
+    privateSigningKey: string;
+  }>;
+  storeKek: (user: User, password: string) => Promise<void>;
+  getValueFromDB: (key: string) => Promise<Uint8Array | undefined>;
+  clearSecrets: () => Promise<void>;
+  encryptMessage: (
+    message: string,
+    recipientPublicIdKey: string
+  ) => Promise<{
+    cipher: string;
+    iv: string;
+  }>;
+  signMessage: (message: string) => Promise<string>;
   decryptMessage: (message: EncryptedMessage) => Promise<string>;
 };
 
@@ -57,15 +66,21 @@ const useCryptoStore = create<CryptoStore>((_, get)=>({
   privateIdKey: null,
   privateSigningKey: null,
   generateRawKeys: async () => {
-    await sodium.ready
-    const {privateKey: privateSigningKey, publicKey: publicSigningKey} = sodium.crypto_sign_keypair();
-    const { privateKey: privateIdKey, publicKey: publicIdKey } = sodium.crypto_box_keypair();
+    await sodium.ready;
+    const {
+      privateKey: privateSigningKeyRaw,
+      publicKey: publicSigningKeyRaw,
+    } = sodium.crypto_sign_keypair();
+    const {
+      privateKey: privateIdKeyRaw,
+      publicKey: publicIdKeyRaw,
+    } = sodium.crypto_box_keypair();
     return {
-      privateIdKey,
-      publicIdKey,
-      privateSigningKey,
-      publicSigningKey
-    }
+      privateIdKey: sodium.to_base64(privateIdKeyRaw),
+      publicIdKey: sodium.to_base64(publicIdKeyRaw),
+      privateSigningKey: sodium.to_base64(privateSigningKeyRaw),
+      publicSigningKey: sodium.to_base64(publicSigningKeyRaw),
+    };
   },
 
   rawToBase64(key) {
@@ -76,9 +91,8 @@ const useCryptoStore = create<CryptoStore>((_, get)=>({
     return sodium.from_base64(key)
   },
 
- async encryptKey(key, password){
-    await sodium.ready
-    console.log(sodium.crypto_pwhash_SALTBYTES);
+ async encryptKey(key, password) {
+    await sodium.ready;
     const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
     const kek = sodium.crypto_pwhash(
       32,
@@ -90,13 +104,14 @@ const useCryptoStore = create<CryptoStore>((_, get)=>({
     );
 
     const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-    const encryptedKey = sodium.crypto_secretbox_easy(key, nonce, kek);
+    const keyBytes = sodium.from_base64(key);
+    const encryptedKey = sodium.crypto_secretbox_easy(keyBytes, nonce, kek);
 
     return {
-      key: encryptedKey,
-      salt,
-      nonce
-    }
+      key: sodium.to_base64(encryptedKey),
+      salt: sodium.to_base64(salt),
+      nonce: sodium.to_base64(nonce),
+    };
   },
 
   decryptKeys: async (encPrivateIdKey, encPrivateSigningKey) => {
@@ -105,15 +120,32 @@ const useCryptoStore = create<CryptoStore>((_, get)=>({
     const idKeyNonce = await get().getValueFromDB('idKeyNonce');
     const signingKeyKek = await get().getValueFromDB('signingKeyKek');
     const signingKeyNonce = await get().getValueFromDB('signingKeyNonce');
-    if(!idKeyNonce || !signingKeyNonce || !idKeyKek || !signingKeyKek) throw new Error('Problem extracting Key from DB');
-    const privateIdKey = sodium.crypto_secretbox_open_easy(encPrivateIdKey, idKeyNonce, idKeyKek);
-    if (!privateIdKey) throw new Error('Failed to decrypt Private ID Key');
-    const privateSigningKey = sodium.crypto_secretbox_open_easy(encPrivateSigningKey, signingKeyNonce, signingKeyKek);
-    if (!privateSigningKey) throw new Error('Failed to decrypt Private Signing Key');
+    if (!idKeyNonce || !signingKeyNonce || !idKeyKek || !signingKeyKek)
+      throw new Error('Problem extracting Key from DB');
+
+    const encPrivateIdKeyBytes = sodium.from_base64(encPrivateIdKey);
+    const encPrivateSigningKeyBytes = sodium.from_base64(encPrivateSigningKey);
+
+    const privateIdKeyBytes = sodium.crypto_secretbox_open_easy(
+      encPrivateIdKeyBytes,
+      idKeyNonce,
+      idKeyKek,
+    );
+    if (!privateIdKeyBytes)
+      throw new Error('Failed to decrypt Private ID Key');
+
+    const privateSigningKeyBytes = sodium.crypto_secretbox_open_easy(
+      encPrivateSigningKeyBytes,
+      signingKeyNonce,
+      signingKeyKek,
+    );
+    if (!privateSigningKeyBytes)
+      throw new Error('Failed to decrypt Private Signing Key');
+
     return {
-      privateIdKey,
-      privateSigningKey
-    }
+      privateIdKey: sodium.to_base64(privateIdKeyBytes),
+      privateSigningKey: sodium.to_base64(privateSigningKeyBytes),
+    };
   },
 
   async storeKek(user: User, password) {
@@ -150,109 +182,139 @@ const useCryptoStore = create<CryptoStore>((_, get)=>({
     await db.userSecrets.clear();
   },
 
-  async encryptMessage(message, recipientPublicIdKey){
+  async encryptMessage(message, recipientPublicIdKey) {
     await sodium.ready;
-    const {privateIdKey, base64toRaw, rawToBase64} = get()
-    if(!privateIdKey){
-      console.error("No private id key found");
-      throw new Error("No Private Id Key found");
+    const { privateIdKey, rawToBase64 } = get();
+    if (!privateIdKey) {
+      console.error('No private id key found');
+      throw new Error('No Private Id Key found');
     }
-    const recipientPublicIdKeyBytes = base64toRaw(recipientPublicIdKey);
+    const privateIdKeyBytes = sodium.from_base64(privateIdKey);
+    const recipientPublicIdKeyBytes = sodium.from_base64(recipientPublicIdKey);
 
-    // Get shared secret
-    const sharedSecret = sodium.crypto_scalarmult(privateIdKey, recipientPublicIdKeyBytes);
+    const sharedSecret = sodium.crypto_scalarmult(
+      privateIdKeyBytes,
+      recipientPublicIdKeyBytes,
+    );
+    const sharedSecretBytes = new Uint8Array(sharedSecret);
 
-    // Get AES encrypting key from secret
-    const aesKeyMaterial = sodium.crypto_generichash(32, sharedSecret);
+    const aesKeyMaterial = sodium.crypto_generichash(32, sharedSecretBytes);
+    const aesKeyBytes = new Uint8Array(aesKeyMaterial);
 
-    //Convert aes key to crypto key
     const cryptoKey = await crypto.subtle.importKey(
-      "raw",
-      aesKeyMaterial,
-      "AES-GCM",
+      'raw',
+      aesKeyBytes,
+      'AES-GCM',
       false,
-      ["encrypt", "decrypt"]
+      ['encrypt', 'decrypt'],
     );
 
-    // Encrypt the message
     const encoder = new TextEncoder();
     const plainText = encoder.encode(message);
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ciphertext = await crypto.subtle.encrypt(
       {
-       name: "AES-GCM",
-        iv: iv,
+        name: 'AES-GCM',
+        iv,
       },
       cryptoKey,
-      plainText
-    )
+      plainText,
+    );
     const cipherUint8 = new Uint8Array(ciphertext);
     const cipher = rawToBase64(cipherUint8);
     const ivString = rawToBase64(iv);
     return {
       cipher,
-      iv: ivString
-    }
+      iv: ivString,
+    };
   },
 
-  async signMessage(message){
+  async signMessage(message) {
     await sodium.ready;
-    const {privateSigningKey, rawToBase64} = get();
-    if(!privateSigningKey) throw new Error("Private signing key not present");
-    return rawToBase64(sodium.crypto_sign_detached(message, privateSigningKey));
-  },
-
-  async generateSecret(publicIdKey: string): Promise<string>{
-    await sodium.ready;
-    const { privateIdKey, base64toRaw, rawToBase64 } = get()
-    if(!privateIdKey) throw new Error('Private Id Key not found');
-
-    const recipientPublicIdKeyBytes = base64toRaw(publicIdKey);
-    const sharedSecret = sodium.crypto_scalarmult(privateIdKey, recipientPublicIdKeyBytes)
-
-    if(!sharedSecret) throw new Error('Error generating shared secret')
-    return rawToBase64(sharedSecret);
-  },
-
-  async decryptMessage(message){
-    const {cipher, senderPublicIdKey, iv, sender, receiverPublicIdKey} = message;
-    const {privateIdKey} = get()
-    const { user } = authStore.getState()
-    if(!privateIdKey) throw new Error('No Private Id key found');
-
-    const messageBytes = get().base64toRaw(cipher);
-    const ivBytes = get().base64toRaw(iv);
-    const senderPublicIdKeyBytes = get().base64toRaw(senderPublicIdKey);
-    const receiverPublicIdKeyBytes = get().base64toRaw(receiverPublicIdKey);
-    let sharedSecret;
-    if(sender === user?._id){
-      sharedSecret = sodium.crypto_scalarmult(privateIdKey, receiverPublicIdKeyBytes);
-    }else{
-      sharedSecret = sodium.crypto_scalarmult(privateIdKey, senderPublicIdKeyBytes);
-    }
-    const aesKeyMaterial = sodium.crypto_generichash(32, sharedSecret);
-    const cryptoKey = await crypto.subtle.importKey(
-      "raw",
-      aesKeyMaterial,
-      "AES-GCM",
-      false,
-      ["encrypt", "decrypt"]
+    const { privateSigningKey, rawToBase64 } = get();
+    if (!privateSigningKey) throw new Error('Private signing key not present');
+    const privateSigningKeyBytes = sodium.from_base64(privateSigningKey);
+    const messageBytes = sodium.from_string(message);
+    const signature = sodium.crypto_sign_detached(
+      messageBytes,
+      privateSigningKeyBytes,
     );
+    return rawToBase64(new Uint8Array(signature));
+  },
+
+  async generateSecret(publicIdKey: string): Promise<string> {
+    await sodium.ready;
+    const { privateIdKey, rawToBase64 } = get();
+    if (!privateIdKey) throw new Error('Private Id Key not found');
+
+    const privateIdKeyBytes = sodium.from_base64(privateIdKey);
+    const recipientPublicIdKeyBytes = sodium.from_base64(publicIdKey);
+    const sharedSecret = sodium.crypto_scalarmult(
+      privateIdKeyBytes,
+      recipientPublicIdKeyBytes,
+    );
+
+    if (!sharedSecret) throw new Error('Error generating shared secret');
+    return rawToBase64(new Uint8Array(sharedSecret));
+  },
+
+  async decryptMessage(message) {
+    const { cipher, senderPublicIdKey, iv, sender, receiverPublicIdKey } =
+      message;
+    const { privateIdKey } = get();
+    const { user } = authStore.getState();
+    if (!privateIdKey) throw new Error('No Private Id key found');
+
+    await sodium.ready;
+
+    const privateIdKeyBytes = sodium.from_base64(privateIdKey);
+    const messageBytes = sodium.from_base64(cipher);
+    const ivBytes = sodium.from_base64(iv);
+    const senderPublicIdKeyBytes = sodium.from_base64(senderPublicIdKey);
+    const receiverPublicIdKeyBytes = sodium.from_base64(receiverPublicIdKey);
+
+    const privateKeyBytes = new Uint8Array(privateIdKeyBytes);
+    const senderKeyBytes = new Uint8Array(senderPublicIdKeyBytes);
+    const receiverKeyBytes = new Uint8Array(receiverPublicIdKeyBytes);
+
+    let sharedSecret: Uint8Array;
+    if (sender === user?._id) {
+      sharedSecret = sodium.crypto_scalarmult(privateKeyBytes, receiverKeyBytes);
+    } else {
+      sharedSecret = sodium.crypto_scalarmult(privateKeyBytes, senderKeyBytes);
+    }
+
+    if (!sharedSecret) throw new Error('Failed to derive shared secret');
+
+    const sharedSecretBytes = new Uint8Array(sharedSecret);
+    const aesKeyMaterial = sodium.crypto_generichash(32, sharedSecretBytes);
+    const aesKeyBytes = new Uint8Array(aesKeyMaterial);
+
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      aesKeyBytes,
+      'AES-GCM',
+      false,
+      ['encrypt', 'decrypt'],
+    );
+
+    const ivBuffer = new Uint8Array(ivBytes);
+    const messageBuffer = new Uint8Array(messageBytes);
 
     const decryptedMessageArrayBuffer = await crypto.subtle.decrypt(
       {
-       name: "AES-GCM",
-        iv: ivBytes,
+        name: 'AES-GCM',
+        iv: ivBuffer,
       },
       cryptoKey,
-      messageBytes
-    )
+      messageBuffer,
+    );
     const decryptedMessageUint8 = new Uint8Array(decryptedMessageArrayBuffer);
     const decoder = new TextDecoder();
     const decryptedMessage = decoder.decode(decryptedMessageUint8);
-    
+
     return decryptedMessage;
-  } 
+  },
 
 })) 
 

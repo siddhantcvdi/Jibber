@@ -35,7 +35,8 @@
     "morgan": "^1.10.0",
     "socket.io": "^4.7.5",
     "tsconfig-paths": "^4.2.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

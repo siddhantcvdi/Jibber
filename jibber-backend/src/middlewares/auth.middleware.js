@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
   if (!token) {
     token = req.cookies?.accessToken;
   }
-
+  
   if (!token) {
     return errorResponse(res, {
       message:

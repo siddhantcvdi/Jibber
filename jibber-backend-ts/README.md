@@ -46,21 +46,25 @@ src/
 ### Installation
 
 1. Clone the repository and navigate to the backend directory:
+
 ```bash
 cd jibber-backend-ts
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create environment file:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Update the `.env` file with your configuration:
+
 ```env
 NODE_ENV=development
 PORT=5000
@@ -72,6 +76,7 @@ CORS_ORIGIN=http://localhost:5173
 ### Development
 
 Start the development server with hot reload:
+
 ```bash
 npm run dev
 ```
@@ -79,11 +84,13 @@ npm run dev
 ### Production
 
 1. Build the TypeScript code:
+
 ```bash
 npm run build
 ```
 
 2. Start the production server:
+
 ```bash
 npm start
 ```
@@ -101,21 +108,25 @@ npm start
 ## API Endpoints
 
 ### Health Check
+
 - `GET /health` - Server health status
 
 ### Authentication (Coming Soon)
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/me` - Get current user
 
 ### Users (Coming Soon)
+
 - `GET /api/users` - Get all users
 - `GET /api/users/:id` - Get user by ID
 - `PUT /api/users/:id` - Update user
 - `DELETE /api/users/:id` - Delete user
 
 ### Chats (Coming Soon)
+
 - `GET /api/chats` - Get user's chats
 - `POST /api/chats` - Create new chat
 - `GET /api/chats/:id` - Get chat by ID
@@ -123,6 +134,7 @@ npm start
 - `DELETE /api/chats/:id` - Delete chat
 
 ### Messages (Coming Soon)
+
 - `GET /api/messages/:chatId` - Get messages for chat
 - `POST /api/messages` - Send new message
 - `PUT /api/messages/:id` - Edit message
@@ -131,12 +143,14 @@ npm start
 ## Socket.IO Events
 
 ### Client to Server
+
 - `join-user` - Join user's personal room
 - `join-chat` - Join a chat room
 - `leave-chat` - Leave a chat room
 - `typing` - Send typing indicator
 
 ### Server to Client
+
 - `user-typing` - Typing indicator from other users
 - `new-message` - New message received
 - `message-edited` - Message edited
@@ -144,17 +158,17 @@ npm start
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment mode | `development` |
-| `PORT` | Server port | `5000` |
-| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017/jibber` |
-| `JWT_SECRET` | JWT signing secret | - |
-| `JWT_EXPIRES_IN` | JWT expiration time | `7d` |
-| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:5173` |
-| `RATE_LIMIT_WINDOW_MS` | Rate limit window | `900000` (15 min) |
-| `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | `100` |
-| `LOG_LEVEL` | Logging level | `info` |
+| Variable                  | Description               | Default                            |
+| ------------------------- | ------------------------- | ---------------------------------- |
+| `NODE_ENV`                | Environment mode          | `development`                      |
+| `PORT`                    | Server port               | `5000`                             |
+| `MONGO_URI`               | MongoDB connection string | `mongodb://localhost:27017/jibber` |
+| `JWT_SECRET`              | JWT signing secret        | -                                  |
+| `JWT_EXPIRES_IN`          | JWT expiration time       | `7d`                               |
+| `CORS_ORIGIN`             | Allowed CORS origin       | `http://localhost:5173`            |
+| `RATE_LIMIT_WINDOW_MS`    | Rate limit window         | `900000` (15 min)                  |
+| `RATE_LIMIT_MAX_REQUESTS` | Max requests per window   | `100`                              |
+| `LOG_LEVEL`               | Logging level             | `info`                             |
 
 ## Contributing
 

@@ -34,7 +34,10 @@ export class ResponseUtil {
     return this.error(res, message, error, 400);
   }
 
-  static unauthorized(res: Response, message: string = 'Unauthorized'): Response {
+  static unauthorized(
+    res: Response,
+    message: string = 'Unauthorized'
+  ): Response {
     return this.error(res, message, null, 401);
   }
 
@@ -42,7 +45,10 @@ export class ResponseUtil {
     return this.error(res, message, null, 403);
   }
 
-  static notFound(res: Response, message: string = 'Resource not found'): Response {
+  static notFound(
+    res: Response,
+    message: string = 'Resource not found'
+  ): Response {
     return this.error(res, message, null, 404);
   }
 

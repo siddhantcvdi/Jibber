@@ -25,12 +25,14 @@ if (!fs.existsSync(logsDir)) {
 app.use(helmet());
 
 // CORS configuration
-app.use(cors({
-  origin: config.corsOrigin,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -56,11 +58,13 @@ app.use(compression());
 if (config.nodeEnv === 'development') {
   app.use(morgan('dev'));
 } else {
-  app.use(morgan('combined', {
-    stream: {
-      write: (message: string) => logger.info(message.trim()),
-    },
-  }));
+  app.use(
+    morgan('combined', {
+      stream: {
+        write: (message: string) => logger.info(message.trim()),
+      },
+    })
+  );
 }
 
 // Health check endpoint

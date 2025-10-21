@@ -34,8 +34,12 @@ const startServer = async (): Promise<void> => {
 
     // Start the server
     server.listen(config.port, () => {
-      logger.info(`🚀 Server running on port ${config.port} in ${config.nodeEnv} mode`);
-      logger.info(`📊 Health check available at http://localhost:${config.port}/health`);
+      logger.info(
+        `🚀 Server running on port ${config.port} in ${config.nodeEnv} mode`
+      );
+      logger.info(
+        `📊 Health check available at http://localhost:${config.port}/health`
+      );
     });
   } catch (error) {
     logger.error('Failed to start server:', error);

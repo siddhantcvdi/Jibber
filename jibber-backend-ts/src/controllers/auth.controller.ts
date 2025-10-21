@@ -13,6 +13,11 @@ import config from '@/config';
 import { LoginState } from '@/models/loginState.model';
 import { UserType } from '@/types';
 import jwt, { SignOptions } from 'jsonwebtoken';
+import { CookieOptions } from 'express';
+
+const hashRefreshToken = (token: string) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
+};
 
 const generateJwtTokens = (user: UserType) => {
   const accessToken = jwt.sign(
@@ -214,4 +219,29 @@ const loginFinish = asyncHandler(async (req, res) => {
       404
     );
   }
+
+  const { refreshToken, accessToken } = generateJwtTokens(user);
+  // Hash and store the refresh token
+  const refreshTokenHash = hashRefreshToken(refreshToken);
+  await User.findByIdAndUpdate(user._id, { refreshTokenHash });
+
+  // Remove any existing login state
+  await LoginState.deleteOne({ email: loginState.email });
+
+  const COOKIE_OPTIONS: CookieOptions = {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'strict',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    path: '/',
+  };
+
+  res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
+
+  const responseData = {
+    user,
+    accessToken,
+  }
+
+  return ResponseUtil.success(res, 'Login finished', responseData);
 });

@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import { User } from '@/models/user.model';
 import config from '@/config';
 import { LoginState } from '@/models/loginState.model';
-import { RefreshJwtPayload, UserType } from '@/types';
+import { AuthRequest, RefreshJwtPayload, UserType } from '@/types';
 import jwt, { SignOptions } from 'jsonwebtoken';
 
 const hashRefreshToken = (token: string) => {
@@ -296,4 +296,17 @@ const logout = asyncHandler(async (req, res) => {
   res.clearCookie('refreshToken', config.cookieOptions);
 
   return ResponseUtil.success(res, 'Logout successful');
+});
+
+const whoami = asyncHandler(async (req: AuthRequest, res) => {
+
+  const user = await User.findById(req.user!._id).select(
+    '-registrationRecord'
+  );
+
+  if(!user){
+    return ResponseUtil.error(res, 'User not found', undefined, 404);
+  }
+
+  return ResponseUtil.success(res, 'User found', user);
 });

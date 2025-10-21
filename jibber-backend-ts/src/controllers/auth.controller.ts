@@ -227,13 +227,7 @@ const loginFinish = asyncHandler(async (req, res) => {
   // Remove any existing login state
   await LoginState.deleteOne({ email: loginState.email });
 
-  const COOKIE_OPTIONS: CookieOptions = {
-    httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: 'strict',
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    path: '/',
-  };
+  const COOKIE_OPTIONS = config.cookieOptions;
 
   res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
 
@@ -276,5 +270,10 @@ const getNewRefreshToken = asyncHandler(async (req, res) => {
   const newRefreshTokenHash = hashRefreshToken(refreshToken);
   await User.findByIdAndUpdate(user._id, { refreshTokenHash: newRefreshTokenHash });
 
+  const COOKIE_OPTIONS = config.cookieOptions;
+
+  res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
+
+  return ResponseUtil.success(res, "Token refreshed successfully");
 
 })

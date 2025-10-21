@@ -40,4 +40,63 @@ const registerStart = asyncHandler(async (req, res) => {
 
     return ResponseUtil.success(res, "Registration started successfully", registrationResponse);
 
+});
+
+const registerFinish = asyncHandler(async (req, res) => {
+    let values;
+    try {
+        values = RegisterFinishParams.parse(req.body);
+    } catch (err) {
+        return ResponseUtil.error(res, "Input Validation Failed while Finishing Registration");
+    }
+
+    const {username, email, registrationRecord ,encPrivateIdKey, encPrivateSigningKey, publicIdKey, publicSigningKey, idKeyNonce, idKeySalt, signingKeyNonce, signingKeySalt} = values
+
+    await User.create({
+        username,
+        email,
+        registrationRecord,
+        encPrivateIdKey,
+        encPrivateSigningKey,
+        publicIdKey,
+        publicSigningKey,
+        idKeyNonce,
+        signingKeyNonce,
+        idKeySalt,
+        signingKeySalt
+    });
+
+    const returnUser = await User.findOne({ username }).select('-registrationRecord');
+
+    return ResponseUtil.success(res, "Registration finished", returnUser);
+});
+
+const loginStart = asyncHandler(async (req, res) => {
+
+    // Input Validation
+    let values;
+    try{
+        values = LoginStartParams.parse(req.body);
+    }catch (e){
+        return ResponseUtil.error(res, "Input Validation Failed while Starting Login");
+    }
+
+    const {usernameOrEmail, startLoginRequest} = values;
+
+    // Check if user already exists
+    const user = await User.findOne({
+        $or: [{username: usernameOrEmail}, {email: usernameOrEmail}]
+    });
+    if(!user){
+        return ResponseUtil.error(res, "User not found", undefined, 404);
+    }
+
+    const { serverLoginState, loginResponse } = opaque.server.startLogin({
+        serverSetup: config.serverSetup,
+        userIdentifier: user.email,
+        registrationRecord: user.registrationRecord,
+        startLoginRequest,
+    });
+
+
 })

@@ -9,6 +9,7 @@ interface Config {
   mongoUri: string;
   jwtSecret: string;
   jwtExpiresIn: string;
+  serverSetup: string;
   corsOrigin: string;
   rateLimitWindowMs: number;
   rateLimitMaxRequests: number;
@@ -20,6 +21,7 @@ const config: Config = {
   mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/jibber',
   jwtSecret: process.env.JWT_SECRET || 'your-super-secret-jwt-key',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    serverSetup: process.env.SERVER_SETUP || 'server-setup',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 minutes
   rateLimitMaxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),

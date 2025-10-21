@@ -276,4 +276,24 @@ const getNewRefreshToken = asyncHandler(async (req, res) => {
 
   return ResponseUtil.success(res, "Token refreshed successfully");
 
-})
+});
+
+const logout = asyncHandler(async (req, res) => {
+  const token = req.cookies?.refreshToken;
+
+  if(!token){
+    return ResponseUtil.error(res, 'No Refresh Token found', undefined, 401);
+  }
+
+  try{
+    const decoded = jwt.verify(token, config.jwtRefreshSecret) as RefreshJwtPayload;
+    await User.findByIdAndUpdate(decoded._id, { refreshTokenHash: null });
+  }catch (e) {
+    // Token might be invalid, but we still clear cookies
+    console.log('Invalid token during logout, clearing cookies anyway');
+  }
+
+  res.clearCookie('refreshToken', config.cookieOptions);
+
+  return ResponseUtil.success(res, 'Logout successful');
+});

@@ -5,6 +5,7 @@ import * as opaque from '@serenity-kit/opaque';
 import crypto from 'crypto'
 import {User} from "@/models/user.model";
 import config from "@/config";
+import {LoginState} from "@/models/loginState.model";
 
 const registerStart = asyncHandler(async (req, res) => {
     let username, email, registrationRequest;
@@ -91,6 +92,13 @@ const loginStart = asyncHandler(async (req, res) => {
         return ResponseUtil.error(res, "User not found", undefined, 404);
     }
 
+    const existingLoginState = await LoginState.findOne({
+        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+    });
+    if (existingLoginState) {
+        return ResponseUtil.error(res, 'Last Login in progress. Please try again in a few seconds.', undefined, 400);
+    }
+
     const { serverLoginState, loginResponse } = opaque.server.startLogin({
         serverSetup: config.serverSetup,
         userIdentifier: user.email,
@@ -98,5 +106,13 @@ const loginStart = asyncHandler(async (req, res) => {
         startLoginRequest,
     });
 
+    // Create a temporary login state for 30s
+    await LoginState.create({
+        username: user.username,
+        email: user.email,
+        serverLoginState,
+    });
+
+    return ResponseUtil.success(res, "Login started successfully", loginResponse);
 
 })

@@ -11,9 +11,8 @@ import crypto from 'crypto';
 import { User } from '@/models/user.model';
 import config from '@/config';
 import { LoginState } from '@/models/loginState.model';
-import { UserType } from '@/types';
+import { RefreshJwtPayload, UserType } from '@/types';
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { CookieOptions } from 'express';
 
 const hashRefreshToken = (token: string) => {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -245,3 +244,37 @@ const loginFinish = asyncHandler(async (req, res) => {
 
   return ResponseUtil.success(res, 'Login finished', responseData);
 });
+
+const getNewRefreshToken = asyncHandler(async (req, res) => {
+  const token: string = req.cookies.refreshToken;
+
+  if(!token){
+    return ResponseUtil.error(res, 'No Refresh Token found', undefined, 401);
+  }
+
+  let decoded: RefreshJwtPayload;
+  try {
+    decoded = jwt.verify(token, config.jwtRefreshSecret) as RefreshJwtPayload;
+  }catch (e) {
+    return ResponseUtil.error(res, 'Refresh token validation failed while refreshing.', e);
+  }
+
+  const user = await User.findById(decoded._id).select(
+    '-registrationRecord'
+  );
+
+  // Verify the refresh token hash
+  const providedTokenHash = hashRefreshToken(token);
+  if (!user || !user.refreshTokenHash || user.refreshTokenHash !== providedTokenHash) {
+    return ResponseUtil.error(res, 'Refresh token validation failed while refreshing.', undefined, 401);
+  }
+
+  // Generate new pair
+  const { accessToken, refreshToken } = generateJwtTokens(user);
+
+  // Update the stored refresh token hash
+  const newRefreshTokenHash = hashRefreshToken(refreshToken);
+  await User.findByIdAndUpdate(user._id, { refreshTokenHash: newRefreshTokenHash });
+
+
+})

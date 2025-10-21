@@ -1,9 +1,17 @@
-import { JwtPayload } from 'jsonwebtoken';
 import { Request } from 'express';
 import mongoose from 'mongoose';
 
+export interface RefreshJwtPayload{
+  _id: string;
+  email: string;
+}
+
+export interface AccessJwtPayload{
+  _id: string;
+}
+
 export interface AuthRequest extends Request {
-  user?: string | JwtPayload;
+  user?: RefreshJwtPayload | AccessJwtPayload;
 }
 
 export interface UserType {

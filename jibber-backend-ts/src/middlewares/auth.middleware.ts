@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { ResponseUtil } from '@/utils/response';
 import { NextFunction, Response, Request } from 'express';
 import config from '@/config';
-import { AuthRequest } from '@/types';
+import { AccessJwtPayload, AuthRequest } from '@/types';
 
 const authMiddleware = (
   req: AuthRequest,
@@ -31,7 +31,7 @@ const authMiddleware = (
   }
 
   try {
-    const decodedToken = jwt.verify(token, config.jwtSecret);
+    const decodedToken = jwt.verify(token, config.jwtAccessSecret) as AccessJwtPayload;
     req.user = decodedToken;
     next();
   } catch (err) {

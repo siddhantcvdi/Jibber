@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { SignOptions } from 'jsonwebtoken';
+import { CookieOptions } from 'express';
 
 // Load environment variables
 dotenv.config();
@@ -16,11 +17,14 @@ interface Config {
   corsOrigin: string;
   rateLimitWindowMs: number;
   rateLimitMaxRequests: number;
+  cookieOptions: CookieOptions
 }
+
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 const config: Config = {
   port: parseInt(process.env.PORT || '5000', 10),
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv,
   mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/jibber',
   jwtAccessSecret: process.env.ACCESS_JWT_SECRET || 'your-super-secret-jwt-key',
   jwtRefreshSecret:
@@ -36,6 +40,13 @@ const config: Config = {
     process.env.RATE_LIMIT_MAX_REQUESTS || '100',
     10
   ),
+  cookieOptions:{
+    httpOnly: true,
+    secure: nodeEnv === 'production',
+    sameSite: 'strict',
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    path: '/',
+  }
 };
 
 export default config;

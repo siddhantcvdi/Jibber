@@ -31,7 +31,10 @@ const authMiddleware = (
   }
 
   try {
-    const decodedToken = jwt.verify(token, config.jwtAccessSecret) as AccessJwtPayload;
+    const decodedToken = jwt.verify(
+      token,
+      config.jwtAccessSecret
+    ) as AccessJwtPayload;
     req.user = decodedToken;
     next();
   } catch (err) {

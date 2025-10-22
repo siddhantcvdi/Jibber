@@ -234,7 +234,7 @@ const loginFinish = asyncHandler(async (req, res) => {
   const responseData = {
     user,
     accessToken,
-  }
+  };
 
   return ResponseUtil.success(res, 'Login finished', responseData);
 });
@@ -242,25 +242,36 @@ const loginFinish = asyncHandler(async (req, res) => {
 const getNewRefreshToken = asyncHandler(async (req, res) => {
   const token: string = req.cookies.refreshToken;
 
-  if(!token){
+  if (!token) {
     return ResponseUtil.error(res, 'No Refresh Token found', undefined, 401);
   }
 
   let decoded: RefreshJwtPayload;
   try {
     decoded = jwt.verify(token, config.jwtRefreshSecret) as RefreshJwtPayload;
-  }catch (e) {
-    return ResponseUtil.error(res, 'Refresh token validation failed while refreshing.', e);
+  } catch (e) {
+    return ResponseUtil.error(
+      res,
+      'Refresh token validation failed while refreshing.',
+      e
+    );
   }
 
-  const user = await User.findById(decoded._id).select(
-    '-registrationRecord'
-  );
+  const user = await User.findById(decoded._id).select('-registrationRecord');
 
   // Verify the refresh token hash
   const providedTokenHash = hashRefreshToken(token);
-  if (!user || !user.refreshTokenHash || user.refreshTokenHash !== providedTokenHash) {
-    return ResponseUtil.error(res, 'Refresh token validation failed while refreshing.', undefined, 401);
+  if (
+    !user ||
+    !user.refreshTokenHash ||
+    user.refreshTokenHash !== providedTokenHash
+  ) {
+    return ResponseUtil.error(
+      res,
+      'Refresh token validation failed while refreshing.',
+      undefined,
+      401
+    );
   }
 
   // Generate new pair
@@ -268,27 +279,31 @@ const getNewRefreshToken = asyncHandler(async (req, res) => {
 
   // Update the stored refresh token hash
   const newRefreshTokenHash = hashRefreshToken(refreshToken);
-  await User.findByIdAndUpdate(user._id, { refreshTokenHash: newRefreshTokenHash });
+  await User.findByIdAndUpdate(user._id, {
+    refreshTokenHash: newRefreshTokenHash,
+  });
 
   const COOKIE_OPTIONS = config.cookieOptions;
 
   res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
 
-  return ResponseUtil.success(res, "Token refreshed successfully");
-
+  return ResponseUtil.success(res, 'Token refreshed successfully');
 });
 
 const logout = asyncHandler(async (req, res) => {
   const token = req.cookies?.refreshToken;
 
-  if(!token){
+  if (!token) {
     return ResponseUtil.error(res, 'No Refresh Token found', undefined, 401);
   }
 
-  try{
-    const decoded = jwt.verify(token, config.jwtRefreshSecret) as RefreshJwtPayload;
+  try {
+    const decoded = jwt.verify(
+      token,
+      config.jwtRefreshSecret
+    ) as RefreshJwtPayload;
     await User.findByIdAndUpdate(decoded._id, { refreshTokenHash: null });
-  }catch (e) {
+  } catch (e) {
     // Token might be invalid, but we still clear cookies
     console.log('Invalid token during logout, clearing cookies anyway');
   }
@@ -299,12 +314,9 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const whoami = asyncHandler(async (req: AuthRequest, res) => {
+  const user = await User.findById(req.user!._id).select('-registrationRecord');
 
-  const user = await User.findById(req.user!._id).select(
-    '-registrationRecord'
-  );
-
-  if(!user){
+  if (!user) {
     return ResponseUtil.error(res, 'User not found', undefined, 404);
   }
 

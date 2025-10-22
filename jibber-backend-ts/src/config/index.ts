@@ -17,7 +17,7 @@ interface Config {
   corsOrigin: string;
   rateLimitWindowMs: number;
   rateLimitMaxRequests: number;
-  cookieOptions: CookieOptions
+  cookieOptions: CookieOptions;
 }
 
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -40,13 +40,13 @@ const config: Config = {
     process.env.RATE_LIMIT_MAX_REQUESTS || '100',
     10
   ),
-  cookieOptions:{
+  cookieOptions: {
     httpOnly: true,
     secure: nodeEnv === 'production',
     sameSite: 'strict',
     maxAge: 30 * 24 * 60 * 60 * 1000,
     path: '/',
-  }
+  },
 };
 
 export default config;

@@ -1,12 +1,12 @@
 import { Request } from 'express';
 import mongoose from 'mongoose';
 
-export interface RefreshJwtPayload{
+export interface RefreshJwtPayload {
   _id: string;
   email: string;
 }
 
-export interface AccessJwtPayload{
+export interface AccessJwtPayload {
   _id: string;
 }
 

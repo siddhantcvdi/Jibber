@@ -2,10 +2,10 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
 import authStore from './auth.store';
-import useCryptoStore from './crypto.store';
 import { useChatStore } from './chats.store';
 import { useMessageStore } from './message.store';
 import type { EncryptedMessage } from '@/types';
+import { decryptMessageService } from '@/services/crypto.service.ts';
 
 interface SocketState {
   socket: Socket | null;
@@ -38,10 +38,9 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on('receivedMessage', async (data: EncryptedMessage)=>{
-      const {decryptMessage} = useCryptoStore.getState()
       const {getSelectedChat} = useChatStore.getState()
       const {addReceivedMessage} = useMessageStore.getState()
-      const text = await decryptMessage(data);
+      const text = await decryptMessageService(data);
       if(getSelectedChat()?._id === data.chatId){
         addReceivedMessage(text)
       }

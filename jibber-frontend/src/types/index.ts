@@ -42,3 +42,13 @@ export interface User {
   signingKeySalt: string,
   profilePhoto: string,
 }
+
+export interface Message {
+  text: string;
+  isSentByMe: boolean;
+  timestamp: string;
+}
+
+export interface GroupedMessage extends Message {
+  showTimestamp: boolean;
+}

@@ -4,18 +4,12 @@ import useCryptoStore from '@/store/crypto.store.ts';
 import { useChatStore } from '@/store/chats.store.ts';
 import { useSocketStore } from './socket.store';
 import authStore from './auth.store';
-import type { EncryptedMessage } from '@/types';
-export interface Message {
-  text: string;
-  isSentByMe: boolean;
-  timestamp: string;
-}
-
-
-
-interface GroupedMessage extends Message {
-  showTimestamp: boolean;
-}
+import type { EncryptedMessage, Message, GroupedMessage } from '@/types';
+import {
+  decryptMessageService,
+  encryptMessageService,
+  signMessageService,
+} from '../services/crypto.service.ts';
 
 interface MessageStore{
   messages: Message[],
@@ -96,15 +90,16 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
 
 
     //  Encrypt and sign message
-    const {encryptMessage, signMessage} = useCryptoStore.getState()
+    // const {encryptMessage, signMessage} = useCryptoStore.getState()
     const {getSelectedChatUser, getSelectedChat} = useChatStore.getState()
+    const {privateIdKey, privateSigningKey} = useCryptoStore.getState();
     const receiverPublicIdKey = getSelectedChatUser()?.publicIdKey;
     let encryptedMessage,signature;
-    if(receiverPublicIdKey){
-      encryptedMessage = await encryptMessage(newMessage, receiverPublicIdKey);
+    if(receiverPublicIdKey && privateIdKey){
+      encryptedMessage = await encryptMessageService(newMessage, privateIdKey, receiverPublicIdKey);
     }
-    if(encryptedMessage){
-      signature = await signMessage(encryptedMessage.cipher);
+    if(encryptedMessage && privateSigningKey){
+      signature = await signMessageService(encryptedMessage.cipher, privateSigningKey);
     }
 
     const { user } = authStore.getState();
@@ -136,13 +131,12 @@ export const useMessageStore = create<MessageStore>((set, get)=>({
       const res = await api.get(`/messages/${id}`);
       const encryptedMessages = res.data.data;
 
-      const { decryptMessage } = useCryptoStore.getState();
       const { user } = authStore.getState();
 
       const decryptedMessages = await Promise.all(
         encryptedMessages.map(async (message: EncryptedMessage) => {
           return {
-            text: await decryptMessage(message),
+            text: await decryptMessageService(message),
             isSentByMe: message.sender === user?._id,
             timestamp: message.timestamp
           };

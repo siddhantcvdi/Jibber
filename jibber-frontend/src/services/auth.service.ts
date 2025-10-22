@@ -94,7 +94,7 @@ export const loginUserService = async (userData: LoginData): Promise<{ user: Use
   // Decouple crypto and socket logic from the core login flow,
   // but keep it within the service layer.
   await useCryptoStore.getState().storeKek(user, password);
-  await useCryptoStore.getState().decryptAndStoreKeys(user);
+  await useCryptoStore.getState().decryptAndStoreKe ys(user);
 
   return { user, accessToken };
 };

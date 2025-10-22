@@ -1,22 +1,30 @@
 import { create } from 'zustand';
 import api, { refreshApi } from '@/services/api.ts';
-import * as opaque from '@serenity-kit/opaque';
 import useCryptoStore from './crypto.store';
 import { useSocketStore } from './socket.store';
-import type { User, RegisterData, LoginData } from '@/types'
+import type {User, RegisterData, LoginData} from '@/types';
+import {
+  loginUserService,
+  registerUserService,
+  getErrorMessage
+} from '../services/auth.service.ts';
 
 interface AuthState {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
   isAuthLoading: boolean;
-  registerUser: (userData: RegisterData) => Promise<void>;
-  loginUser: (userData: LoginData) => Promise<void>;
-  setAuth: (accessToken: string, user: User | null) => void;
+  error: string | null;
+  registerUser: (userData: RegisterData) => Promise<boolean>;
+  loginUser: (userData: LoginData) => Promise<boolean>;
+  logoutUser: () => Promise<void>;
+  setAuth: (accessToken: string | null, user: User | null) => void;
+  setAccessToken: (accessToken: string) => void;
   clearAuth: () => void;
   setLoading: (isAuthLoading: boolean) => void;
   getAccessToken: () => string | null;
   silentRefresh: () => Promise<{ success: boolean }>;
+  clearError: () => void;
 }
 
 export const authStore = create<AuthState>((set, get) => ({
@@ -24,13 +32,18 @@ export const authStore = create<AuthState>((set, get) => ({
   accessToken: null,
   isAuthenticated: false,
   isAuthLoading: false,
+  error: null,
   setAuth: (accessToken, user) => {
     set({
       accessToken,
       user,
-      isAuthenticated: true,
+      isAuthenticated: !!(accessToken && user),
       isAuthLoading: false,
+      error: null,
     });
+  },
+  setAccessToken: (accessToken) => {
+    set({ accessToken });
   },
   clearAuth: () => {
     set({
@@ -38,191 +51,95 @@ export const authStore = create<AuthState>((set, get) => ({
       user: null,
       isAuthenticated: false,
       isAuthLoading: false,
+      error: null,
     });
+  },
+  clearError: () => {
+    set({ error: null });
   },
   setLoading: (isAuthLoading) => {
     set({ isAuthLoading });
   },
-
   getAccessToken: () => get().accessToken,
 
   registerUser: async (userData) => {
-    const backendURL = import.meta.env.VITE_BACKEND_URL;
-    set({ isAuthLoading: true });
+    set({ isAuthLoading: true, error: null });
     try {
-      const password = userData.password;
-      const { registrationRequest, clientRegistrationState } =
-        opaque.client.startRegistration({ password });
-
-      const { data: startData } = await api.post(
-        `${backendURL}/auth/register-start`,
-        {
-          username: userData.username,
-          email: userData.email,
-          registrationRequest,
-        }
-      );
-
-      const registrationResponse = startData.data;
-      console.log('Registration started ✅');
-      const { registrationRecord } = opaque.client.finishRegistration({
-        clientRegistrationState,
-        registrationResponse,
-        password,
-      });
-
-      const generateRawKeys = useCryptoStore.getState().generateRawKeys;
-      const encryptKey = useCryptoStore.getState().encryptKey;
-      const { privateIdKey, privateSigningKey, publicIdKey, publicSigningKey } = await generateRawKeys();
-      // console.log(privateIdKey.length, password, privateSigningKey);
-      
-      const encPrivateIdKey = await encryptKey(privateIdKey, password);
-      const encPrivateSigningKey = await encryptKey(privateSigningKey, password);
-
-      const { data: finishData } = await api.post(
-        `${backendURL}/auth/register-finish`,
-        {
-          username: userData.username,
-          email: userData.email,
-          registrationRecord,
-          encPrivateIdKey: encPrivateIdKey.key,
-          publicIdKey,
-          idKeyNonce: encPrivateIdKey.nonce,
-          idKeySalt: encPrivateIdKey.salt,
-          encPrivateSigningKey: encPrivateSigningKey.key,
-          publicSigningKey,
-          signingKeyNonce: encPrivateSigningKey.nonce,
-          signingKeySalt: encPrivateSigningKey.salt,
-        }
-      );
-      console.log('Registration finished ✅', finishData.data);
-    } catch (err: unknown) {
-      console.error('Registration error ❌', err);
-      throw err;
-    } finally {
+      await registerUserService(userData);
       set({ isAuthLoading: false });
+      return true;
+    } catch (err: unknown) {
+      const message = getErrorMessage(err);
+      console.error('Registration error ❌', message);
+      set({ isAuthLoading: false, error: message });
+      return false;
     }
   },
+
   loginUser: async (userData: LoginData) => {
-    const backendURL = import.meta.env.VITE_BACKEND_URL;
-    set({ isAuthLoading: true });
+    set({ isAuthLoading: true, error: null });
     try {
-      const password = userData.password;
-      let clientLoginState, startLoginRequest;
-      try {
-        const loginStartResult = opaque.client.startLogin({ password });
-        clientLoginState = loginStartResult.clientLoginState;
-        startLoginRequest = loginStartResult.startLoginRequest;
-        console.log('OPAQUE client startLogin successful');
-      } catch (opaqueError) {
-        console.error('OPAQUE client startLogin failed:', opaqueError);
-        throw new Error('Failed to start login process');
-      }
-
-      const { data: startData } = await api.post(
-        `${backendURL}/auth/login-start`,
-        {
-          usernameOrEmail: userData.usernameOrEmail,
-          startLoginRequest,
-        }
-      );
-
-      const loginResponse = startData.data;
-      console.log('Login start response:', loginResponse);
-
-      let loginResult;
-      try {
-        loginResult = opaque.client.finishLogin({
-          clientLoginState,
-          loginResponse,
-          password,
-        });
-        console.log('OPAQUE client finishLogin successful:', loginResult);
-      } catch (opaqueError) {
-        console.error('OPAQUE client finishLogin failed:', opaqueError);
-        throw new Error('Invalid credentials or login process failed');
-      }
-
-      if (!loginResult || !loginResult.finishLoginRequest) {
-        throw new Error(
-          'Login Failed - Invalid credentials or missing finishLoginRequest'
-        );
-      }
-
-      const { finishLoginRequest } = loginResult;
-
-      const { data: finishData } = await api.post(
-        `${backendURL}/auth/login-finish`,
-        {
-          usernameOrEmail: userData.usernameOrEmail,
-          finishLoginRequest,
-        }
-      );
-
-      const { user, accessToken } = finishData.data;
-      console.log('Login successful, user:', user);
-
-      set({
-        user,
-        accessToken,
-        isAuthenticated: true,
-        isAuthLoading: false,
-      });
-      
-      const storeKek = useCryptoStore.getState().storeKek;
-      await storeKek(user, password);
-      const { privateIdKey, privateSigningKey } =
-        await useCryptoStore.getState().decryptKeys(
-          user.encPrivateIdKey,
-          user.encPrivateSigningKey,
-        );
-      useCryptoStore.setState({privateIdKey, privateSigningKey});
-      const { connectSocket } = useSocketStore.getState();
-      connectSocket();
-
+      const { user, accessToken } = await loginUserService(userData); // Call the service
+      get().setAuth(accessToken, user); // Update state with the result
+      return true;
     } catch (err: unknown) {
-      console.error('Login error ❌', err);
-      set({ isAuthLoading: false });
-      throw err;
+      const message = getErrorMessage(err);
+      console.error('Login error ❌', message);
+      get().clearAuth();
+      set({ error: message, isAuthLoading: false });
+      return false;
     }
   },
+
+  logoutUser: async () => {
+    set({ isAuthLoading: true });
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error("Logout failed on server, clearing client session anyway.", error);
+    } finally {
+      get().clearAuth();
+      useCryptoStore.getState().clearKeys();
+    }
+  },
+
   silentRefresh: async () => {
     const { isAuthenticated, setLoading, setAuth, clearAuth } = get();
-
-    if (!isAuthenticated) {
-      setLoading(true);
-    }
+    if (!isAuthenticated) setLoading(true);
 
     try {
       const response = await refreshApi.post('/auth/refresh');
-      console.log("Refreshing in silentRefresh");
-
       const { accessToken } = response.data.data;
-      set({accessToken})
+      const userResponse = await api.get('/auth/me');
+      const user = userResponse.data.data.user;
+      setAuth(accessToken, user);
 
-      try {
-        const userResponse = await api.get('/auth/me');
-        const user = userResponse.data.data.user;
-        console.log("Calling whoami in silentRefresh");
-        setAuth(accessToken, user);
-        const { privateIdKey, privateSigningKey } =
-          await useCryptoStore.getState().decryptKeys(
-            user.encPrivateIdKey,
-            user.encPrivateSigningKey,
-          );
-        useCryptoStore.setState({privateIdKey, privateSigningKey});
-      } catch {
-        setAuth(accessToken, null);
-      }
+      await useCryptoStore.getState().decryptAndStoreKeys(user);
+
       return { success: true };
-    } catch {
-      setLoading(false);
-      if (isAuthenticated) {
-        clearAuth();
-      }
+    } catch (error) {
+      console.error("Silent refresh failed", error);
+      clearAuth();
       return { success: false };
+    } finally {
+      if (!get().isAuthenticated) {
+        setLoading(false);
+      }
     }
   },
 }));
 
+// The subscription model.
+authStore.subscribe(
+  (state, prevState) => {
+    if (state.isAuthenticated && !prevState.isAuthenticated) {
+      useSocketStore.getState().connectSocket();
+    }
+    if (!state.isAuthenticated && prevState.isAuthenticated) {
+      useSocketStore.getState().disconnectSocket();
+    }
+  }
+);
+
 export default authStore;
+

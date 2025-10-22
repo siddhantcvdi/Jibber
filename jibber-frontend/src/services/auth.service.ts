@@ -3,6 +3,12 @@ import * as opaque from '@serenity-kit/opaque';
 import { AxiosError } from 'axios';
 import useCryptoStore from '../store/crypto.store';
 import type { RegisterData, LoginData, User } from '@/types';
+import {
+  generateRawKeysService,
+  encryptKeyService,
+  storeKekService,
+} from '../services/crypto.service.ts';
+
 
 // Helper to extract a user-friendly error message from an Axios error.
 export const getErrorMessage = (error: unknown): string => {
@@ -33,11 +39,10 @@ export const registerUserService = async (userData: RegisterData): Promise<void>
     password,
   });
 
-  const { generateRawKeys, encryptKey } = useCryptoStore.getState();
-  const { privateIdKey, privateSigningKey, publicIdKey, publicSigningKey } = await generateRawKeys();
+  const { privateIdKey, privateSigningKey, publicIdKey, publicSigningKey } = await generateRawKeysService();
 
-  const encPrivateIdKey = await encryptKey(privateIdKey, password);
-  const encPrivateSigningKey = await encryptKey(privateSigningKey, password);
+  const encPrivateIdKey = await encryptKeyService(privateIdKey, password);
+  const encPrivateSigningKey = await encryptKeyService(privateSigningKey, password);
 
   await api.post('/auth/register-finish', {
     username: userData.username,
@@ -93,8 +98,8 @@ export const loginUserService = async (userData: LoginData): Promise<{ user: Use
 
   // Decouple crypto and socket logic from the core login flow,
   // but keep it within the service layer.
-  await useCryptoStore.getState().storeKek(user, password);
-  await useCryptoStore.getState().decryptAndStoreKe ys(user);
+  await storeKekService(user, password);
+  await useCryptoStore.getState().decryptAndStoreKeys(user);
 
   return { user, accessToken };
 };

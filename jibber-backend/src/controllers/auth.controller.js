@@ -177,16 +177,6 @@ const loginFinish = asyncHandler(async (req, res) => {
     });
   }
 
-  const loginState = await LoginState.findOne({
-    $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-  });
-  if (!loginState) {
-    return errorResponse(res, {
-      message: 'Login has not started',
-      statusCode: 400,
-    });
-  }
-
   const user = await User.findOne({
     $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
   }).select('-registrationRecord');

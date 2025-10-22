@@ -310,3 +310,13 @@ const whoami = asyncHandler(async (req: AuthRequest, res) => {
 
   return ResponseUtil.success(res, 'User found', user);
 });
+
+export {
+  registerStart,
+  registerFinish,
+  loginStart,
+  loginFinish,
+  whoami,
+  getNewRefreshToken,
+  logout,
+};

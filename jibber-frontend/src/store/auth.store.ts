@@ -3,32 +3,7 @@ import api, { refreshApi } from '@/services/api.ts';
 import * as opaque from '@serenity-kit/opaque';
 import useCryptoStore from './crypto.store';
 import { useSocketStore } from './socket.store';
-
-interface RegisterData {
-  username: string;
-  password: string;
-  email: string;
-}
-
-interface LoginData {
-  usernameOrEmail: string;
-  password: string;
-}
-
-export interface User {
-  _id: string;
-  username: string;
-  email: string;
-  encPrivateIdKey: string,
-  encPrivateSigningKey: string,
-  publicIdKey: string,
-  publicSigningKey: string,
-  idKeyNonce: string,
-  signingKeyNonce: string,
-  idKeySalt: string,
-  signingKeySalt: string,
-  profilePhoto: string,
-}
+import type { User, RegisterData, LoginData } from '@/types'
 
 interface AuthState {
   user: User | null;

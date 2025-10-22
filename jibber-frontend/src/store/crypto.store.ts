@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import sodium from 'libsodium-wrappers-sumo'
-import authStore, {type User} from '@/store/auth.store'
+import authStore from '@/store/auth.store'
+import type { User } from '@/types'
 import Dexie from 'dexie';
 import type { EncryptedMessage } from '@/types';
 interface UserSecret {
@@ -315,6 +316,7 @@ const useCryptoStore = create<CryptoStore>((_, get)=>({
 
     return decryptedMessage;
   },
+  
 
 })) 
 

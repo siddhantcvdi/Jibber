@@ -8,6 +8,7 @@ export interface RefreshJwtPayload {
 
 export interface AccessJwtPayload {
   _id: string;
+  email: string;
 }
 
 export interface AuthRequest extends Request {

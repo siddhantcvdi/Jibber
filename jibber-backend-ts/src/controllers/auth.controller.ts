@@ -219,7 +219,7 @@ const loginFinish = asyncHandler(async (req, res) => {
     );
   }
 
-  const { refreshToken, accessToken } = generateJwtTokens(user);
+  const { accessToken, refreshToken } = generateJwtTokens(user);
   // Hash and store the refresh token
   const refreshTokenHash = hashRefreshToken(refreshToken);
   await User.findByIdAndUpdate(user._id, { refreshTokenHash });
@@ -240,7 +240,7 @@ const loginFinish = asyncHandler(async (req, res) => {
 });
 
 const getNewRefreshToken = asyncHandler(async (req, res) => {
-  const token: string = req.cookies.refreshToken;
+  const token: string = req.cookies?.refreshToken;
 
   if (!token) {
     return ResponseUtil.error(res, 'No Refresh Token found', undefined, 401);
@@ -287,7 +287,7 @@ const getNewRefreshToken = asyncHandler(async (req, res) => {
 
   res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
 
-  return ResponseUtil.success(res, 'Token refreshed successfully');
+  return ResponseUtil.success(res, 'Token refreshed successfully', accessToken);
 });
 
 const logout = asyncHandler(async (req, res) => {

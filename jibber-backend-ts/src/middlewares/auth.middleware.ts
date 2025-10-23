@@ -29,7 +29,6 @@ const authMiddleware = (
     );
     return;
   }
-
   try {
     const decodedToken = jwt.verify(
       token,

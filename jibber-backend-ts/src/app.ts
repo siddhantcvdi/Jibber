@@ -6,6 +6,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
+import cookieParser from 'cookie-parser'
 
 import config from '@/config';
 import logger from '@/utils/logger';
@@ -23,6 +24,9 @@ if (!fs.existsSync(logsDir)) {
 
 // Security middleware
 app.use(helmet());
+
+// Cookie Parser
+app.use(cookieParser());
 
 // CORS configuration
 app.use(
@@ -82,6 +86,8 @@ app.get('/health', (req: Request, res: Response) => {
 // app.use('/api/users', userRoutes);
 // app.use('/api/chats', chatRoutes);
 // app.use('/api/messages', messageRoutes);
+import authRoute from '@/routes/auth.route';
+app.use('/api/v1/auth', authRoute);
 
 // 404 handler
 app.use(notFoundHandler);

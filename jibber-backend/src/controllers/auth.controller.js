@@ -186,6 +186,10 @@ const loginFinish = asyncHandler(async (req, res) => {
       statusCode: 400,
     });
   }
+
+  const loginState = await LoginState.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+  });
   try {
     const { sessionKey } = opaque.server.finishLogin({
       finishLoginRequest,

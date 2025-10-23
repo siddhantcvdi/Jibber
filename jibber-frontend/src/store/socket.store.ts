@@ -1,65 +1,41 @@
-// socket.store.ts
 import { create } from 'zustand';
-import { io, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import authStore from './auth.store';
-import { useChatStore } from './chats.store';
-import { useMessageStore } from './message.store';
-import type { EncryptedMessage } from '@/types';
-import { decryptMessageService } from '@/services/crypto.service.ts';
+import {
+  connectSocketService,
+  disconnectSocketService,
+  emitMessageService,
+} from '@/services/socket.service';
 
 interface SocketState {
   socket: Socket | null;
+  isConnected: boolean;
+  setSocket: (socket: Socket | null) => void;
   connectSocket: () => void;
   disconnectSocket: () => void;
-  emitMessage: (type: string, ...args: any[]) => void
+  emitMessage: (type: string, ...args: any[]) => void;
 }
 
-export const useSocketStore = create<SocketState>((set, get) => ({
+export const useSocketStore = create<SocketState>((set) => ({
   socket: null,
+  isConnected: false,
+
+  setSocket: (socket) => {
+    set({ socket, isConnected: !!socket });
+  },
 
   connectSocket: () => {
-    const accessToken = authStore.getState().accessToken
-    const socket = io('http://localhost:5000', {
-      autoConnect: true,
-      auth: {
-        token: accessToken,
-      },
-    });
-
-    socket.connect();
-
-    socket.on('connect', () => {
-      console.log('Socket connected ✅', socket.id);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Socket disconnected ❌');
-      set({socket: null})
-    });
-
-    socket.on('receivedMessage', async (data: EncryptedMessage)=>{
-      const {getSelectedChat} = useChatStore.getState()
-      const {addReceivedMessage} = useMessageStore.getState()
-      const text = await decryptMessageService(data);
-      if(getSelectedChat()?._id === data.chatId){
-        addReceivedMessage(text)
-      }
-      console.log(text);
-      
-    })
-
-    set({ socket });
+    const accessToken = authStore.getState().accessToken;
+    connectSocketService(accessToken);
+    // We no longer set state here; the service does it.
   },
 
   disconnectSocket: () => {
-    const socket = get().socket;
-    if (socket) {
-      socket.disconnect();
-      set({ socket: null });
-    }
+    disconnectSocketService();
   },
-  emitMessage(type: string, args: any): void {
-    const {socket} = get()
-    socket?.emit(type, args);
-  }
+
+  emitMessage: (type: string, args: any) => {
+    emitMessageService(type, args);
+  },
 }));
+

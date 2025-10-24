@@ -87,9 +87,7 @@ api.interceptors.response.use(
 
       try {
         const refreshResponse = await refreshApi.post('/auth/refresh');
-        const accessToken  = refreshResponse.data.data;
-        console.log(accessToken);
-
+        const {accessToken}  = refreshResponse.data.data;
         // Update the token in the auth store.
         authStore.getState().setAccessToken(accessToken);
 

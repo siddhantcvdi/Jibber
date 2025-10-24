@@ -287,7 +287,7 @@ const getNewRefreshToken = asyncHandler(async (req, res) => {
 
   res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS);
 
-  return ResponseUtil.success(res, 'Token refreshed successfully', accessToken);
+  return ResponseUtil.success(res, 'Token refreshed successfully', {accessToken});
 });
 
 const logout = asyncHandler(async (req, res) => {
@@ -320,7 +320,7 @@ const whoami = asyncHandler(async (req: AuthRequest, res) => {
     return ResponseUtil.error(res, 'User not found', undefined, 404);
   }
 
-  return ResponseUtil.success(res, 'User found', user);
+  return ResponseUtil.success(res, 'User found', {user});
 });
 
 export {

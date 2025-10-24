@@ -110,7 +110,6 @@ export const authStore = create<AuthState>((set, get) => ({
     try {
       const response = await refreshApi.post('/auth/refresh');
       const { accessToken } = response.data.data;
-      console.log(accessToken);
       const userResponse = await api.get('/auth/me', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });

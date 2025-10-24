@@ -8,7 +8,7 @@ import {
 } from '@/validations/user.validations';
 import * as opaque from '@serenity-kit/opaque';
 import crypto from 'crypto';
-import { User } from '@/models/user.model';
+import { IUser, User } from '@/models/user.model';
 import config from '@/config';
 import { LoginState } from '@/models/loginState.model';
 import { AuthRequest, RefreshJwtPayload, UserType } from '@/types';
@@ -18,7 +18,7 @@ const hashRefreshToken = (token: string) => {
   return crypto.createHash('sha256').update(token).digest('hex');
 };
 
-const generateJwtTokens = (user: UserType) => {
+const generateJwtTokens = (user: IUser) => {
   const accessToken = jwt.sign(
     { _id: user._id, email: user.email },
     config.jwtAccessSecret,

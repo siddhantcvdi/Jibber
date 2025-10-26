@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import { IUser, User } from '@/models/user.model';
 import config from '@/config';
 import { LoginState } from '@/models/loginState.model';
-import { AuthRequest, RefreshJwtPayload, UserType } from '@/types';
+import { AuthRequest, RefreshJwtPayload } from '@/types';
 import jwt, { SignOptions } from 'jsonwebtoken';
 
 const hashRefreshToken = (token: string) => {

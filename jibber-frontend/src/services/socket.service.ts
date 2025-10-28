@@ -10,6 +10,8 @@ let socket: Socket | null = null;
 const setupMessageListener = () => {
   if (!socket) return;
 
+  // Remove listener to prevent event listener stacking
+  socket.off('receivedMessage');
   socket.on('receivedMessage', async (data: EncryptedMessage) => {
     try {
       const decryptedText = await decryptMessageService(data);
@@ -46,15 +48,17 @@ export const connectSocketService = (token: string | null) => {
 
 
   socket = io(VITE_BACKEND_URL, {
-    autoConnect: true,
-    auth: {
-      token,
-    },
+    // auth: { token },
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 2000,
   });
+
 
   socket.on('connect', () => {
     console.log('Socket connected ✅', socket?.id);
     useSocketStore.getState().setSocket(socket);
+    setupMessageListener();
   });
 
   socket.on('disconnect', () => {
@@ -64,23 +68,21 @@ export const connectSocketService = (token: string | null) => {
     useSocketStore.getState().setSocket(null);
   });
 
-  setupMessageListener();
-
   // We no longer return the socket, as it will be set reactively
 };
 
 export const disconnectSocketService = () => {
-  if (socket?.connected) {
+  if (socket) {
+    socket.removeAllListeners();
     socket.disconnect();
+    socket = null;
   }
-  socket = null;
-
   useSocketStore.getState().setSocket(null);
 };
 
-export const emitMessageService = (type: string, payload: unknown) => {
+export const emitMessageService = (type: string, ...args: unknown[]) => {
   if (socket?.connected) {
-    socket.emit(type, payload);
+    socket.emit(type, ...args);
   } else {
     console.error(`Socket not connected. Cannot emit message: ${type}`);
   }

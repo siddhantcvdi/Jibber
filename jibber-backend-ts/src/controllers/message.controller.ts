@@ -27,7 +27,7 @@ export const getMessages = asyncHandler(async (req: AuthRequest, res) => {
   }
 
   const messages = await Message.find({ chatId })
-    .sort({ createdAt: 1 });
+    .sort({ createdAt:  1 });
 
   return ResponseUtil.success(res, "Messages found", messages);
 });

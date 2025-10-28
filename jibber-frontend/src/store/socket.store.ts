@@ -34,8 +34,9 @@ export const useSocketStore = create<SocketState>((set) => ({
     disconnectSocketService();
   },
 
-  emitMessage: (type: string, args: any) => {
-    emitMessageService(type, args);
+  emitMessage: (type: string, ...args: any[]) => {
+    emitMessageService(type, ...args);
   },
+
 }));
 

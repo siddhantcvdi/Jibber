@@ -4,6 +4,7 @@ import app from '@/app';
 import config from '@/config';
 import { connectDB } from '@/config/database';
 import logger from '@/utils/logger';
+import initializeSocket from '@/socket';
 
 // Create HTTP server
 const server = createServer(app);
@@ -15,16 +16,12 @@ const io = new SocketIOServer(server, {
     methods: ['GET', 'POST'],
     credentials: true,
   },
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
-// Socket.IO basic connection handling
-io.on('connection', (socket) => {
-  logger.info(`User connected: ${socket.id}`);
-
-  socket.on('disconnect', () => {
-    logger.info(`User disconnected: ${socket.id}`);
-  });
-});
+// Initialize socket handlers
+initializeSocket(io);
 
 // Start server
 const startServer = async (): Promise<void> => {

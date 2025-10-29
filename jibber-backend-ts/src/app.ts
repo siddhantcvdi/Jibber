@@ -81,6 +81,7 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
+
 // API routes will be added here
 // app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);

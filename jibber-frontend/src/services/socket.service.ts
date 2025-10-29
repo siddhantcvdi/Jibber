@@ -41,17 +41,21 @@ export const connectSocketService = (token: string | null) => {
 
   // Prevent multiple connections
   if (socket && socket.connected) {
+    console.log('Socket already connected, reusing existing connection');
     return;
   }
 
   const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
+  console.log('Connecting to socket server:', VITE_BACKEND_URL);
 
-  socket = io(VITE_BACKEND_URL, {
-    // auth: { token },
+  socket = io('http://localhost:5000', {
+    auth: { token }, // Send token in auth
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 2000,
+    timeout: 20000,
+    transports: ['websocket', 'polling'],
   });
 
 
@@ -61,11 +65,22 @@ export const connectSocketService = (token: string | null) => {
     setupMessageListener();
   });
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected ❌');
+  socket.on('connect_error', (error) => {
+    console.error('Socket connection error:', error.message);
+    if (error.message === 'Authentication required' || error.message === 'Invalid token' || error.message === 'Token expired') {
+      console.error('Socket authentication failed. Please refresh your session.');
+    }
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.log('Socket disconnected ❌', reason);
     socket = null;
     // **FIX:** Update the store's state *when the event fires*
     useSocketStore.getState().setSocket(null);
+  });
+
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
   });
 
   // We no longer return the socket, as it will be set reactively

@@ -18,6 +18,7 @@ interface Config {
   rateLimitWindowMs: number;
   rateLimitMaxRequests: number;
   cookieOptions: CookieOptions;
+  redisUrl: string;
 }
 
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -47,6 +48,7 @@ const config: Config = {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     path: '/',
   },
+  redisUrl: process.env.UPSTASH_REDIS_REST_URL || 'redisUrl',
 };
 
 export default config;

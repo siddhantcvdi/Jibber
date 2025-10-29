@@ -3,10 +3,7 @@ import jwt from 'jsonwebtoken';
 import config from '@/config';
 import { User } from '@/models/user.model';
 import logger from '@/utils/logger';
-
-export interface AuthenticatedSocket extends Socket {
-  user?: { _id: string; email: string };
-}
+import { AuthenticatedSocket } from '@/socket/types';
 
 const socketAuthMiddleware = async (socket: AuthenticatedSocket, next: (err?: Error) => void) => {
   try {

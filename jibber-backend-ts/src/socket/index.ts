@@ -1,9 +1,8 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import jwt from 'jsonwebtoken';
-import config from '@/config';
 import logger from '@/utils/logger';
-import { User } from '@/models/user.model';
-import socketAuthMiddleware from '@/socket/middlewares/auth.middleware';
+import {socketAuthMiddleware} from '@/socket/middlewares';
+import { connectRedis } from '@/config/redis';
+import { createAdapter } from '@socket.io/redis-adapter';
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -15,6 +14,12 @@ interface AuthenticatedSocket extends Socket {
 export default function initializeSocket(io: SocketIOServer): void {
 
   io.use(socketAuthMiddleware);
+
+  const redis = connectRedis();
+  const pubClient = redis;
+  const subClient = redis.duplicate();
+
+  io.adapter(createAdapter(pubClient, subClient));
 
   io.on('connection', (socket: AuthenticatedSocket) => {
     const userId = socket.user?._id;

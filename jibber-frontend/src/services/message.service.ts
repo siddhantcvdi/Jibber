@@ -52,8 +52,8 @@ export const sendMessageService = async (
     // Construct the payload
     const messagePayload = {
       chatId: getSelectedChat()?._id,
-      sender: user._id,
-      receiver: getSelectedChatUser()?._id,
+      senderId: user._id,
+      receiverId: getSelectedChatUser()?._id,
       cipher: encryptedMessage.cipher,
       iv: encryptedMessage.iv,
       signature,
@@ -63,7 +63,7 @@ export const sendMessageService = async (
       timestamp: timestamp,
     };
 
-    emitMessageService('sendMessage', messagePayload);
+    emitMessageService('message:send', messagePayload);
   } catch (err) {
     console.error("Error Sending Message:", err);
     throw err;

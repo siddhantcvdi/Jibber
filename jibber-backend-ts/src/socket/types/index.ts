@@ -6,3 +6,16 @@ export interface AuthenticatedSocket extends Socket {
     email: string;
   };
 }
+
+export interface SendMessagePayload {
+  chatId: string;
+  senderId: string;
+  receiverId: string;
+  cipher: string;
+  iv: string;
+  signature: string;
+  senderPublicIdKey: string;
+  senderPublicSigningKey: string;
+  receiverPublicIdKey: string;
+  timestamp: string;
+}

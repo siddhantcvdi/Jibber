@@ -1,4 +1,4 @@
-import ChatList from '@/components/ChatList/ContactList.tsx';
+import ChatList from '@/components/Sidebar/Sidebar.tsx';
 import EmptyChatState from '../components/EmptyChatState.tsx';
 import { useMediaQuery } from 'react-responsive';
 import { Outlet, useLocation } from 'react-router-dom';

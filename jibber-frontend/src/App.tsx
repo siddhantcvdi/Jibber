@@ -9,7 +9,7 @@ import Settings from './components/Settings';
 import { Toaster } from '@/components/ui/sonner';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
-import ChatList from './components/ChatList/ContactList';
+import ChatList from '@/components/Sidebar/Sidebar.tsx';
 import { useAuthInitializer } from '@/hooks/authInitializer.hook.ts';
 import { useThemeManager } from '@/hooks/themeManager.hook.ts';
 import { useTabSession } from '@/hooks/tabSession.hook.ts';

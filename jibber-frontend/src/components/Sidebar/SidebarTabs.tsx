@@ -5,10 +5,10 @@ interface ChatListTabsProps {
 
 const tabs = [
   { id: 'all', label: 'All Chats' },
-  { id: 'find', label: 'Find Users' },
+  { id: 'requests', label: 'Requests' },
 ]
 
-const ChatListTabs = ({ activeTab, setActiveTab }: ChatListTabsProps) => {
+const SidebarTabs = ({ activeTab, setActiveTab }: ChatListTabsProps) => {
   const activeIndex = tabs.findIndex(tab => tab.id === activeTab);
 
   return (
@@ -38,4 +38,4 @@ const ChatListTabs = ({ activeTab, setActiveTab }: ChatListTabsProps) => {
   )
 }
 
-export default ChatListTabs
+export default SidebarTabs

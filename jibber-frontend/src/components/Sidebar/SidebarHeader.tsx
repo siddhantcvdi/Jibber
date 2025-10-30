@@ -11,7 +11,7 @@ import { Settings, MoreVertical, User, LogOut} from 'lucide-react';
 import authStore from '@/store/auth.store';
 
 
-const ChatListHeader = () => {
+const SidebarHeader = () => {
   const navigate = useNavigate();
   const user  = authStore(select=>select.user)
   const getInitial = (username: string) => {
@@ -78,4 +78,4 @@ const ChatListHeader = () => {
   )
 }
 
-export default ChatListHeader
+export default SidebarHeader

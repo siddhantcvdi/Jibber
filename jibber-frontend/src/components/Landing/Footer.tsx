@@ -1,4 +1,4 @@
-import jibber from '../assets/jibber-new.png';
+import jibber from '../../assets/jibber-new.png';
 
 const Footer = () => {
   return (

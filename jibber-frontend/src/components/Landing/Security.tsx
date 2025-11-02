@@ -1,7 +1,7 @@
 import { Lock, Shield, Eye, Key, Fingerprint, Send } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from '../ui/button.tsx';
 import { useNavigate } from 'react-router-dom';
-import DecryptedText from './ui/DecryptedText';
+import DecryptedText from '../ui/DecryptedText.tsx';
 
 const Security = () => {
   const navigate = useNavigate();

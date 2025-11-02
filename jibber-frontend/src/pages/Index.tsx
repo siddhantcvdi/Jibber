@@ -1,6 +1,6 @@
-import { Hero } from '@/components/Hero';
-import { Features } from '@/components/Features';
-import { CTA } from '@/components/CTA';
+import { Hero } from '@/components/Landing/Hero.tsx';
+import { Features } from '@/components/Landing/Features.tsx';
+import { CTA } from '@/components/Landing/CTA.tsx';
 import { Button } from '@/components/ui/button';
 import jibber from '../assets/jibber-new.png';
 import { useNavigate } from 'react-router-dom';
@@ -14,8 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Menu } from 'lucide-react';
-import Security from '@/components/Security';
-import Footer from '@/components/Footer';
+import Security from '@/components/Landing/Security.tsx';
+import Footer from '@/components/Landing/Footer.tsx';
 
 const Index = () => {
   const navigate = useNavigate();

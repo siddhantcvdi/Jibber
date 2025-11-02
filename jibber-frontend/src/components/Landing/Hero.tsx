@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import jibberold from '../assets/jibber.png';
+import { Button } from '@/components/ui/button.tsx';
+import jibberold from '../../assets/jibber.png';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -5,7 +5,7 @@ interface ChatListTabsProps {
 
 const tabs = [
   { id: 'all', label: 'All Chats' },
-  { id: 'requests', label: 'Requests' },
+  { id: 'find', label: 'Find Friends' },
 ]
 
 const SidebarTabs = ({ activeTab, setActiveTab }: ChatListTabsProps) => {

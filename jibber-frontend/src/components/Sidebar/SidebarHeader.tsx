@@ -14,6 +14,7 @@ import authStore from '@/store/auth.store';
 const SidebarHeader = () => {
   const navigate = useNavigate();
   const user  = authStore(select=>select.user)
+  const logoutUser = authStore(select => select.logoutUser)
   const getInitial = (username: string) => {
     return username ? username.charAt(0).toUpperCase() : 'U';
   };
@@ -64,7 +65,7 @@ const SidebarHeader = () => {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={()=>{}}
+                    onClick={()=> logoutUser()}
                     className="flex items-center gap-3 p-3 cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/50"
                   >
                     <LogOut size={16} />

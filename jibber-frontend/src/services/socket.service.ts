@@ -58,11 +58,20 @@ export const connectSocketService = (token: string | null) => {
     transports: ['websocket', 'polling'],
   });
 
+  const updateConnectionState = (connected: boolean) => {
+    useSocketStore.getState().setSocket(connected ? socket : null);
+  };
 
   socket.on('connect', () => {
     console.log('Socket connected ✅', socket?.id);
-    useSocketStore.getState().setSocket(socket);
+    updateConnectionState(true);
     setupMessageListener();
+  });
+
+  socket.on('reconnect', (attempt) => {
+    console.log('Socket reconnected 🔁 (attempt', attempt, ')');
+    setupMessageListener();
+    updateConnectionState(true);
   });
 
   socket.on('connect_error', (error) => {
@@ -74,8 +83,6 @@ export const connectSocketService = (token: string | null) => {
 
   socket.on('disconnect', (reason) => {
     console.log('Socket disconnected ❌', reason);
-    socket = null;
-    // **FIX:** Update the store's state *when the event fires*
     useSocketStore.getState().setSocket(null);
   });
 

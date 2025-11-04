@@ -15,13 +15,15 @@ export const registerMessageHandlers = (
   if(!userId) return;
 
   socket.on('message:send', async (payload: SendMessagePayload) => {
-    const receiverId = new Types.ObjectId(payload.receiverId);
-    const senderId = new Types.ObjectId(userId);
+    // const receiverId = new Types.ObjectId(payload.receiverId);
+    // const senderId = new Types.ObjectId(userId);
+    //
+    // const receiverExists = await User.exists({ _id: receiverId });
+    // if (!receiverExists) {
+    //   return socket.emit('error', { message: 'Receiver not found' });
+    // }
 
-    const receiverExists = await User.exists({ _id: receiverId });
-    if (!receiverExists) {
-      return socket.emit('error', { message: 'Receiver not found' });
-    }
+    console.log(payload.cipher);
 
 
   })

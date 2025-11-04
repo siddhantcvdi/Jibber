@@ -2,7 +2,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import {socketAuthMiddleware} from '@/socket/middlewares';
 import { connectRedis } from '@/config/redis';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { handleSocketConnection } from '@/socket/handlers';
+import { handleSocketConnection, registerMessageHandlers } from '@/socket/handlers';
 import { AuthenticatedSocket } from '@/socket/types';
 
 export default function initializeSocket(io: SocketIOServer): void {
@@ -18,5 +18,6 @@ export default function initializeSocket(io: SocketIOServer): void {
 
   io.on("connection", (socket: AuthenticatedSocket) => {
     handleSocketConnection(io, socket, pubClient);
+    registerMessageHandlers(io, socket, pubClient);
   });
 }

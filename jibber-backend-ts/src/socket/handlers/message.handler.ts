@@ -32,13 +32,11 @@ export const registerMessageHandlers = (
     if (receiverSocketId) {
       const receiverSocket = io.sockets.sockets.get(receiverSocketId);
       if(receiverSocket) {
-        receiverSocket.emit('message:send', payload);
-        return;
+        receiverSocket.emit('message:receive', payload);
       }
     }
 
     const msg = await Message.create(payload);
-    console.log(msg);
 
   })
 }

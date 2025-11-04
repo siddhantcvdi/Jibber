@@ -11,8 +11,8 @@ const setupMessageListener = () => {
   if (!socket) return;
 
   // Remove listener to prevent event listener stacking
-  socket.off('receivedMessage');
-  socket.on('receivedMessage', async (data: EncryptedMessage) => {
+  socket.off('message:receive');
+  socket.on('message:receive', async (data: EncryptedMessage) => {
     try {
       const decryptedText = await decryptMessageService(data);
       console.log('Decrypted message:', decryptedText);

@@ -45,11 +45,11 @@ export const connectSocketService = (token: string | null) => {
     return;
   }
 
-  const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+  const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
-  console.log('Connecting to socket server:', VITE_BACKEND_URL);
+  console.log('Connecting to socket server:', socketUrl);
 
-  socket = io('http://localhost:5000', {
+  socket = io(socketUrl, {
     auth: { token }, // Send token in auth
     reconnection: true,
     reconnectionAttempts: 5,

@@ -20,7 +20,7 @@ export const fetchMessagesService = async (chatId: string): Promise<Message[]> =
       encryptedMessages.map(async (message) => {
         return {
           text: await decryptMessageService(message),
-          isSentByMe: message.sender === user?._id,
+          isSentByMe: message.senderId === user?._id,
           timestamp: message.timestamp,
         };
       })

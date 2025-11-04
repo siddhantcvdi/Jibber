@@ -242,7 +242,7 @@ export const decryptMessageService = async (message: EncryptedMessage) => {
   const user = authStore.getState().user;
   if (!privateIdKey || !user) throw new Error('Cannot decrypt message: user or private key is missing.');
 
-  const otherPartyPublicIdKey = (message.sender === user._id)
+  const otherPartyPublicIdKey = (message.senderId === user._id)
     ? message.receiverPublicIdKey
     : message.senderPublicIdKey;
 

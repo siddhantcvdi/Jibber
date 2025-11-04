@@ -4,8 +4,8 @@ import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
 export interface IMessage extends Document {
   chatId: Types.ObjectId;
-  sender: Types.ObjectId;
-  receiver: Types.ObjectId;
+  senderId: Types.ObjectId;
+  receiverId: Types.ObjectId;
   cipher: string;
   iv: string;
   signature: string;
@@ -29,12 +29,12 @@ const messageSchema = new Schema<IMessage, MessageModel>(
       ref: 'Chat',
       required: true,
     },
-    sender: {
+    senderId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    receiver: {
+    receiverId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,

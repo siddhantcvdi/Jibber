@@ -1,7 +1,7 @@
 export interface EncryptedMessage{
   chatId: string,
-  sender: string,
-  receiver: string,
+  senderId: string,
+  receiverId: string,
   cipher: string,
   iv: string,
   senderPublicIdKey: string,

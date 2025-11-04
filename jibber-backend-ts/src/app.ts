@@ -90,10 +90,12 @@ app.get('/health', (req: Request, res: Response) => {
 import authRoutes from '@/routes/auth.route';
 import userRoutes from '@/routes/user.routes';
 import chatRoutes from '@/routes/chat.routes';
+import messageRoutes from '@/routes/message.route';
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/chats', chatRoutes);
+app.use('/api/v1/messages', messageRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

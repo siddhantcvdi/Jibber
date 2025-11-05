@@ -18,14 +18,18 @@ const setupMessageListener = () => {
       console.log('Decrypted message:', decryptedText);
 
       // 2. Get state from the relevant stores.
-      const { getSelectedChat } = useChatStore.getState();
+      const { getSelectedChat, incUnreadCount } = useChatStore.getState();
       const { addReceivedMessage } = useMessageStore.getState();
 
       if (getSelectedChat()?._id === data.chatId) {
         addReceivedMessage(decryptedText);
+      }else{
+        incUnreadCount(data.chatId);
+
       }
 
       // later - add a notification for messages received in non-active chats.
+
 
     } catch (error) {
       console.error('Failed to decrypt and process received message:', error);
@@ -103,6 +107,7 @@ export const disconnectSocketService = () => {
 };
 
 export const emitMessageService = (type: string, ...args: unknown[]) => {
+    // socket.emit(type, ...args);
   if (socket?.connected) {
     socket.emit(type, ...args);
   } else {

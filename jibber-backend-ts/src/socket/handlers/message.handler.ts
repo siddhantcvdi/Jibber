@@ -4,6 +4,7 @@ import { Redis } from 'ioredis';
 import { Types } from 'mongoose';
 import { User } from '@/models/user.model';
 import { Message } from '@/models/message.model';
+import { Chat } from '@/models/chat.model';
 
 
 
@@ -37,6 +38,9 @@ export const registerMessageHandlers = (
     }
 
     const msg = await Message.create(payload);
-
+    const chatId = await Chat.findByUsers(receiverId, senderId);
+    if(chatId) {
+      await chatId.incUnread(receiverId);
+    }
   })
 }

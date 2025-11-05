@@ -16,8 +16,8 @@ const io = new SocketIOServer(server, {
     methods: ['GET', 'POST'],
     credentials: true,
   },
-  pingTimeout: 60000,
-  pingInterval: 25000,
+  pingInterval: 15000,
+  pingTimeout: 120000
 });
 
 // Initialize socket handlers

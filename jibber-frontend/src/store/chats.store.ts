@@ -1,4 +1,4 @@
-import {create} from 'zustand'
+import { create } from 'zustand'
 import api from "@/services/api.ts";
 import type { EncryptedMessage } from '@/types';
 
@@ -20,7 +20,7 @@ interface Chat {
   updatedAt: string;
 }
 
-interface ChatStore{
+interface ChatStore {
   isLoading: boolean,
   chats: Chat[],
   selectedChatId: string,
@@ -29,7 +29,8 @@ interface ChatStore{
   clearSelection: () => void,
   getSelectedChat: () => Chat | null,
   getSelectedChatUser: () => ChatUser | null,
-  doesChatExist: (userId: string) => string | undefined
+  doesChatExist: (userId: string) => string | undefined,
+  incUnreadCount: (chatId: string) => void,
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -44,14 +45,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       set({ chats: response.data.data || [] });
     } catch (error) {
       console.error('Error fetching chats:', error);
-      set({ chats: [], isLoading: false })
+      set({ chats: [], isLoading: false });
     } finally {
       set({ isLoading: false });
     }
   },
 
   selectChat: (chatId: string) => {
-    set({ selectedChatId: chatId });
+    const chats = get().chats.map(chat =>
+      chat._id === chatId ? { ...chat, unreadCount: 0 } : chat
+    );
+    set({ selectedChatId: chatId, chats });
   },
 
   clearSelection: () => {
@@ -59,7 +63,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   getSelectedChat: () => {
-    const { chats, selectedChatId } = get(); 
+    const { chats, selectedChatId } = get();
     return chats.find(chat => chat._id === selectedChatId) || null;
   },
 
@@ -67,9 +71,18 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     const selectedChat = get().getSelectedChat();
     return selectedChat?.details || null;
   },
+
   doesChatExist: (userId) => {
-    const { chats } = get(); 
+    const { chats } = get();
     const chat = chats.find(chat => chat.details._id === userId);
-    return chat?._id
+    return chat?._id;
+  },
+
+  incUnreadCount: (chatId: string) => {
+    const chats = get().chats.map(chat =>
+      chat._id === chatId ? { ...chat, unreadCount:  (chat.unreadCount || 0)+1} : chat
+    );
+    set({ chats });
   }
 }));
+

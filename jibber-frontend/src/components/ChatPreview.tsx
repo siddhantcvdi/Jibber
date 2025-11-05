@@ -89,7 +89,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
             <span
               className={`truncate text-xs ${unread > 0 ? ' text-foreground' : 'text-muted-foreground'}`}
             > 
-              {(lastEncryptedMessage?.sender == user?._id )?'You: ': ''}
+              {(lastEncryptedMessage?.senderId == user?._id )?'You: ': ''}
               {lastChatText || 'No messages yet'}
             </span>
           </div>

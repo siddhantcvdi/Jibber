@@ -43,6 +43,18 @@ export const connectSocketService = (token: string | null) => {
     return;
   }
 
+  // If we have an existing socket that is not connected, fully cleanup it
+  if (socket && !socket.connected) {
+    try {
+      socket.removeAllListeners();
+      socket.disconnect();
+    } catch (err) {
+      console.warn('Error cleaning up previous socket instance', err);
+    }
+    socket = null;
+    useSocketStore.getState().setSocket(null);
+  }
+
   // Prevent multiple connections
   if (socket && socket.connected) {
     console.log('Socket already connected, reusing existing connection');
@@ -87,7 +99,16 @@ export const connectSocketService = (token: string | null) => {
 
   socket.on('disconnect', (reason) => {
     console.log('Socket disconnected ❌', reason);
+    // ensure local references are cleaned up when a disconnect happens
     useSocketStore.getState().setSocket(null);
+    try {
+      if (socket && !socket.connected) {
+        socket.removeAllListeners();
+        socket = null;
+      }
+    } catch (err) {
+      console.warn('Error while cleaning up socket after disconnect', err);
+    }
   });
 
   socket.on('error', (error) => {
@@ -107,11 +128,23 @@ export const disconnectSocketService = () => {
 };
 
 export const emitMessageService = (type: string, ...args: unknown[]) => {
-    // socket.emit(type, ...args);
   if (socket?.connected) {
     socket.emit(type, ...args);
-  } else {
-    console.error(`Socket not connected. Cannot emit message: ${type}`);
+    return;
   }
+
+  // If socket exists but is not connected, attempt to reconnect once and then surface the error
+  if (socket && !socket.connected) {
+    console.warn(`Socket not connected, attempting to reconnect before emitting: ${type}`);
+    try {
+      socket.connect();
+    } catch (err) {
+      console.error('Failed to call socket.connect():', err);
+    }
+    console.error(`Socket not connected. Cannot emit message now: ${type}`);
+    return;
+  }
+
+  console.error(`Socket not initialized. Cannot emit message: ${type}`);
 };
 

@@ -3,6 +3,7 @@ import { useNavigate} from 'react-router-dom';
 import { useChatStore } from '@/store/chats.store';
 import type { EncryptedMessage } from '@/types';
 import authStore from '@/store/auth.store';
+import useCryptoStore from '@/store/crypto.store';
 import { decryptMessageService } from '@/services/crypto.service.ts';
 
 interface ChatPreviewProps {
@@ -25,13 +26,14 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
   const navigate = useNavigate();
   const selectChat = useChatStore(select => select.selectChat)
   const user = authStore(select => select.user)
+  const privateIdKey = useCryptoStore(state => state.privateIdKey);
   const [lastChatText, setLastChatText] = useState<string>('');
 
   useEffect(() => {
     const decryptLastMessage = async () => {
-      if (lastEncryptedMessage) {
+      if (lastEncryptedMessage && user?._id && privateIdKey) {
         try {
-          const decrypted = await decryptMessageService(lastEncryptedMessage);
+          const decrypted = await decryptMessageService(lastEncryptedMessage, privateIdKey, user._id);
           setLastChatText(decrypted);
         } catch (error) {
           console.error('Failed to decrypt message:', error);
@@ -42,7 +44,7 @@ const ChatPreview: React.FC<ChatPreviewProps> = ({
       }
     };
     decryptLastMessage();
-  }, [lastEncryptedMessage]);
+  }, [lastEncryptedMessage, user, privateIdKey]);
 
   const handleNavigate = () => {
     selectChat(chatId);

@@ -4,6 +4,8 @@ import { decryptMessageService } from './crypto.service';
 import { useMessageStore } from '@/store/message.store';
 import { useChatStore } from '@/store/chats.store';
 import { useSocketStore } from '@/store/socket.store'; // Import the store
+import authStore from '@/store/auth.store';
+import useCryptoStore from '@/store/crypto.store';
 
 let socket: Socket | null = null;
 
@@ -14,7 +16,12 @@ const setupMessageListener = () => {
   socket.off('message:receive');
   socket.on('message:receive', async (data: EncryptedMessage) => {
     try {
-      const decryptedText = await decryptMessageService(data);
+      const { user } = authStore.getState();
+      const { privateIdKey } = useCryptoStore.getState();
+
+      if (!user || !privateIdKey) return;
+
+      const decryptedText = await decryptMessageService(data, privateIdKey, user._id);
       console.log('Decrypted message:', decryptedText);
 
       // 2. Get state from the relevant stores.
@@ -23,7 +30,7 @@ const setupMessageListener = () => {
 
       if (getSelectedChat()?._id === data.chatId) {
         addReceivedMessage(decryptedText);
-      }else{
+      } else {
         incUnreadCount(data.chatId);
 
       }

@@ -15,12 +15,17 @@ export const fetchMessagesService = async (chatId: string): Promise<Message[]> =
     const res = await api.get(`/messages/${chatId}`);
     const encryptedMessages: EncryptedMessage[] = res.data.data;
     const { user } = authStore.getState();
+    const { privateIdKey } = useCryptoStore.getState();
+
+    if (!user || !privateIdKey) {
+      throw new Error('User or Private Key missing');
+    }
 
     const decryptedMessages = await Promise.all(
       encryptedMessages.map(async (message) => {
         return {
-          text: await decryptMessageService(message),
-          isSentByMe: message.senderId === user?._id,
+          text: await decryptMessageService(message, privateIdKey, user._id),
+          isSentByMe: message.senderId === user._id,
           timestamp: message.timestamp,
         };
       })

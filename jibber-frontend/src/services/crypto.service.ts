@@ -1,8 +1,7 @@
 import sodium from 'libsodium-wrappers-sumo';
 import Dexie from 'dexie';
-import useCryptoStore from '../store/crypto.store';
-import authStore from '../store/auth.store';
-import type {User} from '@/types'
+
+import type { User } from '@/types'
 import type { EncryptedMessage } from '@/types';
 
 // --- DATABASE SETUP ---
@@ -55,7 +54,7 @@ const _deriveAesKey = async (
 
   return crypto.subtle.importKey(
     'raw',
-    new Uint8Array(aesKeyMaterial),
+    new Uint8Array(aesKeyMaterial) as unknown as BufferSource,
     'AES-GCM',
     false,
     ['encrypt', 'decrypt']
@@ -112,7 +111,7 @@ export const encryptKeyService = async (
   };
 };
 
-  export const decryptKeysService = async (
+export const decryptKeysService = async (
   encPrivateIdKey: string,
   encPrivateSigningKey: string
 ): Promise<{ privateIdKey: string; privateSigningKey: string }> => {
@@ -216,7 +215,7 @@ export const encryptMessageService = async (
 
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
-    aesKeyMaterial,
+    aesKeyMaterial as unknown as BufferSource,
     'AES-GCM',
     false,
     ['encrypt', 'decrypt']
@@ -225,9 +224,9 @@ export const encryptMessageService = async (
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encodedMessage = new TextEncoder().encode(message);
   const ciphertext = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: 'AES-GCM', iv: iv as unknown as BufferSource },
     cryptoKey,
-    encodedMessage
+    encodedMessage as unknown as BufferSource
   );
 
   return {
@@ -237,21 +236,23 @@ export const encryptMessageService = async (
 };
 
 
-export const decryptMessageService = async (message: EncryptedMessage) => {
-  const { privateIdKey } = useCryptoStore.getState();
-  const user = authStore.getState().user;
-  if (!privateIdKey || !user) throw new Error('Cannot decrypt message: user or private key is missing.');
+export const decryptMessageService = async (
+  message: EncryptedMessage,
+  privateIdKey: string,
+  ownId: string
+) => {
+  if (!privateIdKey || !ownId) throw new Error('Cannot decrypt message: user or private key is missing.');
 
-  const otherPartyPublicIdKey = (message.senderId === user._id)
+  const otherPartyPublicIdKey = (message.senderId === ownId)
     ? message.receiverPublicIdKey
     : message.senderPublicIdKey;
 
   const cryptoKey = await _deriveAesKey(privateIdKey, otherPartyPublicIdKey);
 
   const decryptedBuffer = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: base64toRaw(message.iv) },
+    { name: 'AES-GCM', iv: base64toRaw(message.iv) as unknown as BufferSource },
     cryptoKey,
-    base64toRaw(message.cipher)
+    base64toRaw(message.cipher) as unknown as BufferSource
   );
 
   return new TextDecoder().decode(new Uint8Array(decryptedBuffer));

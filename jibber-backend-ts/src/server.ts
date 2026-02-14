@@ -17,7 +17,7 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
   pingInterval: 15000,
-  pingTimeout: 120000
+  pingTimeout: 120000,
 });
 
 // Initialize socket handlers
@@ -70,3 +70,4 @@ process.on('SIGTERM', () => {
 startServer();
 
 export { io };
+

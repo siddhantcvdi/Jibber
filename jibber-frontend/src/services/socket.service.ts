@@ -21,7 +21,11 @@ const setupMessageListener = () => {
 
       if (!user || !privateIdKey) return;
 
-      const decryptedText = await decryptMessageService(data, privateIdKey, user._id);
+      const decryptedText = await decryptMessageService(
+        data,
+        privateIdKey,
+        user._id
+      );
       console.log('Decrypted message:', decryptedText);
 
       // 2. Get state from the relevant stores.
@@ -30,18 +34,23 @@ const setupMessageListener = () => {
 
       if (getSelectedChat()?._id === data.chatId) {
         addReceivedMessage(decryptedText);
+        // User is viewing this chat — mark as read in DB
+        emitMarkRead(data.chatId);
       } else {
         incUnreadCount(data.chatId);
-
       }
 
       // later - add a notification for messages received in non-active chats.
-
-
     } catch (error) {
       console.error('Failed to decrypt and process received message:', error);
     }
   });
+};
+
+export const emitMarkRead = (chatId: string) => {
+  if (socket?.connected) {
+    socket.emit('chat:markRead', { chatId });
+  }
 };
 
 export const connectSocketService = (token: string | null) => {
@@ -99,8 +108,14 @@ export const connectSocketService = (token: string | null) => {
 
   socket.on('connect_error', (error) => {
     console.error('Socket connection error:', error.message);
-    if (error.message === 'Authentication required' || error.message === 'Invalid token' || error.message === 'Token expired') {
-      console.error('Socket authentication failed. Please refresh your session.');
+    if (
+      error.message === 'Authentication required' ||
+      error.message === 'Invalid token' ||
+      error.message === 'Token expired'
+    ) {
+      console.error(
+        'Socket authentication failed. Please refresh your session.'
+      );
     }
   });
 
@@ -142,7 +157,9 @@ export const emitMessageService = (type: string, ...args: unknown[]) => {
 
   // If socket exists but is not connected, attempt to reconnect once and then surface the error
   if (socket && !socket.connected) {
-    console.warn(`Socket not connected, attempting to reconnect before emitting: ${type}`);
+    console.warn(
+      `Socket not connected, attempting to reconnect before emitting: ${type}`
+    );
     try {
       socket.connect();
     } catch (err) {
@@ -154,4 +171,3 @@ export const emitMessageService = (type: string, ...args: unknown[]) => {
 
   console.error(`Socket not initialized. Cannot emit message: ${type}`);
 };
-

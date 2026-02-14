@@ -44,7 +44,7 @@ const config: Config = {
   cookieOptions: {
     httpOnly: true,
     secure: nodeEnv === 'production',
-    sameSite: 'strict',
+    sameSite: nodeEnv === 'production' ? 'none' : 'strict',
     maxAge: 30 * 24 * 60 * 60 * 1000,
     path: '/',
   },
@@ -52,3 +52,4 @@ const config: Config = {
 };
 
 export default config;
+

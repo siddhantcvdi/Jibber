@@ -6,7 +6,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
 
 import config from '@/config';
 import logger from '@/utils/logger';
@@ -21,6 +21,9 @@ const logsDir = path.join(process.cwd(), 'logs');
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
+
+// Trust proxy (required for secure cookies behind load balancers like Render/Heroku)
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
@@ -81,7 +84,6 @@ app.get('/health', (req: Request, res: Response) => {
   });
 });
 
-
 // API routes will be added here
 // app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);
@@ -104,3 +106,4 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 export default app;
+

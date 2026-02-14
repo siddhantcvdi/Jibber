@@ -32,6 +32,7 @@ interface ChatStore {
   getSelectedChatUser: () => ChatUser | null;
   doesChatExist: (userId: string) => string | undefined;
   incUnreadCount: (chatId: string) => void;
+  updateLastMessage: (chatId: string, message: EncryptedMessage) => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -85,6 +86,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       chat._id === chatId
         ? { ...chat, unreadCount: (chat.unreadCount || 0) + 1 }
         : chat
+    );
+    set({ chats });
+  },
+
+  updateLastMessage: (chatId: string, message: EncryptedMessage) => {
+    const chats = get().chats.map((chat) =>
+      chat._id === chatId ? { ...chat, lastMessage: message } : chat
     );
     set({ chats });
   },

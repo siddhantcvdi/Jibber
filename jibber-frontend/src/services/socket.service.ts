@@ -29,8 +29,12 @@ const setupMessageListener = () => {
       console.log('Decrypted message:', decryptedText);
 
       // 2. Get state from the relevant stores.
-      const { getSelectedChat, incUnreadCount } = useChatStore.getState();
+      const { getSelectedChat, incUnreadCount, updateLastMessage } =
+        useChatStore.getState();
       const { addReceivedMessage } = useMessageStore.getState();
+
+      // Always update the chat preview with the latest message
+      updateLastMessage(data.chatId, data);
 
       if (getSelectedChat()?._id === data.chatId) {
         addReceivedMessage(decryptedText);

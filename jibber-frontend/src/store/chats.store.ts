@@ -33,6 +33,8 @@ interface ChatStore {
   doesChatExist: (userId: string) => string | undefined;
   incUnreadCount: (chatId: string) => void;
   updateLastMessage: (chatId: string, message: EncryptedMessage) => void;
+  deleteChat: (chatId: string) => Promise<void>;
+  removeChat: (chatId: string) => void;
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -95,5 +97,21 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       chat._id === chatId ? { ...chat, lastMessage: message } : chat
     );
     set({ chats });
+  },
+
+  deleteChat: async (chatId: string) => {
+    try {
+      await api.delete(`/chats/${chatId}`);
+      get().removeChat(chatId);
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    }
+  },
+
+  removeChat: (chatId: string) => {
+    const chats = get().chats.filter((chat) => chat._id !== chatId);
+    const selectedChatId =
+      get().selectedChatId === chatId ? '' : get().selectedChatId;
+    set({ chats, selectedChatId });
   },
 }));

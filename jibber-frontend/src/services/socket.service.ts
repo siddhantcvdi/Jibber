@@ -6,7 +6,7 @@ import { useChatStore } from '@/store/chats.store';
 import { useSocketStore } from '@/store/socket.store'; // Import the store
 import authStore from '@/store/auth.store';
 import useCryptoStore from '@/store/crypto.store';
-
+import { toast } from 'sonner';
 let socket: Socket | null = null;
 
 const setupMessageListener = () => {
@@ -42,15 +42,35 @@ const setupMessageListener = () => {
         emitMarkRead(data.chatId);
       } else {
         incUnreadCount(data.chatId);
-      }
 
-      // later - add a notification for messages received in non-active chats.
+        // Show toast for messages in non-active chats
+        const senderChat = useChatStore
+          .getState()
+          .chats.find((c) => c._id === data.chatId);
+        const senderName = senderChat?.details?.username || 'New message';
+        const preview =
+          decryptedText.length > 50
+            ? decryptedText.slice(0, 50) + '…'
+            : decryptedText;
+        toast.message(senderName, { description: preview });
+      }
     } catch (error) {
       console.error('Failed to decrypt and process received message:', error);
     }
   });
-};
 
+  // Listen for new chats created by other users
+  socket.off('chat:created');
+  socket.on('chat:created', () => {
+    useChatStore.getState().fetchChats();
+  });
+
+  // Listen for chats deleted by the other user
+  socket.off('chat:deleted');
+  socket.on('chat:deleted', (data: { chatId: string }) => {
+    useChatStore.getState().removeChat(data.chatId);
+  });
+};
 export const emitMarkRead = (chatId: string) => {
   if (socket?.connected) {
     socket.emit('chat:markRead', { chatId });

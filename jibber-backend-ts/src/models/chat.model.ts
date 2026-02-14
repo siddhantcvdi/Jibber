@@ -1,6 +1,5 @@
 import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
-
 export interface IChat extends Document {
   users: Types.ObjectId[];
   unreadCounts: Map<string, number>;
@@ -15,7 +14,10 @@ export interface IChat extends Document {
 }
 
 export interface ChatModel extends Model<IChat> {
-  findByUsers(id1: Types.ObjectId | string, id2: Types.ObjectId | string): Promise<IChat | null>;
+  findByUsers(
+    id1: Types.ObjectId | string,
+    id2: Types.ObjectId | string
+  ): Promise<IChat | null>;
 }
 
 const chatSchema = new Schema<IChat, ChatModel>(
@@ -50,7 +52,9 @@ chatSchema.pre('validate', function (next) {
   next();
 });
 
-chatSchema.index({ users: 1 }, { unique: true });
+// Non-unique index for query performance. Pair uniqueness is enforced
+// by findByUsers check in the controller + pre-validate hook.
+chatSchema.index({ users: 1 });
 
 chatSchema.statics.findByUsers = function (id1, id2) {
   const userId1 = Types.ObjectId.isValid(id1) ? new Types.ObjectId(id1) : id1;
@@ -80,5 +84,5 @@ chatSchema.methods.getUnreadCount = function (userId: Types.ObjectId) {
   return this.unreadCounts.get(userId.toString()) || 0;
 };
 
-
 export const Chat = mongoose.model<IChat, ChatModel>('Chat', chatSchema);
+

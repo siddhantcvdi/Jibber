@@ -4,45 +4,77 @@ import { ResponseUtil } from '@/utils/response';
 import { User } from '@/models/user.model';
 import { Chat } from '@/models/chat.model';
 import { Message } from '@/models/message.model';
-import mongoose, {Types} from 'mongoose';
+import mongoose, { Types } from 'mongoose';
+import { io } from '@/server';
+import { getRedis } from '@/config/redis';
 
 export const createChat = asyncHandler(async (req: AuthRequest, res) => {
   const users: string[] = req.body?.users;
 
   if (!Array.isArray(users) || users.length !== 2 || !users[0] || !users[1]) {
-    return ResponseUtil.error(res, "Invalid users for chat session", undefined, 400);
+    return ResponseUtil.error(
+      res,
+      'Invalid users for chat session',
+      undefined,
+      400
+    );
   }
 
   if (users[0] === users[1]) {
-    return ResponseUtil.error(res, "You cannot chat with yourself", undefined, 400);
+    return ResponseUtil.error(
+      res,
+      'You cannot chat with yourself',
+      undefined,
+      400
+    );
   }
 
   const [user1, user2] = await Promise.all([
     User.findById(users[0]),
-    User.findById(users[1])
+    User.findById(users[1]),
   ]);
 
   if (!user1 || !user2) {
-    return ResponseUtil.error(res, "One or both users not found", undefined, 404);
+    return ResponseUtil.error(
+      res,
+      'One or both users not found',
+      undefined,
+      404
+    );
   }
 
   const existingChat = await Chat.findByUsers(users[0], users[1]);
   if (existingChat) {
-    return ResponseUtil.error(res, "Chat already exists", undefined, 409);
+    return ResponseUtil.success(res, 'Chat already exists', existingChat);
   }
 
   const newChat = await Chat.create({
-    users: [user1._id, user2._id]
+    users: [user1._id, user2._id],
   });
 
-  return ResponseUtil.success(res, "New chat created successfully", newChat);
+  // Notify the other user via socket so their chat list updates
+  const currentUserId = req.user?._id;
+  const otherUserId = users.find((id) => id !== currentUserId);
+  if (otherUserId) {
+    try {
+      const redis = getRedis();
+      const otherSocketId = await redis.get(`user:${otherUserId}:socket`);
+      if (otherSocketId) {
+        io.to(otherSocketId).emit('chat:created', { chatId: newChat._id });
+      }
+    } catch (_) {
+      // Non-critical — the other user will see the chat on next refresh
+    }
+  }
+
+  return ResponseUtil.success(res, 'New chat created successfully', newChat);
 });
 
 export const getAllChatsOfUser = asyncHandler(async (req: AuthRequest, res) => {
   const currentUserId = req.user?._id;
 
   if (!currentUserId) {
-    return ResponseUtil.error(res, "User not authenticated", undefined, 401);
+    return ResponseUtil.error(res, 'User not authenticated', undefined, 401);
   }
 
   const chats = await Chat.aggregate([
@@ -52,10 +84,10 @@ export const getAllChatsOfUser = asyncHandler(async (req: AuthRequest, res) => {
     // Lookup other user details
     {
       $lookup: {
-        from: "users",
-        localField: "users",
-        foreignField: "_id",
-        as: "users",
+        from: 'users',
+        localField: 'users',
+        foreignField: '_id',
+        as: 'users',
         pipeline: [
           {
             $project: {
@@ -63,58 +95,113 @@ export const getAllChatsOfUser = asyncHandler(async (req: AuthRequest, res) => {
               profilePhoto: 1,
               email: 1,
               publicIdKey: 1,
-              publicSigningKey: 1
-            }
-          }
-        ]
-      }
+              publicSigningKey: 1,
+            },
+          },
+        ],
+      },
     },
 
     // Lookup the last message (only the latest one)
     {
       $lookup: {
-        from: "messages",
-        let: { chatId: "$_id" },
+        from: 'messages',
+        let: { chatId: '$_id' },
         pipeline: [
-          { $match: { $expr: { $eq: ["$chatId", "$$chatId"] } } },
+          { $match: { $expr: { $eq: ['$chatId', '$$chatId'] } } },
           { $sort: { createdAt: -1 } },
-          { $limit: 1 }
+          { $limit: 1 },
         ],
-        as: "lastMessage"
-      }
+        as: 'lastMessage',
+      },
     },
 
     // Flatten the lastMessage array
-    { $unwind: { path: "$lastMessage", preserveNullAndEmptyArrays: true } },
+    { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
 
     // Add computed fields (like unreadCount)
     {
       $addFields: {
         unreadCount: {
           $ifNull: [
-            { $getField: { field: { $toString: currentUserId }, input: "$unreadCounts" } },
-            0
-          ]
-        }
-      }
+            {
+              $getField: {
+                field: { $toString: currentUserId },
+                input: '$unreadCounts',
+              },
+            },
+            0,
+          ],
+        },
+      },
     },
 
     // Sort by most recently updated chats
-    { $sort: { updatedAt: -1 } }
+    { $sort: { updatedAt: -1 } },
   ]);
 
   // Format the other user and response
-  const formattedChats = chats.map(chat => {
-    const otherUser = chat.users.find((u: Types.ObjectId) => u._id.toString() !== currentUserId.toString());
+  const formattedChats = chats.map((chat) => {
+    const otherUser = chat.users.find(
+      (u: Types.ObjectId) => u._id.toString() !== currentUserId.toString()
+    );
     return {
       _id: chat._id,
       details: otherUser,
       lastMessage: chat.lastMessage,
       unreadCount: chat.unreadCount || 0,
       createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt
+      updatedAt: chat.updatedAt,
     };
   });
 
-  return ResponseUtil.success(res, "Chats retrieved successfully", formattedChats);
+  return ResponseUtil.success(
+    res,
+    'Chats retrieved successfully',
+    formattedChats
+  );
 });
+
+export const deleteChat = asyncHandler(async (req: AuthRequest, res) => {
+  const chatId = req.params?.chatId;
+  const currentUserId = req.user?._id;
+
+  if (!chatId || !mongoose.Types.ObjectId.isValid(chatId)) {
+    return ResponseUtil.error(res, 'Invalid chatId', undefined, 400);
+  }
+
+  const chat = await Chat.findById(chatId);
+  if (!chat) {
+    return ResponseUtil.error(res, 'Chat not found', undefined, 404);
+  }
+
+  // Verify user is a participant
+  if (!chat.users.some((id) => id.toString() === currentUserId)) {
+    return ResponseUtil.error(res, 'Not authorized', undefined, 403);
+  }
+
+  // Delete all messages in this chat
+  await Message.deleteMany({ chatId: chat._id });
+
+  // Get the other user before deleting
+  const otherUserId = chat.users.find((id) => id.toString() !== currentUserId);
+
+  // Delete the chat
+  await Chat.findByIdAndDelete(chatId);
+
+  // Notify the other user via socket
+  if (otherUserId) {
+    try {
+      const redis = getRedis();
+      const otherSocketId = await redis.get(`user:${otherUserId}:socket`);
+      if (otherSocketId) {
+        io.to(otherSocketId).emit('chat:deleted', { chatId });
+      }
+    } catch (_) {
+      // Non-critical
+    }
+  }
+
+  return ResponseUtil.success(res, 'Chat deleted successfully');
+});
+
